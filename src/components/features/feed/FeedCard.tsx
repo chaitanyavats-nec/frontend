@@ -19,7 +19,7 @@ export function FeedCard({ post, showProvenance = false, isReply = false }: Feed
     const timestamp = new Date(dateString).getTime();
     const now = Date.now();
     const diffInSeconds = Math.floor((now - timestamp) / 1000);
-    
+
     if (diffInSeconds < 60) return `${diffInSeconds}s ago`;
     const diffInMinutes = Math.floor(diffInSeconds / 60);
     if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
@@ -47,7 +47,7 @@ export function FeedCard({ post, showProvenance = false, isReply = false }: Feed
           {/* Header Row */}
           <div className="flex items-center justify-between gap-2 mb-1">
             <div className="flex items-center gap-1.5 truncate">
-              <Link 
+              <Link
                 href={`/profile/${post.authorDid}`}
                 className="font-semibold text-foreground hover:underline truncate"
               >
@@ -57,7 +57,7 @@ export function FeedCard({ post, showProvenance = false, isReply = false }: Feed
                 {post.authorDid.substring(0, 16)}...
               </span>
             </div>
-            
+
             <span className="text-xs text-muted-foreground shrink-0 whitespace-nowrap">
               {getRelativeTime(post.timestamp)}
             </span>
@@ -83,10 +83,10 @@ export function FeedCard({ post, showProvenance = false, isReply = false }: Feed
           <div className="flex items-center justify-between pt-2 border-t border-border mt-3">
             <div>
               {post.provenance && (showProvenance || true) && (
-                <ProvenanceTag 
-                  provenance={post.provenance} 
-                  postId={post.id} 
-                  expanded={false} 
+                <ProvenanceTag
+                  provenance={post.provenance}
+                  postId={post.id}
+                  expanded={false}
                 />
               )}
             </div>
@@ -96,7 +96,7 @@ export function FeedCard({ post, showProvenance = false, isReply = false }: Feed
                 <ChatCircle size={16} />
                 <span>{post.replyCount || 0}</span>
               </button>
-              
+
               <button className="flex items-center gap-1.5 hover:text-primary transition-colors text-sm">
                 <GitCommit size={16} />
                 <span className="sr-only">Derive</span>
