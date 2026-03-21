@@ -1,0 +1,6 @@
+src/app/(app)/post/[id]/page.tsx(55,76): error TS2322: Type '{ key: string; post: Post; showProvenance: false; isReply: true; }' is not assignable to type 'IntrinsicAttributes & FeedCardProps'.
+  Property 'isReply' does not exist on type 'IntrinsicAttributes & FeedCardProps'.
+src/components/features/feed/FeedCard.tsx(4,37): error TS2307: Cannot find module 'date-fns' or its corresponding type declarations.
+src/components/features/feed/FeedCard.tsx(5,22): error TS2305: Module '"phosphor-react"' has no exported member 'LinkIcon'.
+src/components/features/governance/GovernanceProposal.tsx(4,10): error TS2305: Module '"phosphor-react"' has no exported member 'Gavel'.
+src/components/features/governance/GovernanceProposal.tsx(116,42): error TS1501: This regular expression flag is only available when targeting 'es2018' or later.
