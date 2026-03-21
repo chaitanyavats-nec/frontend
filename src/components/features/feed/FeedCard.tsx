@@ -10,7 +10,7 @@ interface FeedCardProps {
   isReply?: boolean;
 }
 
-export function FeedCard({ post, showProvenance = false, isReply = false }: FeedCardProps) {
+export function FeedCard({ post, showProvenance = false }: FeedCardProps) {
   const getInitials = (name: string) => {
     return name?.substring(0, 2).toUpperCase() || '??';
   };
