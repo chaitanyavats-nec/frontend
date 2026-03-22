@@ -1,0 +1,193 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* White / Neutral Scale */
+    --white-0: 255 255 255;
+    --white-50: 250 250 250;
+    --white-100: 245 245 245;
+    --white-200: 229 229 229;
+    --white-300: 212 212 212;
+    --white-400: 163 163 163;
+    --white-500: 115 115 115;
+    --white-600: 82 82 82;
+    --white-700: 64 64 64;
+    --white-800: 38 38 38;
+    --white-900: 23 23 23;
+    --white-1000: 0 0 0;
+
+    /* Paper Scale */
+    --paper-0: 255 255 255;
+    --paper-50: 252 250 248;
+    --paper-100: 245 242 236;
+    --paper-200: 232 228 218;
+    --paper-300: 219 212 198;
+    --paper-400: 198 189 170;
+    --paper-500: 173 163 143;
+    --paper-600: 145 135 116;
+    --paper-700: 115 107 92;
+    --paper-800: 84 78 68;
+    --paper-900: 56 52 46;
+    --paper-1000: 15 15 14;
+
+    /* Ink Scale */
+    --ink-0: 255 255 255;
+    --ink-50: 245 245 244;
+    --ink-100: 230 230 228;
+    --ink-200: 204 204 202;
+    --ink-300: 173 173 171;
+    --ink-400: 138 138 136;
+    --ink-500: 102 102 100;
+    --ink-600: 71 71 70;
+    --ink-700: 46 46 45;
+    --ink-800: 26 26 25;
+    --ink-900: 15 15 14;
+    --ink-1000: 0 0 0;
+
+    /* Sage Scale */
+    --sage-0: 255 255 255;
+    --sage-50: 235 242 239;
+    --sage-100: 215 230 224;
+    --sage-200: 184 212 202;
+    --sage-300: 148 186 173;
+    --sage-400: 110 156 140;
+    --sage-500: 74 124 106;
+    --sage-600: 56 102 85;
+    --sage-700: 45 82 71;
+    --sage-800: 34 61 54;
+    --sage-900: 21 41 35;
+    --sage-1000: 0 0 0;
+
+    /* Terracotta Scale */
+    --terracotta-0: 255 255 255;
+    --terracotta-50: 253 241 238;
+    --terracotta-100: 248 221 214;
+    --terracotta-200: 232 180 170;
+    --terracotta-300: 221 146 131;
+    --terracotta-400: 209 116 101;
+    --terracotta-500: 196 96 74;
+    --terracotta-600: 161 74 54;
+    --terracotta-700: 126 55 39;
+    --terracotta-800: 94 40 27;
+    --terracotta-900: 64 27 18;
+    --terracotta-1000: 0 0 0;
+
+    /* Gold Scale */
+    --gold-0: 255 255 255;
+    --gold-50: 254 249 238;
+    --gold-100: 250 235 208;
+    --gold-200: 240 212 160;
+    --gold-300: 227 186 117;
+    --gold-400: 212 164 82;
+    --gold-500: 196 146 58;
+    --gold-600: 161 118 43;
+    --gold-700: 128 92 31;
+    --gold-800: 97 68 22;
+    --gold-900: 66 45 14;
+    --gold-1000: 0 0 0;
+
+    /* Slate Scale */
+    --slate-0: 255 255 255;
+    --slate-50: 242 243 245;
+    --slate-100: 230 232 235;
+    --slate-200: 192 196 204;
+    --slate-300: 153 158 171;
+    --slate-400: 114 119 133;
+    --slate-500: 74 78 90;
+    --slate-600: 59 62 73;
+    --slate-700: 45 47 56;
+    --slate-800: 32 34 40;
+    --slate-900: 20 21 26;
+    --slate-1000: 0 0 0;
+
+    /* ── Semantic Aliases (Light) ──────────────────────── */
+    --color-paper: 249 250 251;      /* gray-50 — page bg */
+    --color-paper-dark: 229 231 235; /* gray-200 — borders */
+    --color-surface: 255 255 255;    /* pure white — card bg */
+    --color-ink: 17 24 39;           /* gray-900 — text */
+
+    --color-sage: var(--sage-500);
+    --color-sage-dark: var(--sage-700);
+    --color-sage-light: var(--sage-100);
+    --color-terracotta: var(--terracotta-500);
+    --color-terracotta-light: var(--terracotta-100);
+    --color-gold: var(--gold-500);
+    --color-gold-light: var(--gold-100);
+    --color-slate: var(--slate-500);
+    --color-slate-light: var(--slate-200);
+  }
+
+  .dark {
+    /* ── Semantic Aliases (Dark) ───────────────────────── */
+    --color-paper: 15 17 23;         /* very dark blue-black bg */
+    --color-paper-dark: 42 45 58;    /* subtle borders */
+    --color-surface: 26 29 39;       /* elevated card bg */
+    --color-ink: 241 245 249;        /* off-white text */
+
+    /* Sage adjustments for dark context */
+    --color-sage: var(--sage-400);
+    --color-sage-dark: var(--sage-200);
+    --color-sage-light: var(--sage-800);
+
+    /* Terracotta adjustments */
+    --color-terracotta: var(--terracotta-400);
+    --color-terracotta-light: var(--terracotta-800);
+
+    /* Gold adjustments */
+    --color-gold: var(--gold-400);
+    --color-gold-light: var(--gold-800);
+
+    /* Slate adjustments */
+    --color-slate: var(--slate-300);
+    --color-slate-light: var(--slate-700);
+  }
+}
+
+@layer base {
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-paper text-ink font-sans text-base;
+    min-height: 100vh;
+  }
+
+  /* Focus styles for accessibility */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-sage;
+  }
+
+  /* Remove default button styles */
+  button {
+    @apply cursor-pointer;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-paper;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-light rounded-lg;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate;
+  }
+}

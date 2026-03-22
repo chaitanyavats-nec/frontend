@@ -1,27 +1,18 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Crimson_Pro, DM_Mono } from "next/font/google";
+import { Inter, DM_Mono } from "next/font/google";
 import "./globals.css";
 
-const playfairDisplay = Playfair_Display({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-playfair-display",
+  variable: "--font-inter",
   display: "swap",
-  weight: ["400", "500", "600", "700", "800"],
-});
-
-const crimsonPro = Crimson_Pro({
-  subsets: ["latin"],
-  variable: "--font-crimson-pro",
-  display: "swap",
-  weight: ["300", "400", "500", "600", "700"],
-  style: ["normal", "italic"],
 });
 
 const dmMono = DM_Mono({
   subsets: ["latin"],
   variable: "--font-dm-mono",
-  display: "swap",
   weight: ["300", "400", "500"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -40,7 +31,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${playfairDisplay.variable} ${crimsonPro.variable} ${dmMono.variable}`}
+      className={`${inter.variable} ${dmMono.variable}`}
       suppressHydrationWarning
     >
       <body>
