@@ -14,7 +14,7 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <button className="flex items-center gap-2 text-slate-light font-mono text-xs opacity-50" aria-label="Toggle theme">
+      <button className="flex items-center gap-2 text-slate text-xs font-medium opacity-50" aria-label="Toggle theme">
         <Moon size={20} />
         <span className="hidden lg:inline">Dark Mode</span>
       </button>
@@ -24,7 +24,7 @@ export function ThemeToggle() {
   return (
     <button
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="flex items-center gap-2 text-slate-light hover:text-paper transition-colors duration-150 font-mono text-xs"
+      className="flex items-center gap-2 text-slate hover:text-ink transition-colors duration-150 text-xs font-medium"
       aria-label="Toggle theme"
     >
       {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}

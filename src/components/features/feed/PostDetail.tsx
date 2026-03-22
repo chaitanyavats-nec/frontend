@@ -21,7 +21,7 @@ function getInitials(name: string): string {
 
 export function PostDetail({ post, provenance }: PostDetailProps) {
   return (
-    <article className="pb-6" role="article" aria-label={`Post by ${post.authorDisplayName}`}>
+    <article className="bg-surface rounded-lg border border-paper-dark p-5 sm:p-6" role="article" aria-label={`Post by ${post.authorDisplayName}`}>
       {/* Author Row — larger avatar */}
       <div className="flex items-center gap-3 mb-4">
         <Avatar className="h-12 w-12">
@@ -32,7 +32,7 @@ export function PostDetail({ post, provenance }: PostDetailProps) {
         </Avatar>
 
         <div>
-          <span className="font-mono text-sm text-ink font-medium block">
+          <span className="font-semibold text-sm text-ink block">
             {post.authorDisplayName}
           </span>
           <div className="flex items-center gap-2">
@@ -42,7 +42,7 @@ export function PostDetail({ post, provenance }: PostDetailProps) {
                 : post.authorDid}
             </span>
             <time
-              className="font-mono text-xs text-slate-light"
+              className="text-xs text-slate"
               dateTime={post.timestamp}
             >
               {new Date(post.timestamp).toLocaleDateString("en-GB", {
@@ -59,14 +59,14 @@ export function PostDetail({ post, provenance }: PostDetailProps) {
 
       {/* Full Content — no line clamp */}
       <div className="mb-4">
-        <p className="font-editorial text-base text-ink leading-relaxed whitespace-pre-wrap">
+        <p className="text-base text-ink leading-relaxed whitespace-pre-wrap">
           {post.content}
         </p>
       </div>
 
       {/* Media — full width */}
       {post.media && post.media.length > 0 && (
-        <div className="mb-4 rounded-md overflow-hidden">
+        <div className="mb-4 rounded-lg overflow-hidden">
           {post.media.map((item, i) => (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -82,8 +82,8 @@ export function PostDetail({ post, provenance }: PostDetailProps) {
       {/* Citations — expandable */}
       {post.citations && post.citations.length > 0 && (
         <div className="mb-4">
-          <h3 className="font-mono text-xs text-slate mb-2">Citations</h3>
-          <div className="border border-paper-dark rounded-md overflow-hidden">
+          <h3 className="text-xs font-medium text-slate mb-2">Citations</h3>
+          <div className="border border-paper-dark rounded-lg overflow-hidden">
             {post.citations.map((citation, i) => (
               <div
                 key={i}
@@ -91,7 +91,7 @@ export function PostDetail({ post, provenance }: PostDetailProps) {
                   i > 0 ? "border-t border-paper-dark" : ""
                 }`}
               >
-                <span className="px-1.5 py-0.5 rounded text-xs font-mono bg-paper-dark text-slate shrink-0 mt-0.5">
+                <span className="px-1.5 py-0.5 rounded text-xs font-mono bg-paper-dark/50 text-slate shrink-0 mt-0.5">
                   {citation.sourceType}
                 </span>
                 <div className="min-w-0">
@@ -99,11 +99,11 @@ export function PostDetail({ post, provenance }: PostDetailProps) {
                     href={citation.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="font-editorial text-sm text-sage hover:text-sage-dark block"
+                    className="text-sm text-sage hover:text-sage-dark block"
                   >
                     {citation.title}
                   </a>
-                  <span className="font-mono text-xs text-slate-light">
+                  <span className="text-xs text-slate">
                     Accessed {new Date(citation.accessedAt).toLocaleDateString("en-GB", {
                       day: "numeric",
                       month: "short",
@@ -123,23 +123,23 @@ export function PostDetail({ post, provenance }: PostDetailProps) {
       </div>
 
       {/* Action Row */}
-      <div className="flex items-center gap-2 pt-2 border-t border-paper-dark">
+      <div className="flex items-center gap-2 pt-3 border-t border-paper-dark">
         <button
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-slate hover:text-ink hover:bg-paper-dark transition-colors duration-150 font-mono text-xs"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-slate hover:text-ink hover:bg-paper-dark/50 transition-colors duration-150 text-xs font-medium"
           aria-label={`${post.replyCount} replies. Click to reply.`}
         >
           <ChatCircle size={18} />
           <span>{post.replyCount} replies</span>
         </button>
         <button
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-slate hover:text-terracotta hover:bg-terracotta-light/30 transition-colors duration-150 font-mono text-xs"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-slate hover:text-terracotta hover:bg-terracotta/10 transition-colors duration-150 text-xs font-medium"
           aria-label="Flag this post"
         >
           <Flag size={18} />
           <span>Flag</span>
         </button>
         <button
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-slate hover:text-ink hover:bg-paper-dark transition-colors duration-150 font-mono text-xs"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-slate hover:text-ink hover:bg-paper-dark/50 transition-colors duration-150 text-xs font-medium"
           aria-label="Share this post"
         >
           <ShareNetwork size={18} />

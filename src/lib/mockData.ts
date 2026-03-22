@@ -15,7 +15,7 @@ const cid = (suffix: string) => `Qm${suffix.padEnd(44, "abcdef1234567890")}`;
 export const mockProfiles: UserProfile[] = [
   {
     did: did("R7vX2pQnKz8WfH3jL9mYcTbNsA4gE6dU"),
-    displayName: "Adaeze Okonkwo",
+    displayName: "Chaitanya Vats",
     avatarUrl: undefined,
     bio: "Political economist researching platform cooperativism and data sovereignty. University of Lagos → LSE. Writing about the intersection of digital rights and African feminist thought.",
     affiliationCount: 2,

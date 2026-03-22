@@ -12,16 +12,16 @@ export default function UserProfilePage() {
   const params = useParams();
   const did = params.did as string;
   const { profiles, posts } = useMockData();
-  
+
   const profile = profiles.find((p) => p.did === did);
 
   if (!profile) {
     return (
-      <div className="py-12 text-center">
-        <p className="font-editorial text-base text-slate">Profile not found.</p>
+      <div className="py-12 text-center bg-surface border border-paper-dark rounded-lg">
+        <p className="font-sans text-sm text-slate">Profile not found.</p>
         <Link
           href="/home"
-          className="inline-flex items-center gap-1 font-mono text-xs text-sage hover:text-sage-dark mt-4"
+          className="inline-flex items-center gap-1 font-medium text-xs text-sage hover:text-sage-dark mt-4"
         >
           <ArrowLeft size={14} />
           Back to feed
@@ -38,7 +38,7 @@ export default function UserProfilePage() {
     <div className="space-y-6">
       <Link
         href="/home"
-        className="inline-flex items-center gap-1.5 font-mono text-xs text-slate hover:text-ink mb-2 transition-colors duration-150"
+        className="inline-flex items-center gap-1.5 font-medium text-xs text-slate hover:text-ink mb-2 transition-colors duration-150 bg-surface px-3 py-1.5 rounded-lg border border-paper-dark"
       >
         <ArrowLeft size={14} />
         Back
@@ -49,15 +49,17 @@ export default function UserProfilePage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column: Feed */}
         <div className="lg:col-span-2 order-2 lg:order-1">
-          <h2 className="font-mono text-sm text-ink mb-4 pb-2 border-b border-paper-dark">
+          <h2 className="font-sans font-semibold text-lg text-ink mb-4 tracking-tight">
             Recent Posts
           </h2>
           {userPosts.length === 0 ? (
-            <p className="font-editorial text-sm text-slate py-8 text-center">
-              This user hasn&apos;t posted anything yet.
-            </p>
+            <div className="bg-surface rounded-lg border border-paper-dark p-8 text-center">
+              <p className="font-sans text-sm text-slate">
+                This user hasn&apos;t posted anything yet.
+              </p>
+            </div>
           ) : (
-            <div>
+            <div className="space-y-4">
               {userPosts.map((post) => (
                 <FeedCard key={post.id} post={post} />
               ))}

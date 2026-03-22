@@ -19,8 +19,8 @@ export default function MyProfilePage() {
 
   return (
     <div className="space-y-6">
-      <div className="mb-8">
-        <h1 className="font-display text-2xl text-ink hidden sm:block">My Profile</h1>
+      <div className="mb-6 lg:mb-8">
+        <h1 className="font-sans font-bold text-3xl tracking-tight text-ink hidden lg:block">My Profile</h1>
       </div>
 
       <ProfileHeader profile={myProfile} />
@@ -28,15 +28,17 @@ export default function MyProfilePage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column: Feed */}
         <div className="lg:col-span-2 order-2 lg:order-1">
-          <h2 className="font-mono text-sm text-ink mb-4 pb-2 border-b border-paper-dark">
+          <h2 className="font-sans font-semibold text-lg text-ink mb-4 tracking-tight">
             Recent Posts
           </h2>
           {myPosts.length === 0 ? (
-            <p className="font-editorial text-sm text-slate py-8 text-center">
-              You haven&apos;t posted anything yet.
-            </p>
+            <div className="bg-surface rounded-lg border border-paper-dark p-8 text-center">
+              <p className="font-sans text-sm text-slate">
+                You haven&apos;t posted anything yet.
+              </p>
+            </div>
           ) : (
-            <div>
+            <div className="space-y-4">
               {myPosts.map((post) => (
                 <FeedCard key={post.id} post={post} />
               ))}

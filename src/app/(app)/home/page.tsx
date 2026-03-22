@@ -57,8 +57,8 @@ export default function HomePage() {
   return (
     <div>
       {/* Page heading */}
-      <div className="mb-6">
-        <h1 className="font-display text-2xl text-ink">Feed</h1>
+      <div className="mb-6 lg:mb-8">
+        <h1 className="font-sans font-bold text-3xl tracking-tight text-ink hidden lg:block">Feed</h1>
       </div>
 
       {/* Feed Mode Bar */}
@@ -71,10 +71,10 @@ export default function HomePage() {
       />
 
       {/* Feed Cards */}
-      <div>
+      <div className="space-y-4">
         {visiblePosts.length === 0 ? (
-          <div className="py-12 text-center">
-            <p className="font-editorial text-base text-slate">
+          <div className="py-12 text-center bg-surface rounded-lg border border-paper-dark">
+            <p className="font-sans text-sm text-slate">
               No posts found{selectedTopic ? ` for topic "${selectedTopic}"` : ""}.
             </p>
           </div>
@@ -87,11 +87,11 @@ export default function HomePage() {
 
       {/* Pagination: Load More — NOT infinite scroll */}
       {hasMore && (
-        <div className="py-6 flex justify-center">
+        <div className="py-8 flex justify-center">
           <Button
             variant="outline"
             onClick={() => setVisibleCount((prev) => prev + POSTS_PER_PAGE)}
-            className="font-mono text-xs"
+            className="font-medium text-xs rounded-full px-6"
           >
             Load more ({filteredPosts.length - visibleCount} remaining)
           </Button>
@@ -100,8 +100,8 @@ export default function HomePage() {
 
       {/* Natural stopping point */}
       {!hasMore && visiblePosts.length > 0 && (
-        <div className="py-8 text-center border-t border-paper-dark">
-          <p className="font-mono text-xs text-slate-light">
+        <div className="py-10 mt-6 text-center border-t border-paper-dark">
+          <p className="font-sans text-sm text-slate">
             You&apos;ve reached the end. Take a break.
           </p>
         </div>

@@ -44,9 +44,9 @@ export function FeedModeBar({
             role="tab"
             aria-selected={mode === option.value}
             className={cn(
-              "px-3 py-1.5 rounded-md font-mono text-xs transition-colors duration-150",
+              "px-3 py-1.5 rounded-lg font-medium text-xs transition-colors duration-150",
               mode === option.value
-                ? "bg-sage text-paper"
+                ? "bg-sage text-white-0"
                 : "bg-transparent text-slate border border-paper-dark hover:border-sage/30 hover:text-ink"
             )}
           >
@@ -61,9 +61,9 @@ export function FeedModeBar({
           <button
             onClick={() => onTopicSelect?.("")}
             className={cn(
-              "px-2.5 py-1 rounded-full font-mono text-xs whitespace-nowrap transition-colors duration-150 border shrink-0",
+              "px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors duration-150 border shrink-0",
               !selectedTopic
-                ? "bg-sage text-paper border-sage"
+                ? "bg-sage text-white-0 border-sage"
                 : "bg-transparent text-slate border-paper-dark hover:border-sage/30"
             )}
           >
@@ -74,9 +74,9 @@ export function FeedModeBar({
               key={topic.slug}
               onClick={() => onTopicSelect?.(topic.slug)}
               className={cn(
-                "px-2.5 py-1 rounded-full font-mono text-xs whitespace-nowrap transition-colors duration-150 border shrink-0",
+                "px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors duration-150 border shrink-0",
                 selectedTopic === topic.slug
-                  ? "bg-sage text-paper border-sage"
+                  ? "bg-sage text-white-0 border-sage"
                   : cn("bg-transparent border", domainColors[topic.domain] || "border-paper-dark text-slate")
               )}
             >

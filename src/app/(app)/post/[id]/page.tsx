@@ -14,11 +14,11 @@ export default function PostDetailPage() {
 
   if (!post) {
     return (
-      <div className="py-12 text-center">
-        <p className="font-editorial text-base text-slate">Post not found.</p>
+      <div className="py-12 text-center bg-surface border border-paper-dark rounded-lg">
+        <p className="font-sans text-sm text-slate">Post not found.</p>
         <Link
           href="/home"
-          className="inline-flex items-center gap-1 font-mono text-xs text-sage hover:text-sage-dark mt-4"
+          className="inline-flex items-center gap-1 font-medium text-xs text-sage hover:text-sage-dark mt-4"
         >
           <ArrowLeft size={14} />
           Back to feed
@@ -35,7 +35,7 @@ export default function PostDetailPage() {
       {/* Back navigation */}
       <Link
         href="/home"
-        className="inline-flex items-center gap-1.5 font-mono text-xs text-slate hover:text-ink mb-4 transition-colors duration-150"
+        className="inline-flex items-center gap-1.5 font-medium text-xs text-slate hover:text-ink mb-4 transition-colors duration-150 bg-surface px-3 py-1.5 rounded-lg border border-paper-dark"
       >
         <ArrowLeft size={14} />
         Back
@@ -46,11 +46,11 @@ export default function PostDetailPage() {
 
       {/* Reply Thread */}
       {mockReplies.length > 0 && (
-        <div className="mt-6">
-          <h3 className="font-mono text-xs text-slate mb-3">
+        <div className="mt-8">
+          <h3 className="font-semibold text-lg text-ink mb-4 tracking-tight">
             {post.replyCount} replies
           </h3>
-          <div className="border-t border-paper-dark">
+          <div className="space-y-4">
             {mockReplies.map((reply) => (
               <FeedCard key={reply.id} post={reply} showProvenance={false} isReply />
             ))}

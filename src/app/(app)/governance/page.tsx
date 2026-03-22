@@ -13,14 +13,16 @@ export default function GovernanceHubPage() {
   const pastProposals = proposals.filter((p) => p.status !== "open");
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8">
+    <div className="max-w-3xl mx-auto space-y-10">
       {/* Header Area */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <Scales size={32} className="text-ink" />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+        <div className="flex items-center gap-4">
+          <div className="p-3 bg-surface border border-paper-dark rounded-lg shadow-sm">
+            <Scales size={28} className="text-ink" />
+          </div>
           <div>
-            <h1 className="font-display text-2xl text-ink">Governance Hub</h1>
-            <p className="font-editorial text-sm text-slate mt-1">
+            <h1 className="font-sans font-bold text-3xl text-ink tracking-tight">Governance</h1>
+            <p className="font-sans text-sm text-slate mt-1">
               Shape the infrastructure and policies of Agora.
             </p>
           </div>
@@ -28,11 +30,11 @@ export default function GovernanceHubPage() {
 
         <div className="flex items-center gap-3">
           <Link href="/governance/constitution" passHref>
-            <Button variant="outline" className="font-mono text-xs flex items-center gap-2">
-              <BookOpen size={16} /> View Constitution
+            <Button variant="outline" className="flex items-center gap-2">
+              <BookOpen size={16} /> Constitution
             </Button>
           </Link>
-          <Button className="font-mono text-xs bg-sage hover:bg-sage-dark text-paper">
+          <Button>
             New Proposal
           </Button>
         </div>
@@ -40,23 +42,25 @@ export default function GovernanceHubPage() {
 
       {/* Active Proposals */}
       <div>
-        <h2 className="font-mono text-sm text-ink mb-4 pb-2 border-b border-paper-dark">
+        <h2 className="font-sans font-semibold text-lg text-ink mb-4 tracking-tight">
           Active Proposals
         </h2>
         {openProposals.length === 0 ? (
-          <p className="font-editorial text-sm text-slate py-8 text-center bg-paper-dark/20 rounded-md border border-paper-dark border-dashed">
-            No active proposals at this time.
-          </p>
+          <div className="bg-surface rounded-lg border border-paper-dark p-12 text-center">
+            <p className="font-sans text-sm text-slate">
+              No active proposals at this time.
+            </p>
+          </div>
         ) : (
           <div className="space-y-6">
             {openProposals.map((proposal) => (
-              <div key={proposal.id} className="group relative">
+              <div key={proposal.id} className="group relative h-full">
                 <Link
                   href={`/governance/proposal/${proposal.id}`}
                   className="absolute inset-0 z-10"
                   aria-label={`View proposal ${proposal.title}`}
                 />
-                <div className="transition-transform duration-150 group-hover:-translate-y-1">
+                <div className="transition-transform duration-150 group-hover:-translate-y-1 h-full">
                   <GovernanceProposalCard proposal={proposal} isDetailedView={false} />
                 </div>
               </div>
@@ -67,19 +71,19 @@ export default function GovernanceHubPage() {
 
       {/* Historical Proposals */}
       {pastProposals.length > 0 && (
-        <div className="pt-8">
-          <h2 className="font-mono text-sm text-ink mb-4 pb-2 border-b border-paper-dark">
+        <div className="pt-4 border-t border-paper-dark">
+          <h2 className="font-sans font-semibold text-lg text-ink mb-4 tracking-tight mt-6">
             Recent Decisions
           </h2>
           <div className="space-y-6 opacity-80 hover:opacity-100 transition-opacity duration-300">
             {pastProposals.map((proposal) => (
-              <div key={proposal.id} className="group relative">
+              <div key={proposal.id} className="group relative h-full">
                 <Link
                   href={`/governance/proposal/${proposal.id}`}
                   className="absolute inset-0 z-10"
                   aria-label={`View past proposal ${proposal.title}`}
                 />
-                <div className="transition-transform duration-150 group-hover:-translate-y-1 shadow-sm group-hover:shadow-md">
+                <div className="transition-transform duration-150 group-hover:-translate-y-1 h-full">
                   <GovernanceProposalCard proposal={proposal} isDetailedView={false} />
                 </div>
               </div>

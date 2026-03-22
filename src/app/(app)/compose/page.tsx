@@ -25,19 +25,19 @@ export default function ComposePage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="mb-6">
-        <h1 className="font-display text-2xl text-ink">Publish</h1>
-        <p className="font-editorial text-sm text-slate mt-1">
+    <div className="max-w-2xl mx-auto space-y-6">
+      <div className="mb-2">
+        <h1 className="font-sans font-bold text-2xl tracking-tight text-ink">Publish</h1>
+        <p className="font-sans text-sm text-slate mt-1">
           Share information with full provenance and context.
         </p>
       </div>
 
       <div className="space-y-6">
         {/* Content Area */}
-        <div className="bg-paper p-4 rounded-md border border-paper-dark focus-within:border-sage/50 transition-colors">
+        <div className="bg-surface p-5 rounded-lg border border-paper-dark focus-within:border-sage/50 transition-colors shadow-sm">
           <textarea
-            className="w-full bg-transparent border-none focus:ring-0 resize-none font-editorial text-base text-ink placeholder:text-slate/50 min-h-[150px]"
+            className="w-full bg-transparent border-none focus:ring-0 resize-none font-sans text-base text-ink placeholder:text-slate/50 min-h-[150px]"
             placeholder="What do you want to share?"
             value={content}
             onChange={(e) => setContent(e.target.value)}
@@ -45,29 +45,29 @@ export default function ComposePage() {
         </div>
 
         {/* Provenance Settings */}
-        <div className="bg-paper-dark/20 p-5 rounded-md border border-paper-dark">
-          <h2 className="font-mono text-sm text-ink mb-4">Provenance Declaration</h2>
+        <div className="bg-surface p-6 rounded-lg border border-paper-dark shadow-sm">
+          <h2 className="font-sans font-semibold text-lg tracking-tight text-ink mb-5">Provenance Declaration</h2>
           
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div>
-              <label className="font-mono text-xs text-slate block mb-2">Claim Type</label>
-              <div className="flex gap-2 flex-wrap">
+              <label className="font-mono text-[11px] uppercase tracking-wider font-semibold text-slate block mb-3">Claim Type</label>
+              <div className="flex gap-3 flex-wrap">
                 {(["original", "derived", "republished"] as const).map((type) => (
                   <button
                     key={type}
                     onClick={() => setSourceType(type)}
                     className={cn(
-                      "px-3 py-1.5 rounded-md font-mono text-xs capitalize transition-colors duration-150 border",
+                      "px-4 py-2 rounded-lg font-sans font-medium text-sm capitalize transition-colors duration-150 border",
                       sourceType === type
-                        ? "bg-sage text-paper border-sage"
-                        : "bg-paper text-slate border-paper-dark hover:border-sage/30"
+                        ? "bg-sage text-white-0 border-sage"
+                        : "bg-paper text-slate border-paper-dark hover:border-sage/30 hover:bg-sage/5"
                     )}
                   >
                     {type}
                   </button>
                 ))}
               </div>
-              <p className="font-editorial text-xs text-slate mt-2">
+              <p className="font-sans text-sm text-slate mt-3 leading-relaxed">
                 {sourceType === "original" && "You are the primary source or witness to this information."}
                 {sourceType === "derived" && "This information is synthesized or analyzed from other sources."}
                 {sourceType === "republished" && "This is a direct quote or repost of existing information."}
@@ -76,46 +76,46 @@ export default function ComposePage() {
 
             {/* Citations block for derived/republished */}
             {sourceType !== "original" && (
-              <div className="pt-2 border-t border-paper-dark">
-                <div className="flex items-center justify-between mb-3">
-                  <label className="font-mono text-xs text-slate">Source Citations (Required)</label>
+              <div className="pt-5 border-t border-paper-dark">
+                <div className="flex items-center justify-between mb-4">
+                  <label className="font-mono text-[11px] uppercase tracking-wider font-semibold text-slate">Source Citations (Required)</label>
                   <button
                     onClick={addCitation}
-                    className="flex items-center gap-1 font-mono text-xs text-sage hover:text-sage-dark"
+                    className="flex items-center gap-1.5 font-sans font-medium text-xs text-sage hover:text-sage-dark bg-sage/10 hover:bg-sage/20 px-2.5 py-1.5 rounded-md transition-colors"
                   >
                     <Plus size={14} /> Add Source
                   </button>
                 </div>
                 
                 {citations.length === 0 ? (
-                  <div className="p-4 rounded border border-dashed border-paper-dark text-center">
-                    <p className="font-mono text-xs text-slate-light">
+                  <div className="p-6 rounded-lg border border-dashed border-paper-dark text-center bg-paper/50">
+                    <p className="font-sans text-sm text-slate">
                       Non-original claims require at least one cited source.
                     </p>
                   </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {citations.map((cite, i) => (
-                      <div key={i} className="flex gap-2 items-start">
-                        <div className="flex-1 space-y-2">
+                      <div key={i} className="flex gap-3 items-start bg-paper/50 p-4 rounded-lg border border-paper-dark">
+                        <div className="flex-1 space-y-3">
                           <input
                             type="text"
                             placeholder="Source Title/Description"
-                            className="w-full bg-paper border border-paper-dark rounded px-3 py-1.5 font-mono text-xs text-ink focus:outline-none focus:border-sage/50"
+                            className="w-full bg-surface border border-paper-dark rounded-md px-3 py-2 font-sans text-sm text-ink focus:outline-none focus:border-sage/50"
                             value={cite.title}
                             onChange={(e) => updateCitation(i, "title", e.target.value)}
                           />
                           <input
                             type="url"
                             placeholder="URL (optional)"
-                            className="w-full bg-paper border border-paper-dark rounded px-3 py-1.5 font-mono text-xs text-ink focus:outline-none focus:border-sage/50"
+                            className="w-full bg-surface border border-paper-dark rounded-md px-3 py-2 font-mono text-xs text-ink focus:outline-none focus:border-sage/50"
                             value={cite.url}
                             onChange={(e) => updateCitation(i, "url", e.target.value)}
                           />
                         </div>
                         <button
                           onClick={() => removeCitation(i)}
-                          className="p-1.5 rounded text-slate hover:text-terracotta hover:bg-terracotta-light/30 transition-colors"
+                          className="p-2 rounded-md text-slate hover:text-terracotta hover:bg-terracotta/10 transition-colors"
                           title="Remove source"
                         >
                           &times;
@@ -130,12 +130,12 @@ export default function ComposePage() {
         </div>
 
         {/* Action Row */}
-        <div className="flex items-center justify-between pt-2">
-          <p className="font-mono text-xs text-slate-light">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
+          <p className="font-sans text-xs text-slate">
             All declarations are logged on-chain.
           </p>
           <Button
-            className="flex items-center gap-2 px-6 py-2 bg-sage hover:bg-sage-dark text-paper font-mono text-sm rounded-md transition-colors"
+            className="flex items-center gap-2 px-8"
             disabled={!content || (sourceType !== "original" && citations.length === 0)}
           >
             <span>Publish</span>
