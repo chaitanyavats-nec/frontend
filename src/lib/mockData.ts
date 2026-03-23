@@ -101,6 +101,14 @@ const provenanceOriginal1: ProvenanceRecord = {
       onChainAddress: "0x1234567890abcdef1234567890abcdef12345678",
     },
   ],
+  coordinationFlag: {
+    detected: true,
+    confidence: 0.91,
+    signals: ["Cross-platform posting burst detected"],
+    contestable: false,
+    reportUrl: "https://agora.example/reports/coord-2025-0399.json",
+    survivedCoordinatedAttack: true,
+  },
 };
 
 const provenanceOriginal2: ProvenanceRecord = {
@@ -235,6 +243,7 @@ const provenanceCoordinated: ProvenanceRecord = {
     ],
     contestable: true,
     reportUrl: "https://agora.example/reports/coord-2025-0342.json",
+    survivedCoordinatedAttack: true,
   },
 };
 

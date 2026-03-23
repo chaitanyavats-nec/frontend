@@ -150,8 +150,8 @@ function ExpandedSummary({
                       aff.stakeStatus === "active"
                         ? "bg-sage/10 text-sage-dark border-sage/20"
                         : aff.stakeStatus === "challenged"
-                        ? "bg-gold/10 text-gold border-gold/20"
-                        : "bg-terracotta/10 text-terracotta border-terracotta/20"
+                          ? "bg-gold/10 text-gold border-gold/20"
+                          : "bg-terracotta/10 text-terracotta border-terracotta/20"
                     )}
                   >
                     {aff.organizationName}
@@ -278,9 +278,9 @@ function AffiliationCard({ affiliation }: { affiliation: AffiliationSummary }) {
     <div className="bg-surface border border-paper-dark rounded-lg p-4 shadow-sm">
       <div className="flex items-center justify-between mb-1">
         <h4 className="font-sans font-semibold text-sm text-ink">{affiliation.organizationName}</h4>
-        <span className={cn("px-2 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider border", 
-          affiliation.stakeStatus === "active" ? "border-sage/20" : 
-          affiliation.stakeStatus === "challenged" ? "border-gold/20" : "border-terracotta/20",
+        <span className={cn("px-2 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider border",
+          affiliation.stakeStatus === "active" ? "border-sage/20" :
+            affiliation.stakeStatus === "challenged" ? "border-gold/20" : "border-terracotta/20",
           statusColors[affiliation.stakeStatus]
         )}>
           {affiliation.stakeStatus}
@@ -449,7 +449,7 @@ export function ProvenanceFullChain({ provenance }: { provenance: ProvenanceReco
           </button>
           <AnimatePresence>
             {showProportionality && (
-               <motion.div
+              <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}

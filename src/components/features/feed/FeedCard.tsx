@@ -12,6 +12,7 @@ import {
 } from 'phosphor-react';
 import { ProvenanceTag } from '../provenance/ProvenanceTag';
 import { cn } from '@/lib/utils';
+import { ShieldCheck } from '@phosphor-icons/react';
 
 interface FeedCardProps {
   post: Post;
@@ -156,6 +157,11 @@ export function FeedCard({ post, showProvenance = false, isReply = false }: Feed
 
             {/* Action Buttons */}
             <div className="flex items-center gap-0.5">
+              {post.provenance?.coordinationFlag?.detected && post.provenance?.coordinationFlag?.survivedCoordinatedAttack && (
+                <div title="This post survived a coordinated complaint campaign" className="flex items-center justify-center px-2 py-1">
+                  <ShieldCheck size={16} className="text-sage" />
+                </div>
+              )}
               {/* Reply */}
               <button
                 className="flex items-center gap-1.5 px-2 py-1 rounded-md text-slate hover:text-sage hover:bg-sage/10 transition-all duration-150 text-sm group/btn"

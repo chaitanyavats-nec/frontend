@@ -1,4 +1,5 @@
 import { AppNav } from "@/components/layouts/AppNav";
+import { ContributionModal } from "@/components/features/onboarding/ContributionModal";
 
 export default function AppLayout({
   children,
@@ -14,6 +15,7 @@ export default function AppLayout({
           {children}
         </div>
       </main>
+      <ContributionModal />
     </div>
   );
 }

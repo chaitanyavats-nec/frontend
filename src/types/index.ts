@@ -46,6 +46,7 @@ export interface CoordinationFlag {
   signals: string[];
   contestable: boolean;
   reportUrl: string;
+  survivedCoordinatedAttack?: boolean;
 }
 
 export interface ProportionalityData {

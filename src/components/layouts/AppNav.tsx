@@ -10,7 +10,8 @@ import {
   Bank,
   UserCircle,
   Bell,
-  Fingerprint
+  Fingerprint,
+  Gear
 } from "phosphor-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/features/theme/ThemeToggle";
@@ -29,6 +30,7 @@ const desktopNavItems: NavItem[] = [
   { label: "Moderation", href: "/moderation", icon: Shield, badge: 2 },
   { label: "Governance", href: "/governance", icon: Bank, badge: 1 },
   { label: "Profile", href: "/profile/me", icon: UserCircle },
+  { label: "Settings", href: "/settings/privacy", icon: Gear },
 ];
 
 const mobileNavItems: NavItem[] = [
@@ -36,7 +38,7 @@ const mobileNavItems: NavItem[] = [
   { label: "Explore", href: "/explore", icon: Compass },
   { label: "Compose", href: "/compose", icon: PlusCircle },
   { label: "Civics", href: "/civics", icon: Fingerprint, badge: 3 },
-  { label: "Profile", href: "/profile/me", icon: UserCircle },
+  { label: "Settings", href: "/settings/privacy", icon: Gear },
 ];
 
 export function AppNav() {
