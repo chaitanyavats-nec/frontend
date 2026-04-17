@@ -45,10 +45,10 @@ export function FeedCard({ post, showProvenance = false, isReply = false }: Feed
   return (
     <article
       className={cn(
-        'group transition-colors duration-150',
+        'group transition-all duration-200',
         isReply
-          ? 'border-l-2 border-sage/30 pl-3 py-3 pr-4 hover:bg-paper-dark/30'
-          : 'bg-surface rounded-lg border border-paper-dark p-4 sm:p-5 hover:border-sage/30'
+          ? 'border-l-2 border-teal/20 pl-3 py-3 pr-4 hover:bg-teal/5'
+          : 'bg-surface rounded-xl border border-paper-dark p-3.5 sm:p-5 hover:border-teal/30 hover:shadow-sm'
       )}
     >
       <div className="flex items-start gap-3">
@@ -72,7 +72,7 @@ export function FeedCard({ post, showProvenance = false, isReply = false }: Feed
             <div className="flex items-center gap-1.5 min-w-0">
               <Link
                 href={`/profile/${post.authorDid}`}
-                className="font-semibold text-[15px] text-ink hover:text-sage transition-colors duration-150 truncate"
+                className="font-editorial text-[17px] text-ink hover:text-teal transition-colors duration-150 truncate leading-tight"
               >
                 {post.authorDisplayName}
               </Link>
@@ -89,12 +89,47 @@ export function FeedCard({ post, showProvenance = false, isReply = false }: Feed
           {/* ── Content Body ──────────────────────────── */}
           <div
             className={cn(
-              'text-ink whitespace-pre-wrap leading-relaxed',
+              'text-ink whitespace-pre-wrap leading-relaxed break-words overflow-hidden',
               isReply ? 'text-sm mb-2' : 'text-sm md:text-base mb-3'
             )}
           >
             {post.content}
           </div>
+
+          {/* ── Multimedia ──────────────────────────────── */}
+          {post.media && post.media.length > 0 && (
+            <div
+              className={cn(
+                "grid gap-2 mb-3 mt-2 overflow-hidden rounded-xl border border-paper-dark",
+                post.media.length === 1 ? "grid-cols-1" : "grid-cols-2"
+              )}
+            >
+              {post.media.map((item, idx) => (
+                <div
+                  key={idx}
+                  className={cn(
+                    "relative bg-paper-dark/10 flex items-center justify-center overflow-hidden",
+                    post.media && post.media.length === 3 && idx === 0 ? "row-span-2" : "",
+                    post.media && post.media.length === 1 ? "aspect-auto max-h-[400px]" : "aspect-square"
+                  )}
+                >
+                  {item.type === "image" ? (
+                    <img
+                      src={item.url}
+                      alt={item.altText || "Post image"}
+                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                    />
+                  ) : item.type === "video" ? (
+                    <video
+                      src={item.url}
+                      controls
+                      className="w-full h-full object-cover"
+                    />
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* ── Citations ─────────────────────────────── */}
           {post.citations && post.citations.length > 0 && (
@@ -105,9 +140,9 @@ export function FeedCard({ post, showProvenance = false, isReply = false }: Feed
                   href={citation.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-paper-dark/30 border border-paper-dark hover:border-sage/30 transition-colors duration-150 group/cite"
+                  className="flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-paper-dark/20 border border-paper-dark hover:border-teal/30 transition-colors duration-150 group/cite"
                 >
-                  <BookOpen size={14} className="text-sage shrink-0" />
+                  <BookOpen size={14} className="text-teal shrink-0" />
                   <span className="text-xs text-ink truncate">
                     {citation.title}
                   </span>
@@ -129,7 +164,7 @@ export function FeedCard({ post, showProvenance = false, isReply = false }: Feed
               {post.topicTags.map((tag) => (
                 <span
                   key={tag}
-                  className="text-xs font-mono px-2 py-0.5 rounded-full bg-sage/10 text-sage border border-sage/20 transition-colors duration-150 hover:bg-sage/20"
+                  className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-teal/5 text-teal border border-teal/20 transition-all duration-150 hover:bg-teal/10"
                 >
                   #{tag}
                 </span>
@@ -159,39 +194,39 @@ export function FeedCard({ post, showProvenance = false, isReply = false }: Feed
             <div className="flex items-center gap-0.5">
               {post.provenance?.coordinationFlag?.detected && post.provenance?.coordinationFlag?.survivedCoordinatedAttack && (
                 <div title="This post survived a coordinated complaint campaign" className="flex items-center justify-center px-2 py-1">
-                  <ShieldCheck size={16} className="text-sage" />
+                  <ShieldCheck size={18} className="text-teal" />
                 </div>
               )}
               {/* Reply */}
               <button
-                className="flex items-center gap-1.5 px-2 py-1 rounded-md text-slate hover:text-sage hover:bg-sage/10 transition-all duration-150 text-sm group/btn"
+                className="flex items-center gap-1.5 px-2 py-1 rounded-md text-slate hover:text-teal hover:bg-teal/5 transition-all duration-150 text-sm group/btn"
                 aria-label={`${post.replyCount || 0} replies`}
               >
                 <ChatCircle
-                  size={16}
+                  size={18}
                   className="transition-transform duration-150 group-hover/btn:scale-110"
                 />
-                <span className="text-xs">{post.replyCount || 0}</span>
+                <span className="text-xs font-bold">{post.replyCount || 0}</span>
               </button>
 
               {/* Derive */}
               <button
-                className="flex items-center gap-1.5 px-2 py-1 rounded-md text-slate hover:text-gold hover:bg-gold/10 transition-all duration-150 text-sm group/btn"
+                className="flex items-center gap-1.5 px-2 py-1 rounded-md text-slate hover:text-violet hover:bg-violet/5 transition-all duration-150 text-sm group/btn"
                 aria-label="Derive post"
               >
                 <GitCommit
-                  size={16}
+                  size={18}
                   className="transition-transform duration-150 group-hover/btn:scale-110"
                 />
               </button>
 
               {/* Share */}
               <button
-                className="flex items-center gap-1.5 px-2 py-1 rounded-md text-slate hover:text-terracotta hover:bg-terracotta/10 transition-all duration-150 text-sm group/btn"
+                className="flex items-center gap-1.5 px-2 py-1 rounded-md text-slate hover:text-orange hover:bg-orange/5 transition-all duration-150 text-sm group/btn"
                 aria-label="Share link"
               >
                 <LinkIcon
-                  size={16}
+                  size={18}
                   className="transition-transform duration-150 group-hover/btn:scale-110"
                 />
               </button>

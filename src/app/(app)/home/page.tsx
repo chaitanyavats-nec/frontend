@@ -58,7 +58,7 @@ export default function HomePage() {
     <div>
       {/* Page heading */}
       <div className="mb-6 lg:mb-8">
-        <h1 className="font-sans font-bold text-3xl tracking-tight text-ink hidden lg:block">Feed</h1>
+        <h1 className="font-editorial font-bold text-4xl tracking-tight text-ink hidden lg:block">Feed</h1>
       </div>
 
       {/* Feed Mode Bar */}

@@ -17,19 +17,19 @@ interface ProvenanceTagProps {
 const sourceTypeConfig = {
   original: {
     label: "Original",
-    pillClasses: "bg-sage-light text-sage-dark border-sage-light",
+    pillClasses: "bg-teal-light text-teal-dark border-teal-light",
   },
   derived: {
     label: "Derived",
-    pillClasses: "bg-sage-light text-sage-dark border-sage-light",
+    pillClasses: "bg-teal-light text-teal-dark border-teal-light",
   },
   republished: {
     label: "Republished",
-    pillClasses: "bg-sage-light text-sage-dark border-sage-light",
+    pillClasses: "bg-teal-light text-teal-dark border-teal-light",
   },
   institutional: {
     label: "Institutional",
-    pillClasses: "bg-gold/10 text-gold border-gold/20",
+    pillClasses: "bg-violet/10 text-violet border-violet/20",
   },
 } as const;
 
@@ -38,14 +38,14 @@ function getSourceConfig(provenance: ProvenanceRecord) {
   if (provenance.fundingDisclosure && provenance.fundingDisclosure.type !== "independent") {
     return {
       label: "Funded",
-      pillClasses: "bg-terracotta/10 text-terracotta border-terracotta/20",
+      pillClasses: "bg-orange/10 text-orange border-orange/20",
     };
   }
   // Check if coordinated
   if (provenance.coordinationFlag?.detected) {
     return {
       label: "Coordinated",
-      pillClasses: "bg-terracotta text-white-0 border-terracotta",
+      pillClasses: "bg-orange text-paper border-orange shadow-sm",
     };
   }
   return sourceTypeConfig[provenance.sourceType];
@@ -106,7 +106,7 @@ function ExpandedSummary({
       transition={{ duration: 0.2, ease: "easeOut" }}
       className="overflow-hidden"
     >
-      <div className="border-l-2 border-sage bg-surface p-4 mt-3 rounded-r-lg shadow-sm border-y border-r border-paper-dark">
+      <div className="border-l-2 border-teal bg-surface p-4 mt-3 rounded-r-lg shadow-md border-y border-r border-paper-dark">
         <div className="space-y-3">
           {/* Origin Type */}
           <div className="flex items-center gap-2">
@@ -127,7 +127,7 @@ function ExpandedSummary({
                     href={provenance.originUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="ml-1 inline-flex items-center text-sage hover:text-sage-dark"
+                    className="ml-1 inline-flex items-center text-teal hover:text-teal-dark"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <LinkIcon size={14} />
@@ -146,12 +146,12 @@ function ExpandedSummary({
                   <span
                     key={aff.onChainAddress}
                     className={cn(
-                      "inline-flex items-center gap-1.5 px-2 py-1 rounded-md font-mono text-[11px] font-medium border",
+                      "inline-flex items-center gap-1.5 px-2 py-1 rounded-md font-mono text-[11px] font-medium border transition-colors",
                       aff.stakeStatus === "active"
-                        ? "bg-sage/10 text-sage-dark border-sage/20"
+                        ? "bg-teal/10 text-teal-dark border-teal/20"
                         : aff.stakeStatus === "challenged"
-                          ? "bg-gold/10 text-gold border-gold/20"
-                          : "bg-terracotta/10 text-terracotta border-terracotta/20"
+                          ? "bg-violet/10 text-violet border-violet/20"
+                          : "bg-orange/10 text-orange border-orange/20"
                     )}
                   >
                     {aff.organizationName}
@@ -164,15 +164,15 @@ function ExpandedSummary({
 
           {/* Funding Flag */}
           {provenance.fundingDisclosure && provenance.fundingDisclosure.type !== "independent" && (
-            <div className="flex items-start gap-2 bg-paper-dark/30 p-2.5 rounded-md border border-paper-dark">
-              <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-terracotta shrink-0 mt-0.5">Funded</span>
+            <div className="flex items-start gap-2 bg-paper-dark/20 p-2.5 rounded-md border border-paper-dark">
+              <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-orange shrink-0 mt-0.5">Funded</span>
               <span className="font-sans text-sm text-ink font-medium">
                 {provenance.fundingDisclosure.funderName || "Undisclosed"}
                 {provenance.fundingDisclosure.amount && (
                   <span className="text-slate ml-1.5 font-normal">({provenance.fundingDisclosure.amount})</span>
                 )}
                 {provenance.fundingDisclosure.staked && (
-                  <span className="ml-2 font-mono text-[10px] uppercase tracking-wider font-bold text-sage bg-sage/10 px-1.5 py-0.5 rounded border border-sage/20">✓ Staked</span>
+                  <span className="ml-2 font-mono text-[10px] uppercase tracking-wider font-bold text-teal bg-teal/10 px-1.5 py-0.5 rounded border border-teal/20">✓ Staked</span>
                 )}
               </span>
             </div>
@@ -180,10 +180,10 @@ function ExpandedSummary({
 
           {/* Coordination Flag */}
           {provenance.coordinationFlag?.detected && (
-            <div className="bg-terracotta/10 border border-terracotta/30 rounded-md p-3">
+            <div className="bg-orange/10 border border-orange/30 rounded-md p-3">
               <div className="flex items-center gap-1.5">
-                <Warning size={16} weight="fill" className="text-terracotta" />
-                <span className="font-sans text-sm text-terracotta font-semibold">
+                <Warning size={16} weight="fill" className="text-orange" />
+                <span className="font-sans text-sm text-orange font-semibold">
                   Coordination detected ({Math.round(provenance.coordinationFlag.confidence * 100)}% confidence)
                 </span>
               </div>
@@ -197,7 +197,7 @@ function ExpandedSummary({
           <Link
             href={`/post/${postId}/provenance`}
             onClick={(e) => e.stopPropagation()}
-            className="inline-flex items-center gap-1 font-sans text-xs font-medium text-sage hover:text-sage-dark transition-colors duration-150 pt-1"
+            className="inline-flex items-center gap-1 font-sans text-xs font-semibold text-teal hover:text-teal-dark transition-colors duration-150 pt-1"
           >
             View full chain
             <ArrowRight size={14} />
@@ -211,17 +211,17 @@ function ExpandedSummary({
 // ─── STATE 3: Full Chain View ───────────────────────────────
 function TransmissionNodeCard({ node }: { node: TransmissionNode }) {
   const typeColors: Record<string, string> = {
-    primary: "bg-sage text-white-0",
-    secondary: "bg-sage/10 text-sage-dark border-sage/20 border",
+    primary: "bg-teal text-paper",
+    secondary: "bg-teal/10 text-teal-dark border-teal/20 border",
     tertiary: "bg-surface text-slate border-paper-dark border",
-    institutional: "bg-gold/10 text-gold border-gold/20 border",
-    unverified: "bg-terracotta/10 text-terracotta border-terracotta/20 border",
+    institutional: "bg-violet/10 text-violet border-violet/20 border",
+    unverified: "bg-orange/10 text-orange border-orange/20 border",
   };
 
   const relationshipColors: Record<string, string> = {
-    supports: "text-sage",
-    contradicts: "text-terracotta",
-    contextualises: "text-gold",
+    supports: "text-teal",
+    contradicts: "text-orange",
+    contextualises: "text-violet",
     quotes: "text-ink",
   };
 
@@ -229,7 +229,7 @@ function TransmissionNodeCard({ node }: { node: TransmissionNode }) {
     <div className="relative pl-8">
       {/* Timeline dot and line */}
       <div className="absolute left-3 top-0 bottom-0 w-px bg-paper-dark" />
-      <div className="absolute left-[9px] top-4 w-2.5 h-2.5 rounded-full bg-sage border-2 border-paper" />
+      <div className="absolute left-[9px] top-4 w-2.5 h-2.5 rounded-full bg-teal border-2 border-paper" />
 
       <div className="pb-6">
         <div className="bg-surface border border-paper-dark rounded-lg p-4 shadow-sm">
@@ -247,7 +247,7 @@ function TransmissionNodeCard({ node }: { node: TransmissionNode }) {
               href={node.sourceUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-mono text-xs text-sage hover:text-sage-dark underline truncate max-w-[300px]"
+              className="font-mono text-xs text-teal hover:text-teal-dark underline truncate max-w-[300px]"
             >
               {node.sourceUrl}
             </a>
@@ -275,12 +275,12 @@ function AffiliationCard({ affiliation }: { affiliation: AffiliationSummary }) {
   };
 
   return (
-    <div className="bg-surface border border-paper-dark rounded-lg p-4 shadow-sm">
+    <div className="bg-surface border border-paper-dark rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between mb-1">
-        <h4 className="font-sans font-semibold text-sm text-ink">{affiliation.organizationName}</h4>
-        <span className={cn("px-2 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider border",
-          affiliation.stakeStatus === "active" ? "border-sage/20" :
-            affiliation.stakeStatus === "challenged" ? "border-gold/20" : "border-terracotta/20",
+        <h4 className="font-editorial font-semibold text-base text-ink">{affiliation.organizationName}</h4>
+        <span className={cn("px-2 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider border transition-colors",
+          affiliation.stakeStatus === "active" ? "border-teal/20" :
+            affiliation.stakeStatus === "challenged" ? "border-violet/20" : "border-orange/20",
           statusColors[affiliation.stakeStatus]
         )}>
           {affiliation.stakeStatus}
@@ -311,8 +311,8 @@ export function ProvenanceFullChain({ provenance }: { provenance: ProvenanceReco
       {/* Header */}
       <div>
         <div className="flex items-center gap-2 mb-2">
-          <Eye size={24} className="text-sage" />
-          <h2 className="font-sans font-bold text-2xl tracking-tight text-ink">Source Chain</h2>
+          <Eye size={24} className="text-teal" />
+          <h2 className="font-editorial font-bold text-3xl tracking-tight text-ink">Source Chain</h2>
         </div>
         <p className="font-sans text-sm text-slate">
           Complete provenance data for this content. All declarations are on-chain and verifiable.
@@ -380,13 +380,13 @@ export function ProvenanceFullChain({ provenance }: { provenance: ProvenanceReco
                 <span className="font-mono text-[11px] uppercase tracking-wider font-semibold text-slate mb-1 block">Status</span>
                 <div className="flex items-center gap-2 mt-1">
                   <span className={cn(
-                    "px-2 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider border",
-                    provenance.fundingDisclosure.declared ? "bg-sage/10 text-sage border-sage/20" : "bg-terracotta/10 text-terracotta border-terracotta/20"
+                    "px-2 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider border transition-colors",
+                    provenance.fundingDisclosure.declared ? "bg-teal/10 text-teal border-teal/20" : "bg-orange/10 text-orange border-orange/20"
                   )}>
                     {provenance.fundingDisclosure.declared ? "Declared" : "Undeclared"}
                   </span>
                   {provenance.fundingDisclosure.staked && (
-                    <span className="px-2 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider border bg-sage/10 text-sage border-sage/20">
+                    <span className="px-2 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider border bg-teal/10 text-teal border-teal/20">
                       Staked
                     </span>
                   )}
@@ -401,14 +401,14 @@ export function ProvenanceFullChain({ provenance }: { provenance: ProvenanceReco
       {provenance.coordinationFlag?.detected && (
         <div>
           <h3 className="font-sans font-semibold text-lg tracking-tight text-ink mb-4">Coordination Flag</h3>
-          <div className="bg-terracotta/5 border border-terracotta/20 rounded-lg p-5">
+          <div className="bg-orange/5 border border-orange/20 rounded-lg p-5">
             <div className="flex items-center gap-2.5 mb-4">
-              <Warning size={20} weight="fill" className="text-terracotta" />
-              <span className="font-sans text-sm text-terracotta font-bold">
+              <Warning size={20} weight="fill" className="text-orange" />
+              <span className="font-sans text-sm text-orange font-bold">
                 Confidence: {Math.round(provenance.coordinationFlag.confidence * 100)}%
               </span>
               {provenance.coordinationFlag.contestable && (
-                <span className="px-2 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider bg-gold/10 text-gold border border-gold/20 ml-auto">
+                <span className="px-2 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider bg-violet/10 text-violet border border-violet/20 ml-auto shadow-sm">
                   Contestable
                 </span>
               )}

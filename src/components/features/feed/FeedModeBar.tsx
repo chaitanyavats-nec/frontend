@@ -18,12 +18,12 @@ const modeOptions: { value: FeedMode; label: string }[] = [
 ];
 
 const domainColors: Record<string, string> = {
-  politics: "border-terracotta/40 text-terracotta",
-  science: "border-sage/40 text-sage-dark",
-  local: "border-gold/40 text-gold",
+  politics: "border-orange/20 text-orange bg-orange/5",
+  science: "border-teal/20 text-teal-dark bg-teal/5",
+  local: "border-violet/20 text-violet bg-violet/5",
   culture: "border-slate/40 text-slate",
-  technology: "border-sage/40 text-sage",
-  economics: "border-gold/40 text-gold",
+  technology: "border-teal/20 text-teal bg-teal/5",
+  economics: "border-violet/20 text-violet bg-violet/5",
 };
 
 export function FeedModeBar({
@@ -44,10 +44,10 @@ export function FeedModeBar({
             role="tab"
             aria-selected={mode === option.value}
             className={cn(
-              "px-3 py-1.5 rounded-lg font-medium text-xs transition-colors duration-150",
+              "px-3 py-1.5 rounded-lg font-bold text-xs transition-all duration-150 uppercase tracking-wider",
               mode === option.value
-                ? "bg-sage text-white-0"
-                : "bg-transparent text-slate border border-paper-dark hover:border-sage/30 hover:text-ink"
+                ? "bg-teal text-paper shadow-sm"
+                : "bg-transparent text-slate border border-paper-dark hover:border-teal/30 hover:text-ink"
             )}
           >
             {option.label}
@@ -57,14 +57,14 @@ export function FeedModeBar({
 
       {/* Topic Chips (when Topics mode is selected) */}
       {mode === "topics" && (
-        <div className="mt-3 flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
+        <div className="mt-3 -mx-4 px-4 flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide shrink-0">
           <button
             onClick={() => onTopicSelect?.("")}
             className={cn(
-              "px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors duration-150 border shrink-0",
+              "px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-150 border shrink-0 uppercase tracking-tighter",
               !selectedTopic
-                ? "bg-sage text-white-0 border-sage"
-                : "bg-transparent text-slate border-paper-dark hover:border-sage/30"
+                ? "bg-teal text-paper border-teal"
+                : "bg-transparent text-slate border-paper-dark hover:border-teal/30"
             )}
           >
             All
@@ -74,9 +74,9 @@ export function FeedModeBar({
               key={topic.slug}
               onClick={() => onTopicSelect?.(topic.slug)}
               className={cn(
-                "px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors duration-150 border shrink-0",
+                "px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-150 border shrink-0 uppercase tracking-tighter",
                 selectedTopic === topic.slug
-                  ? "bg-sage text-white-0 border-sage"
+                  ? "bg-teal text-paper border-teal shadow-sm"
                   : cn("bg-transparent border", domainColors[topic.domain] || "border-paper-dark text-slate")
               )}
             >
