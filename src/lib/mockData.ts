@@ -304,6 +304,13 @@ export const mockPosts: Post[] = [
     authorDisplayName: mockProfiles[0].displayName,
     content:
       "The fundamental flaw in platform capitalism isn't the technology — it's the incentive structure. When engagement equals revenue, platforms will always optimise for emotional arousal over informed discourse. Agora's model proves there's an alternative: fund infrastructure through governance, not attention harvesting.\n\nWe've been running cooperative platform experiments in Lagos for two years now. The data is clear: when you remove engagement metrics, conversation quality improves by every measure we can track.",
+    media: [
+      {
+        url: "/images/network.png",
+        type: "image",
+        altText: "A decentralized human network illustration",
+      },
+    ],
     topicTags: ["platform-cooperativism", "data-sovereignty"],
     provenance: provenanceOriginal1,
     replyCount: 23,
@@ -316,6 +323,13 @@ export const mockPosts: Post[] = [
     authorDisplayName: mockProfiles[1].displayName,
     content:
       "Just filed my annual affiliation declaration. Zero institutional ties, zero undisclosed funding. I know some people find the provenance system burdensome, but as a journalist in Latin America, this is exactly the transparency I wish mainstream media had. Every source traceable, every conflict of interest visible.\n\nThe story I'm working on about mining concessions in Oaxaca would be impossible to publish on corporate platforms without self-censorship.",
+    media: [
+      {
+        url: "/images/engagement.png",
+        type: "image",
+        altText: "Civic gathering in an urban square",
+      },
+    ],
     topicTags: ["journalism", "transparency"],
     provenance: provenanceOriginal2,
     replyCount: 8,
@@ -452,6 +466,13 @@ export const mockPosts: Post[] = [
     authorDisplayName: mockProfiles[0].displayName,
     content:
       "A new preprint on algorithmic amplification confirms what platform researchers have suspected: recommendation algorithms don't just reflect polarisation — they manufacture it. The study analysed 2.3 billion content impressions across three platforms and found that 'engagement-optimised' feeds increased exposure to extreme content by 340% compared to chronological feeds.\n\nThis is why Agora defaults to chronological. It's not a design limitation. It's a design decision.",
+    media: [
+      {
+        url: "/images/sovereignty.png",
+        type: "image",
+        altText: "Abstract digital sovereignty visualization",
+      },
+    ],
     citations: [
       {
         url: "https://arxiv.org/abs/2025.04521",

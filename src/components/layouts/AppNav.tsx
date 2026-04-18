@@ -66,9 +66,9 @@ export function AppNav() {
       </div>
 
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex lg:flex-col lg:w-20 lg:fixed lg:inset-y-0 lg:left-0 bg-surface border-r border-paper-dark z-40 transition-all duration-300">
+      <aside className="hidden lg:flex lg:flex-col lg:w-20 lg:fixed lg:inset-y-0 z-40 transition-all duration-300 left-[max(0px,calc(50%-640px))]">
         <div className="flex flex-col items-center pt-8 pb-6">
-          <h1 className="font-editorial text-3xl font-bold text-ink tracking-tight leading-none">
+          <h1 className="font-editorial text-3xl font-bold text-ink tracking-tight leading-none cursor-default">
             A
           </h1>
           <p className="font-mono text-[8px] uppercase tracking-tighter text-slate mt-1 opacity-70">
@@ -76,7 +76,7 @@ export function AppNav() {
           </p>
         </div>
 
-        <nav className="flex-1 px-3 space-y-1" role="navigation" aria-label="Main navigation">
+        <nav className="flex-1 px-3 space-y-2 mt-4" role="navigation" aria-label="Main navigation">
           {desktopNavItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.href);
@@ -88,18 +88,27 @@ export function AppNav() {
                   "flex items-center justify-center p-3 rounded-xl transition-all duration-150 relative group",
                   active
                     ? "bg-teal/10 text-teal shadow-inner"
-                    : "text-slate hover:text-ink hover:bg-paper-dark/40"
+                    : "text-slate hover:text-ink hover:bg-paper-dark/20"
                 )}
                 aria-current={active ? "page" : undefined}
-                title={item.label}
               >
-                <Icon size={24} weight={active ? "fill" : "regular"} className="group-hover:scale-110 transition-transform" />
+                <div className="relative">
+                  <Icon size={24} weight={active ? "fill" : "regular"} className="group-hover:scale-110 transition-transform" />
+                  {item.badge && item.badge > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 bg-orange text-paper text-[10px] font-bold rounded-full h-4 min-w-[16px] flex items-center justify-center px-1 shadow-sm border border-paper">
+                      {item.badge}
+                    </span>
+                  )}
+                </div>
+                
+                {/* Custom Tooltip */}
+                <div className="absolute left-full ml-3 px-2.5 py-1.5 bg-ink text-paper text-[11px] font-bold uppercase tracking-wider rounded-md opacity-0 translate-x-[-8px] group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 whitespace-nowrap pointer-events-none z-50 shadow-xl border border-ink/10">
+                  {item.label}
+                  {/* Arrow */}
+                  <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-ink rotate-45" />
+                </div>
+                
                 <span className="sr-only">{item.label}</span>
-                {item.badge && item.badge > 0 && (
-                  <span className="ml-auto bg-orange text-paper text-xs font-medium rounded-full h-5 min-w-[20px] flex items-center justify-center px-1.5 shadow-sm">
-                    {item.badge}
-                  </span>
-                )}
               </Link>
             );
           })}
@@ -110,16 +119,23 @@ export function AppNav() {
           <ThemeToggle />
 
           <button
-            className="flex flex-col items-center gap-1 text-slate hover:text-ink transition-colors duration-150 group"
+            className="flex flex-col items-center gap-1 text-slate hover:text-ink transition-colors duration-150 group relative"
             aria-label="Notifications"
-            title="Notifications"
           >
             <div className="relative">
               <Bell size={24} className="group-hover:scale-110 transition-transform" />
-              <span className="absolute -top-1 -right-1 bg-orange text-paper rounded-full h-4 min-w-[16px] flex items-center justify-center px-1 text-[9px] font-bold shadow-sm">
+              <span className="absolute -top-1.5 -right-1.5 bg-orange text-paper rounded-full h-4 min-w-[16px] flex items-center justify-center px-1 text-[9px] font-bold shadow-sm border border-paper">
                 3
               </span>
             </div>
+            
+            {/* Custom Tooltip */}
+            <div className="absolute left-full ml-3 px-2.5 py-1.5 bg-ink text-paper text-[11px] font-bold uppercase tracking-wider rounded-md opacity-0 translate-x-[-8px] group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 whitespace-nowrap pointer-events-none z-50 shadow-xl border border-ink/10">
+              Notifications
+              {/* Arrow */}
+              <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-ink rotate-45" />
+            </div>
+            
             <span className="sr-only">Notifications</span>
           </button>
         </div>

@@ -81,7 +81,7 @@ function CollapsedPill({
       {affiliationName && (
         <>
           <span className="opacity-50">·</span>
-          <span className="max-w-[120px] truncate">{affiliationName}</span>
+          <span className="max-w-[80px] sm:max-w-[120px] truncate">{affiliationName}</span>
         </>
       )}
     </button>

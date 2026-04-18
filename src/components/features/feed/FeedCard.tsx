@@ -1,6 +1,7 @@
 "use client";
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Post } from '@/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -76,14 +77,14 @@ export function FeedCard({ post, showProvenance = false, isReply = false }: Feed
               >
                 {post.authorDisplayName}
               </Link>
-              <span className="text-xs font-mono text-slate truncate hidden sm:inline">
-                {post.authorDid.substring(0, 24)}…
-              </span>
-              <span className="text-slate/40 hidden sm:inline">·</span>
-              <time className="text-xs text-slate shrink-0">
-                {getRelativeTime(post.timestamp)}
-              </time>
-            </div>
+               <span className="text-xs font-mono text-slate truncate hidden sm:inline">
+                 {post.authorDid.substring(0, 24)}…
+               </span>
+               <span className="text-slate/40 hidden sm:inline">·</span>
+               <time className="text-xs text-slate shrink-0">
+                 {getRelativeTime(post.timestamp)}
+               </time>
+             </div>
           </div>
 
           {/* ── Content Body ──────────────────────────── */}
@@ -114,9 +115,11 @@ export function FeedCard({ post, showProvenance = false, isReply = false }: Feed
                   )}
                 >
                   {item.type === "image" ? (
-                    <img
+                    <Image
                       src={item.url}
                       alt={item.altText || "Post image"}
+                      width={800}
+                      height={600}
                       className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                     />
                   ) : item.type === "video" ? (
@@ -175,7 +178,7 @@ export function FeedCard({ post, showProvenance = false, isReply = false }: Feed
           {/* ── Provenance + Actions Footer ───────────── */}
           <div
             className={cn(
-              'flex items-center justify-between pt-2.5',
+              'flex items-center justify-between flex-wrap gap-2 pt-2.5',
               !isReply && 'border-t border-paper-dark/60 mt-1'
             )}
           >
