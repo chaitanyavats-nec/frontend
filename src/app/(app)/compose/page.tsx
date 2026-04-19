@@ -1,148 +1,158 @@
 "use client";
 
 import { useState } from "react";
-import { PaperPlaneRight, Plus } from "phosphor-react";
+import { useMockData } from "@/hooks/useMockData";
+import { usePosts } from "@/hooks/usePosts";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { ProvenanceTag } from "@/components/features/provenance/ProvenanceTag";
+import { ArrowLeft, TextAa, Link as LinkIcon, Info } from "phosphor-react";
+import { useRouter } from "next/navigation";
+import type { ProvenanceRecord, Post } from "@/types";
 
 export default function ComposePage() {
-  const [content, setContent] = useState("");
-  const [sourceType, setSourceType] = useState<"original" | "derived" | "republished">("original");
-  const [citations, setCitations] = useState<{ url: string; title: string }[]>([]);
+  const router = useRouter();
+  const { topics, currentUser } = useMockData();
+  const { createPost, isCreating, createError } = usePosts();
+  
+  const [body, setBody] = useState("");
+  const [topicId, setTopicId] = useState("");
+  const [citationUrl, setCitationUrl] = useState("");
+  const [provenanceType, setProvenanceType] = useState<any>("original");
 
-  const addCitation = () => {
-    setCitations([...citations, { url: "", title: "" }]);
+  // Construct a preview provenance record
+  const previewProvenance: ProvenanceRecord = {
+    postCid: "preview-cid",
+    sourceType: provenanceType,
+    transmissionChain: [],
+    authorAffiliations: currentUser.verifiedAffiliations || [],
   };
 
-  const updateCitation = (index: number, field: "url" | "title", value: string) => {
-    const newCitations = [...citations];
-    newCitations[index][field] = value;
-    setCitations(newCitations);
-  };
-
-  const removeCitation = (index: number) => {
-    setCitations(citations.filter((_, i) => i !== index));
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await createPost({
+        body,
+        topicId,
+        provenanceType,
+        citationUrl: citationUrl || null,
+      });
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <div className="mb-2">
-        <h1 className="font-sans font-bold text-2xl tracking-tight text-ink">Publish</h1>
-        <p className="font-sans text-sm text-slate mt-1">
-          Share information with full provenance and context.
-        </p>
-      </div>
+    <div className="max-w-2xl mx-auto py-8 px-4 font-sans min-h-screen">
+      <header className="flex items-center justify-between mb-12">
+        <button 
+          onClick={() => router.back()}
+          className="p-2 -ml-2 rounded-full hover:bg-paper-dark/30 transition-colors text-slate"
+        >
+          <ArrowLeft size={20} />
+        </button>
+        <h1 className="font-editorial font-bold text-2xl tracking-tight text-ink">New Contribution</h1>
+        <div className="w-9" /> {/* Spacer */}
+      </header>
 
-      <div className="space-y-6">
-        {/* Content Area */}
-        <div className="bg-surface p-5 rounded-lg border border-paper-dark focus-within:border-sage/50 transition-colors shadow-sm">
+      <form onSubmit={handleSubmit} className="space-y-10">
+        {/* Editor Area */}
+        <div className="space-y-6">
           <textarea
-            className="w-full bg-transparent border-none focus:ring-0 resize-none font-sans text-base text-ink placeholder:text-slate/50 min-h-[150px]"
-            placeholder="What do you want to share?"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
+            required
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            placeholder="What is the evidence? What is the context?"
+            className="w-full bg-transparent border-none focus:ring-0 text-xl font-sans leading-relaxed text-ink placeholder:text-slate/40 min-h-[200px] resize-none"
           />
-        </div>
 
-        {/* Provenance Settings */}
-        <div className="bg-surface p-6 rounded-lg border border-paper-dark shadow-sm">
-          <h2 className="font-sans font-semibold text-lg tracking-tight text-ink mb-5">Provenance Declaration</h2>
-          
-          <div className="space-y-6">
-            <div>
-              <label className="font-mono text-[11px] uppercase tracking-wider font-semibold text-slate block mb-3">Claim Type</label>
-              <div className="flex gap-3 flex-wrap">
-                {(["original", "derived", "republished"] as const).map((type) => (
-                  <button
-                    key={type}
-                    onClick={() => setSourceType(type)}
-                    className={cn(
-                      "px-4 py-2 rounded-lg font-sans font-medium text-sm capitalize transition-colors duration-150 border",
-                      sourceType === type
-                        ? "bg-sage text-white-0 border-sage"
-                        : "bg-paper text-slate border-paper-dark hover:border-sage/30 hover:bg-sage/5"
-                    )}
-                  >
-                    {type}
-                  </button>
-                ))}
-              </div>
-              <p className="font-sans text-sm text-slate mt-3 leading-relaxed">
-                {sourceType === "original" && "You are the primary source or witness to this information."}
-                {sourceType === "derived" && "This information is synthesized or analyzed from other sources."}
-                {sourceType === "republished" && "This is a direct quote or repost of existing information."}
-              </p>
+          <div className="flex items-center gap-4 border-y border-paper-dark py-4">
+            <div className="flex-1 flex items-center gap-2 group">
+              <LinkIcon size={18} className="text-slate group-focus-within:text-teal transition-colors" />
+              <input
+                type="url"
+                value={citationUrl}
+                onChange={(e) => setCitationUrl(e.target.value)}
+                placeholder="Primary source URL (optional)"
+                className="bg-transparent border-none focus:ring-0 text-sm font-mono text-teal w-full placeholder:text-slate/30"
+              />
             </div>
-
-            {/* Citations block for derived/republished */}
-            {sourceType !== "original" && (
-              <div className="pt-5 border-t border-paper-dark">
-                <div className="flex items-center justify-between mb-4">
-                  <label className="font-mono text-[11px] uppercase tracking-wider font-semibold text-slate">Source Citations (Required)</label>
-                  <button
-                    onClick={addCitation}
-                    className="flex items-center gap-1.5 font-sans font-medium text-xs text-sage hover:text-sage-dark bg-sage/10 hover:bg-sage/20 px-2.5 py-1.5 rounded-md transition-colors"
-                  >
-                    <Plus size={14} /> Add Source
-                  </button>
-                </div>
-                
-                {citations.length === 0 ? (
-                  <div className="p-6 rounded-lg border border-dashed border-paper-dark text-center bg-paper/50">
-                    <p className="font-sans text-sm text-slate">
-                      Non-original claims require at least one cited source.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {citations.map((cite, i) => (
-                      <div key={i} className="flex gap-3 items-start bg-paper/50 p-4 rounded-lg border border-paper-dark">
-                        <div className="flex-1 space-y-3">
-                          <input
-                            type="text"
-                            placeholder="Source Title/Description"
-                            className="w-full bg-surface border border-paper-dark rounded-md px-3 py-2 font-sans text-sm text-ink focus:outline-none focus:border-sage/50"
-                            value={cite.title}
-                            onChange={(e) => updateCitation(i, "title", e.target.value)}
-                          />
-                          <input
-                            type="url"
-                            placeholder="URL (optional)"
-                            className="w-full bg-surface border border-paper-dark rounded-md px-3 py-2 font-mono text-xs text-ink focus:outline-none focus:border-sage/50"
-                            value={cite.url}
-                            onChange={(e) => updateCitation(i, "url", e.target.value)}
-                          />
-                        </div>
-                        <button
-                          onClick={() => removeCitation(i)}
-                          className="p-2 rounded-md text-slate hover:text-terracotta hover:bg-terracotta/10 transition-colors"
-                          title="Remove source"
-                        >
-                          &times;
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
           </div>
         </div>
 
-        {/* Action Row */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
-          <p className="font-sans text-xs text-slate">
-            All declarations are logged on-chain.
+        {/* Metadata section */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+          <div className="space-y-3">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-slate flex items-center gap-1.5">
+              Topic Category
+            </label>
+            <select
+              required
+              value={topicId}
+              onChange={(e) => setTopicId(e.target.value)}
+              className="w-full bg-paper border border-paper-dark rounded-lg px-4 py-3 text-sm font-sans focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all appearance-none cursor-pointer"
+            >
+              <option value="" disabled>Select a topic...</option>
+              {topics.map((t) => (
+                <option key={t.slug} value={(t as any).id || t.slug}>
+                  {t.displayName}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="space-y-3">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-slate flex items-center gap-1.5">
+              Provenance Type
+            </label>
+            <select
+              required
+              value={provenanceType}
+              onChange={(e) => setProvenanceType(e.target.value)}
+              className="w-full bg-paper border border-paper-dark rounded-lg px-4 py-3 text-sm font-sans focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all appearance-none cursor-pointer"
+            >
+              <option value="original">Original Contribution</option>
+              <option value="institutional">Institutional / Official</option>
+              <option value="derived">Derived / Analysis</option>
+              <option value="republished">Republished Content</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Preview section */}
+        <div className="bg-surface border border-paper-dark p-6 rounded-xl space-y-4 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-slate">Live Provenance Preview</span>
+            <Info size={14} className="text-slate/50" />
+          </div>
+          <div className="pt-2">
+            <ProvenanceTag 
+              provenance={previewProvenance} 
+              postId="preview" 
+              expanded={true}
+            />
+          </div>
+          <p className="text-[10px] text-slate italic pt-2">
+            Your verified affiliations ({currentUser.verifiedAffiliations.length}) will be automatically attached to this post's provenance chain.
           </p>
+        </div>
+
+        {createError && (
+          <p className="text-terracotta text-xs font-medium text-center bg-terracotta/5 py-3 rounded-lg border border-terracotta/20">
+            {(createError as any).message || "Failed to publish post."}
+          </p>
+        )}
+
+        <div className="pt-8">
           <Button
-            className="flex items-center gap-2 px-8"
-            disabled={!content || (sourceType !== "original" && citations.length === 0)}
+            type="submit"
+            disabled={isCreating || !body || !topicId}
+            className="w-full bg-ink text-paper h-14 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-teal transition-all duration-300 shadow-xl shadow-ink/10 disabled:opacity-50 disabled:hover:bg-ink"
           >
-            <span>Publish</span>
-            <PaperPlaneRight size={16} weight="fill" />
+            {isCreating ? "Publishing to Agora..." : "Publish Contribution"}
           </Button>
         </div>
-      </div>
+      </form>
     </div>
   );
 }

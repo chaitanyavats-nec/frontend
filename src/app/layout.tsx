@@ -28,6 +28,7 @@ export const metadata: Metadata = {
 };
 
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { ReactQueryProvider } from "@/components/providers/ReactQueryProvider";
 
 export default function RootLayout({
   children,
@@ -41,9 +42,11 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-          {children}
-        </ThemeProvider>
+        <ReactQueryProvider>
+          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+            {children}
+          </ThemeProvider>
+        </ReactQueryProvider>
       </body>
     </html>
   );
