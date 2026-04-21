@@ -4,14 +4,17 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "phosphor-react";
 import { ProvenanceFullChain } from "@/components/features/provenance/ProvenanceTag";
-import { useMockData } from "@/hooks/useMockData";
+import { usePost } from "@/hooks/usePost";
 
 export default function ProvenancePage() {
   const params = useParams();
-  const { getPostById } = useMockData();
-  const post = getPostById(params.id as string);
+  const { post, loading, error } = usePost(params.id as string);
 
-  if (!post) {
+  if (loading) {
+    return <div className="py-20 text-center animate-pulse text-slate">Loading chain...</div>;
+  }
+
+  if (error || !post) {
     return (
       <div className="py-12 text-center">
         <p className="font-editorial text-base text-slate">Post not found.</p>
@@ -40,10 +43,10 @@ export default function ProvenancePage() {
       {/* Post preview */}
       <div className="mb-8 p-4 bg-paper-dark/40 rounded-md border border-paper-dark">
         <p className="font-editorial text-sm text-slate line-clamp-3">
-          {post.content}
+          {post.body}
         </p>
         <span className="font-mono text-xs text-slate-light mt-2 block">
-          by {post.authorDisplayName} · {new Date(post.timestamp).toLocaleDateString("en-GB", {
+          by {post.author.display_name} · {new Date(post.created_at).toLocaleDateString("en-GB", {
             day: "numeric",
             month: "short",
             year: "numeric",
@@ -52,7 +55,7 @@ export default function ProvenancePage() {
       </div>
 
       {/* Full Provenance Chain (STATE 3) */}
-      <ProvenanceFullChain provenance={post.provenance} />
+      <ProvenanceFullChain post={post} />
     </div>
   );
 }

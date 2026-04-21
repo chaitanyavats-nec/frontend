@@ -1,3 +1,9 @@
+// ─── Database & Enriched Types ──────────────────────────────
+export * from "./db";
+import { PostWithProvenance } from "./db";
+
+// ─── UI & Local Types ───────────────────────────────────────
+
 // ─── Media ──────────────────────────────────────────────────
 export interface MediaItem {
   url: string;
@@ -130,7 +136,7 @@ export interface GovernanceProposal {
 // ─── Moderation ─────────────────────────────────────────────
 export interface ModerationCase {
   id: string;
-  flaggedPost: Post;
+  flaggedPost: PostWithProvenance;
   flagType:
     | "coordination"
     | "citation-misrepresentation"
@@ -148,6 +154,7 @@ export interface ModerationCase {
 
 // ─── Topics & Feed ──────────────────────────────────────────
 export interface Topic {
+  id?: string;
   slug: string;
   displayName: string;
   domain: "politics" | "science" | "local" | "culture" | "technology" | "economics";

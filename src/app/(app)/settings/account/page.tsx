@@ -8,16 +8,26 @@ import {
   Textarea, 
   SettingAction 
 } from "@/components/features/settings/SettingsComponents";
-import { mockProfiles } from "@/lib/mockData";
 import { Copy, Plus, UserCircle, Image as ImageIcon } from "phosphor-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useProfile } from "@/hooks/useProfile";
+import { cn } from "@/lib/utils";
+import type { DbAffiliation } from "@/types";
 
 export default function AccountSettingsPage() {
-  const user = mockProfiles[0]; // In a real app, this would come from a hook
+  const { user } = useAuth();
+  const { profile, loading } = useProfile(user?.id || "");
 
   const handleCopyDid = () => {
-    navigator.clipboard.writeText(user.did);
-    alert("DID copied to clipboard");
+    if (profile?.did) {
+      navigator.clipboard.writeText(profile.did);
+      alert("DID copied to clipboard");
+    }
   };
+
+  if (loading || !profile) {
+    return <div className="p-8 text-center text-slate animate-pulse">Loading settings...</div>;
+  }
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -28,7 +38,7 @@ export default function AccountSettingsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div className="space-y-2">
             <label className="text-xs font-bold uppercase tracking-wider text-slate">Display Name</label>
-            <Input defaultValue={user.displayName} placeholder="Your name" />
+            <Input defaultValue={profile.display_name} placeholder="Your name" />
           </div>
           <div className="space-y-2">
             <label className="text-xs font-bold uppercase tracking-wider text-slate">Pronouns</label>
@@ -39,7 +49,7 @@ export default function AccountSettingsPage() {
         <div className="space-y-2 mb-6">
           <label className="text-xs font-bold uppercase tracking-wider text-slate">Bio / About</label>
           <Textarea 
-            defaultValue={user.bio} 
+            defaultValue={profile.bio || ""} 
             placeholder="Tell the community about yourself..." 
             className="h-24"
           />
@@ -94,19 +104,24 @@ export default function AccountSettingsPage() {
               </button>
             </div>
             <code className="block text-xs text-ink font-mono break-all bg-surface/50 p-2 rounded">
-              {user.did}
+              {profile.did || "Identity pending"}
             </code>
           </div>
 
           <div className="p-4 bg-paper-dark/10 rounded-xl space-y-3">
             <label className="text-[10px] font-bold uppercase tracking-widest text-slate">Linked Public Key</label>
             <code className="block text-xs text-ink font-mono break-all bg-surface/50 p-2 rounded">
-              z6MkR7vX2pQnKz8WfH3jL9mYcTbNsA4gE6dU
+              {profile.public_key || "No key attached"}
             </code>
           </div>
 
           <SettingItem label="BrightID Verification" description="Your proof-of-personhood status across the network.">
-            <span className="text-xs font-bold text-teal bg-teal/10 px-2 py-0.5 rounded uppercase tracking-wider">Verified</span>
+            <span className={cn(
+              "text-xs font-bold px-2 py-0.5 rounded uppercase tracking-wider",
+              profile.humanity_verified ? "text-teal bg-teal/10" : "text-slate bg-paper-dark/20"
+            )}>
+              {profile.humanity_verified ? "Verified" : "Unverified"}
+            </span>
           </SettingItem>
 
           <SettingItem label="Affiliation Declarations" description="Manage your verified institutional and community ties.">
@@ -116,9 +131,9 @@ export default function AccountSettingsPage() {
           </SettingItem>
 
           <div className="pl-4 space-y-2 border-l-2 border-paper-dark/50 ml-2">
-            {user.verifiedAffiliations.map((aff, i) => (
-              <div key={i} className="flex justify-between items-center text-sm py-1">
-                <span className="text-ink">{aff.organizationName} ({aff.affiliationType})</span>
+            {profile.affiliations?.map((aff: DbAffiliation, i: number) => (
+              <div key={aff.id || i} className="flex justify-between items-center text-sm py-1">
+                <span className="text-ink">{aff.organization_name} ({aff.affiliation_type})</span>
                 <button className="text-xs font-bold text-slate hover:text-orange transition-colors">REVOKE</button>
               </div>
             ))}

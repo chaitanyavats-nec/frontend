@@ -3,11 +3,10 @@
 import { ChatCircle, Flag, ShareNetwork } from "phosphor-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ProvenanceTag } from "@/components/features/provenance/ProvenanceTag";
-import type { Post, ProvenanceRecord } from "@/types";
+import type { PostWithProvenance } from "@/types";
 
 interface PostDetailProps {
-  post: Post;
-  provenance: ProvenanceRecord;
+  post: PostWithProvenance;
 }
 
 function getInitials(name?: string): string {
@@ -20,33 +19,33 @@ function getInitials(name?: string): string {
     .slice(0, 2) || "??";
 }
 
-export function PostDetail({ post, provenance }: PostDetailProps) {
+export function PostDetail({ post }: PostDetailProps) {
   return (
-    <article className="bg-surface rounded-lg border border-paper-dark p-5 sm:p-6" role="article" aria-label={`Post by ${post.authorDisplayName}`}>
+    <article className="bg-surface rounded-lg border border-paper-dark p-5 sm:p-6" role="article" aria-label={`Post by ${post.author.display_name}`}>
       {/* Author Row — larger avatar */}
       <div className="flex items-center gap-3 mb-4">
         <Avatar className="h-12 w-12">
-          {post.authorAvatarUrl && (
-            <AvatarImage src={post.authorAvatarUrl} alt={post.authorDisplayName} />
+          {post.author.avatar_url && (
+            <AvatarImage src={post.author.avatar_url} alt={post.author.display_name} />
           )}
-          <AvatarFallback className="text-sm">{getInitials(post.authorDisplayName)}</AvatarFallback>
+          <AvatarFallback className="text-sm">{getInitials(post.author.display_name)}</AvatarFallback>
         </Avatar>
 
         <div>
           <span className="font-semibold text-sm text-ink block">
-            {post.authorDisplayName}
+            {post.author.display_name}
           </span>
           <div className="flex items-center gap-2">
             <span className="font-mono text-xs text-slate">
-              {post.authorDid.length > 30
-                ? `${post.authorDid.slice(0, 20)}…${post.authorDid.slice(-8)}`
-                : post.authorDid}
+              {post.author.did && post.author.did.length > 30
+                ? `${post.author.did.slice(0, 20)}…${post.author.did.slice(-8)}`
+                : post.author.did || 'did:agora:unknown'}
             </span>
             <time
               className="text-xs text-slate"
-              dateTime={post.timestamp}
+              dateTime={post.created_at}
             >
-              {new Date(post.timestamp).toLocaleDateString("en-GB", {
+              {new Date(post.created_at).toLocaleDateString("en-GB", {
                 day: "numeric",
                 month: "short",
                 year: "numeric",
@@ -61,19 +60,19 @@ export function PostDetail({ post, provenance }: PostDetailProps) {
       {/* Full Content — no line clamp */}
       <div className="mb-4">
         <p className="text-base text-ink leading-relaxed whitespace-pre-wrap">
-          {post.content}
+          {post.body}
         </p>
       </div>
 
       {/* Media — full width */}
-      {post.media && post.media.length > 0 && (
-        <div className="mb-4 rounded-lg overflow-hidden">
-          {post.media.map((item, i) => (
+      {post.media_urls && post.media_urls.length > 0 && (
+        <div className="mb-4 rounded-lg overflow-hidden grid gap-2">
+          {post.media_urls.map((url, i) => (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               key={i}
-              src={item.url}
-              alt={item.altText}
+              src={url}
+              alt="Post image"
               className="w-full object-cover"
             />
           ))}
@@ -93,7 +92,7 @@ export function PostDetail({ post, provenance }: PostDetailProps) {
                 }`}
               >
                 <span className="px-1.5 py-0.5 rounded text-xs font-mono bg-paper-dark/50 text-slate shrink-0 mt-0.5">
-                  {citation.sourceType}
+                  {citation.source_type}
                 </span>
                 <div className="min-w-0">
                   <a
@@ -105,7 +104,7 @@ export function PostDetail({ post, provenance }: PostDetailProps) {
                     {citation.title}
                   </a>
                   <span className="text-xs text-slate">
-                    Accessed {new Date(citation.accessedAt).toLocaleDateString("en-GB", {
+                    Accessed {new Date(citation.accessed_at).toLocaleDateString("en-GB", {
                       day: "numeric",
                       month: "short",
                       year: "numeric",
@@ -118,19 +117,19 @@ export function PostDetail({ post, provenance }: PostDetailProps) {
         </div>
       )}
 
-      {/* ProvenanceTag — expanded by default (STATE 2) */}
+      {/* ProvenanceTag — expanded by default */}
       <div className="mb-4">
-        <ProvenanceTag provenance={provenance} postId={post.id} expanded={true} />
+        <ProvenanceTag post={post} expanded={true} />
       </div>
 
       {/* Action Row */}
       <div className="flex items-center gap-2 pt-3 border-t border-paper-dark">
         <button
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-slate hover:text-ink hover:bg-paper-dark/50 transition-colors duration-150 text-xs font-medium"
-          aria-label={`${post.replyCount} replies. Click to reply.`}
+          aria-label={`${post.reply_count} replies. Click to reply.`}
         >
           <ChatCircle size={18} />
-          <span>{post.replyCount} replies</span>
+          <span>{post.reply_count} replies</span>
         </button>
         <button
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-slate hover:text-terracotta hover:bg-terracotta/10 transition-colors duration-150 text-xs font-medium"

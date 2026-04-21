@@ -3,13 +3,13 @@
 import { CheckCircle } from "phosphor-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import type { UserProfile } from "@/types";
+import type { UserWithReputation } from "@/types";
 import { useFollows } from "@/hooks/useFollows";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 
 interface ProfileHeaderProps {
-  profile: UserProfile;
+  profile: UserWithReputation;
 }
 
 function getInitials(name?: string): string {
@@ -51,11 +51,11 @@ export function ProfileHeader({ profile }: ProfileHeaderProps) {
     <div className="bg-surface p-6 rounded-lg border border-paper-dark">
       <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-center">
         <Avatar className="h-24 w-24 border-2 border-surface shadow-sm">
-          {profile.avatarUrl && (
-            <AvatarImage src={profile.avatarUrl} alt={profile.displayName} />
+          {profile.avatar_url && (
+            <AvatarImage src={profile.avatar_url} alt={profile.display_name} />
           )}
           <AvatarFallback className="text-2xl font-semibold bg-paper-dark/10">
-            {getInitials(profile.displayName)}
+            {getInitials(profile.display_name)}
           </AvatarFallback>
         </Avatar>
 
@@ -64,24 +64,24 @@ export function ProfileHeader({ profile }: ProfileHeaderProps) {
             <div className="min-w-0">
               <div className="flex items-center gap-3 mb-1">
                 <h1 className="font-sans font-bold text-2xl text-ink truncate tracking-tight leading-tight">
-                  {profile.displayName}
+                  {profile.display_name}
                 </h1>
                 <span
                   className={cn(
                     "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider shrink-0",
-                    LADDER_COLORS[profile?.reputationScore?.ladderLevel || "new"]
+                    LADDER_COLORS[profile.ladder_level || "new"]
                   )}
                 >
-                  {profile?.reputationScore?.ladderLevel || "new"}
+                  {profile.ladder_level || "new"}
                 </span>
               </div>
               <div className="flex items-center gap-2 text-slate text-xs font-medium">
                 <span className="font-mono opacity-60 truncate">
-                  {profile?.did ? truncateDid(profile.did) : "No DID"}
+                  {profile.did ? truncateDid(profile.did) : "Identity pending"}
                 </span>
                 <span>·</span>
                 <span>
-                  Joined {profile?.joinedAt ? new Date(profile.joinedAt).toLocaleDateString("en-GB", { month: "short", year: "numeric" }) : "Recently"}
+                  Joined {profile.created_at ? new Date(profile.created_at).toLocaleDateString("en-GB", { month: "short", year: "numeric" }) : "Recently"}
                 </span>
               </div>
             </div>
@@ -104,11 +104,11 @@ export function ProfileHeader({ profile }: ProfileHeaderProps) {
 
           <div className="flex items-center gap-6 mb-4">
             <div className="flex items-center gap-1.5">
-              <span className="font-bold text-ink text-sm">{profile.followersCount || 0}</span>
+              <span className="font-bold text-ink text-sm">{profile.follower_count || 0}</span>
               <span className="text-slate text-xs uppercase tracking-widest font-medium opacity-70">Followers</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="font-bold text-ink text-sm">{profile.followingCount || 0}</span>
+              <span className="font-bold text-ink text-sm">{profile.following_count || 0}</span>
               <span className="text-slate text-xs uppercase tracking-widest font-medium opacity-70">Following</span>
             </div>
           </div>
@@ -120,19 +120,19 @@ export function ProfileHeader({ profile }: ProfileHeaderProps) {
           )}
 
           {/* Affiliations */}
-          {profile?.verifiedAffiliations && profile.verifiedAffiliations.length > 0 && (
+          {profile.affiliations && profile.affiliations.length > 0 && (
             <div className="flex flex-wrap gap-2">
-              {profile.verifiedAffiliations.map((aff) => (
+              {profile.affiliations.map((aff) => (
                 <div
-                  key={aff.organizationName}
+                  key={aff.id}
                   className="flex items-center gap-1.5 px-2.5 py-1.5 bg-paper-dark/30 hover:bg-paper-dark/50 transition-colors border border-paper-dark rounded-lg"
                 >
                   <CheckCircle size={14} className="text-sage shrink-0" weight="fill" />
                   <span className="font-medium text-xs text-ink">
-                    {aff.organizationName}
+                    {aff.organization_name}
                   </span>
                   <span className="font-medium text-[10px] text-slate uppercase bg-surface px-1.5 py-0.5 rounded-md border border-paper-dark shadow-sm">
-                    {aff.affiliationType}
+                    {aff.affiliation_type}
                   </span>
                 </div>
               ))}

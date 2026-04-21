@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "phosphor-react";
 import { useProfile } from "@/hooks/useProfile";
-import { usePosts } from "@/hooks/usePosts";
+import { useFeed } from "@/hooks/useFeed";
 import { ProfileHeader } from "@/components/features/profile/ProfileHeader";
 import { ReputationMeter } from "@/components/features/profile/ReputationMeter";
 import { FeedCard } from "@/components/features/feed/FeedCard";
@@ -13,8 +13,8 @@ export default function UserProfilePage() {
   const params = useParams();
   const did = params.did as string;
   
-  const { data: profile, isLoading: isProfileLoading } = useProfile(did);
-  const { posts, isPostsLoading } = usePosts();
+  const { profile, loading: isProfileLoading } = useProfile(did);
+  const { posts, loading: isPostsLoading } = useFeed("chronological");
 
   if (isProfileLoading) {
     return (
@@ -43,8 +43,18 @@ export default function UserProfilePage() {
     );
   }
 
-  // Get posts by this user (filtering from feed for now, ideally fetch by author)
-  const userPosts = posts?.filter((p) => p.authorDid === profile.did) || [];
+  // Get posts by this user (filtering from feed)
+  const userPosts = posts?.filter((p) => p.author.did === profile.did) || [];
+
+  // Construct reputation score for sub-component
+  const reputationScore = {
+    total: profile.reputation_total,
+    moderationAccuracy: profile.reputation_moderation_accuracy,
+    contentLongevity: profile.reputation_content_longevity,
+    disputeParticipation: profile.reputation_dispute_participation,
+    accountAgeWeight: profile.reputation_account_age_weight,
+    ladderLevel: profile.ladder_level,
+  };
 
   return (
     <div className="space-y-6">
@@ -87,7 +97,7 @@ export default function UserProfilePage() {
 
         {/* Right Column: Reputation */}
         <div className="order-1 lg:order-2">
-          <ReputationMeter score={profile.reputationScore} />
+          <ReputationMeter score={reputationScore} />
         </div>
       </div>
     </div>

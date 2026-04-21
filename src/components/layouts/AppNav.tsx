@@ -71,9 +71,9 @@ export function AppNav() {
         <div className="mb-8 px-4 w-full h-12 flex items-center">
           <Link href="/home" className="relative flex items-center justify-center w-12 h-12 shrink-0">
             <div className="absolute inset-0">
-              <div className="absolute top-0 left-2 w-7 h-7 bg-cyan-300/80 rounded-full mix-blend-screen" />
-              <div className="absolute bottom-1 left-0 w-7 h-7 bg-magenta-300/80 rounded-full mix-blend-screen" />
-              <div className="absolute bottom-1 right-0 w-7 h-7 bg-yellow-300/80 rounded-full mix-blend-screen" />
+              <div className="absolute top-0 left-2 w-7 h-7 bg-cyan-300/80 rounded-full mix-blend-multiply dark:mix-blend-screen" />
+              <div className="absolute bottom-1 left-0 w-7 h-7 bg-magenta-300/80 rounded-full mix-blend-multiply dark:mix-blend-screen" />
+              <div className="absolute bottom-1 right-0 w-7 h-7 bg-yellow-300/80 rounded-full mix-blend-multiply dark:mix-blend-screen" />
             </div>
             <span className="relative font-serif text-2xl font-black text-neutral-900 dark:text-neutral-50 leading-none">A</span>
           </Link>

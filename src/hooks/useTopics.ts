@@ -18,8 +18,9 @@ export function useTopics() {
       
       // Map to frontend Topic type
       return (data as unknown[]).map((t) => {
-        const topic = t as { slug: string; name: string; domain?: string };
+        const topic = t as { id: string; slug: string; name: string; domain?: string };
         return {
+          id: topic.id,
           slug: topic.slug,
           displayName: topic.name,
           domain: (topic.domain as "politics" | "science" | "local" | "culture" | "technology" | "economics") || "politics",

@@ -2,20 +2,22 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Post } from '@/types';
+import { PostWithProvenance } from '@/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   ChatCircle,
   GitCommit,
   ArrowUpRight,
+  ShieldCheck,
 } from 'phosphor-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useInteractions } from '@/hooks/useInteractions';
 import { useAuthModalStore } from '@/stores/useAuthModalStore';
+import { ProvenanceTag } from '../provenance/ProvenanceTag';
 
 interface FeedCardProps {
-  post: Post;
+  post: PostWithProvenance;
   showProvenance?: boolean;
   isReply?: boolean;
 }
@@ -72,34 +74,39 @@ export function FeedCard({ post, isReply = false }: FeedCardProps) {
       )}
       <div className={cn("p-3.5 sm:p-5", isReply && "p-0")}>
         <div className="flex items-start gap-4">
-          {/* ── Avatar ── */}
-          <Link href={`/profile/${post.authorDid}`} className="shrink-0">
-            <div className="relative w-10 h-10 rounded-full overflow-hidden border border-neutral-200 dark:border-neutral-700">
-              <Avatar className="h-full w-full">
-                <AvatarImage src={post.authorAvatarUrl} alt={post.authorDisplayName || ''} />
-                <AvatarFallback className="bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 font-mono text-xs">
-                  {getInitials(post.authorDisplayName)}
+          {/* ── Author Avatar ── */}
+          <div className="shrink-0 pt-1">
+            <Link href={`/profile/${post.author.did}`}>
+              <Avatar className="h-10 w-10 border-2 border-surface shadow-sm hover:opacity-90 transition-opacity">
+                {post.author.avatar_url && (
+                  <AvatarImage src={post.author.avatar_url} alt={post.author.display_name} />
+                )}
+                <AvatarFallback className="text-[14px] font-bold bg-paper-dark/10">
+                  {getInitials(post.author.display_name)}
                 </AvatarFallback>
               </Avatar>
-            </div>
-          </Link>
+            </Link>
+          </div>
 
           <div className="flex-1 min-w-0">
             {/* ── Header Row ── */}
             <div className="flex items-center justify-between gap-2 mb-1">
               <div className="flex items-center gap-2 min-w-0">
                 <Link
-                  href={`/profile/${post.authorDid}`}
+                  href={`/profile/${post.author.did}`}
                   className="font-sans font-bold text-[14px] text-neutral-900 dark:text-neutral-50 hover:text-cyan-600 transition-colors truncate"
                 >
-                  {post.authorDisplayName}
+                  {post.author.display_name}
                 </Link>
+                {post.coordination_survived && (
+                  <ShieldCheck size={14} className="text-teal" weight="fill" />
+                )}
                 <span className="text-[10px] font-mono text-neutral-400 truncate hidden sm:inline tracking-tighter">
-                  @{post.authorDid.substring(0, 8)}...
+                  @{post.author.did?.substring(0, 8) ?? 'unknown'}...
                 </span>
                 <span className="text-neutral-300 dark:text-neutral-700 hidden sm:inline">·</span>
                 <time className="text-[10px] font-mono text-neutral-400 shrink-0">
-                  {getRelativeTime(post.timestamp)}
+                  {getRelativeTime(post.created_at)}
                 </time>
               </div>
             </div>
@@ -112,83 +119,61 @@ export function FeedCard({ post, isReply = false }: FeedCardProps) {
                   isReply ? 'text-sm' : 'text-[15px]'
                 )}
               >
-                {post.content}
+                {post.body}
               </div>
             </div>
 
-            {/* ── Multimedia ── */}
-            {post.media && post.media.length > 0 && (
+            {/* ── Visual Media ── */}
+            {post.media_urls && post.media_urls.length > 0 && (
               <div
                 className={cn(
-                  "grid gap-1 mb-4 overflow-hidden rounded-sm border border-neutral-200 dark:border-neutral-800",
-                  post.media.length === 1 ? "grid-cols-1" : "grid-cols-2"
+                  'relative rounded-sm overflow-hidden mb-4 border border-paper-dark bg-paper-dark/30',
+                  post.media_urls.length > 1 ? 'grid grid-cols-2 gap-1' : 'block'
                 )}
               >
-                {post.media.map((item, idx) => (
+                {post.media_urls.map((url: string, idx: number) => (
                   <div
                     key={idx}
                     className={cn(
-                      "relative bg-neutral-100 dark:bg-neutral-900 flex items-center justify-center overflow-hidden",
-                      post.media && post.media.length === 1 ? "aspect-auto max-h-[500px]" : "aspect-square"
+                      'relative',
+                      post.media_urls!.length === 1 ? 'aspect-[16/9]' : 'aspect-square'
                     )}
                   >
-                    {item.type === "image" ? (
-                      <Image
-                        src={item.url}
-                        alt={item.altText || "Post image"}
-                        width={800}
-                        height={600}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : item.type === "video" ? (
-                      <video src={item.url} controls className="w-full h-full object-cover" />
-                    ) : null}
+                    <Image
+                      src={url}
+                      alt={`Media ${idx + 1}`}
+                      fill
+                      className="object-cover transition-transform duration-500 hover:scale-105"
+                    />
                   </div>
                 ))}
               </div>
             )}
 
             {/* ── Topic Tags ── */}
-            {post.topicTags && post.topicTags.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mb-4">
-                {post.topicTags.map((tag) => (
+            {post.topic_tags && post.topic_tags.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-4">
+                {post.topic_tags.map((tag: string) => (
                   <span
                     key={tag}
-                    className="text-[9px] font-mono font-medium px-2 py-0.5 rounded-xs bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800 uppercase tracking-wider"
+                    className="px-2 py-0.5 bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 rounded-full text-[10px] font-mono leading-none"
                   >
-                    {tag}
+                    #{tag}
                   </span>
                 ))}
               </div>
             )}
 
-            {/* ── Provenance Signature Box ── */}
-            {post.provenance && (
-              <div className="bg-neutral-50 dark:bg-neutral-900/50 border border-dashed border-neutral-200 dark:border-neutral-800 rounded-sm p-2 flex items-center gap-3 mb-4">
-                <div className="relative w-5 h-5 shrink-0">
-                  <div className="absolute top-0 left-0.5 w-3 h-3 bg-cyan-300/60 rounded-full" />
-                  <div className="absolute bottom-0 left-0 w-3 h-3 bg-magenta-300/60 rounded-full" />
-                  <div className="absolute bottom-0 right-0 w-3 h-3 bg-yellow-300/60 rounded-full" />
-                </div>
-                <div className="grow min-w-0">
-                  <div className="text-[8px] font-mono font-bold text-neutral-400 uppercase tracking-widest leading-none mb-1">
-                    Cryptographic Witness
-                  </div>
-                  <div className="text-[10px] font-mono text-neutral-500 truncate leading-none">
-                    sha256:{post.id.substring(0, 32)}...
-                  </div>
-                </div>
-                <div className="text-[9px] font-mono font-bold text-success uppercase shrink-0">
-                  Signed ✓
-                </div>
-              </div>
-            )}
+            {/* ── Provenance Tag ── */}
+            <div className="mb-4">
+              <ProvenanceTag post={post} />
+            </div>
 
             {/* ── Action Footer ── */}
             <div className="flex items-center justify-between pt-3 border-t border-dotted border-neutral-200 dark:border-neutral-800">
               <div className="flex items-center gap-4">
                 <span className="text-[10px] font-mono text-neutral-400">
-                  {post.provenance?.socialContext?.sourceNode || 'agora.io'}
+                  {post.origin_label || 'agora.io'}
                 </span>
               </div>
 
@@ -198,7 +183,7 @@ export function FeedCard({ post, isReply = false }: FeedCardProps) {
                   className="flex items-center gap-1.5 px-2 py-1.5 rounded-xs font-mono text-[10px] text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-50 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all border border-transparent hover:border-neutral-200 dark:hover:border-neutral-700"
                 >
                   <ChatCircle size={16} />
-                  <span>{post.replyCount || 0}</span>
+                  <span>{post.reply_count || 0}</span>
                 </button>
 
                 <button

@@ -17,8 +17,10 @@ const EXPLORE_TABS = [
   "Technology"
 ];
 
+import { useFeed } from "@/hooks/useFeed";
+
 export default function ExplorePage() {
-  const { posts } = useMockData();
+  const { posts, loading } = useFeed("curated");
   const [activeTab, setActiveTab] = useState("For you");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -73,15 +75,16 @@ export default function ExplorePage() {
            </div>
         )}
 
-        {/* Dynamic Feed based on tab (using mock posts for now) */}
-        {posts.map((post) => (
-          <FeedCard key={post.id} post={post} />
-        ))}
-        
-        {/* Load More Placeholder */}
-        <div className="py-10 text-center">
-          <div className="inline-block w-8 h-8 border-4 border-paper-dark border-t-teal rounded-full animate-spin" />
-        </div>
+        {/* Dynamic Feed based on tab */}
+        {loading ? (
+          <div className="space-y-4">
+            {[1, 2, 3].map(i => <div key={i} className="h-40 bg-surface rounded-xl animate-pulse border border-paper-dark" />)}
+          </div>
+        ) : (
+          posts.map((post) => (
+            <FeedCard key={post.id} post={post} />
+          ))
+        )}
       </div>
     </div>
   );

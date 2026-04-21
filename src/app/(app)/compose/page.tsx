@@ -6,27 +6,39 @@ import { usePosts } from "@/hooks/usePosts";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { ProvenanceTag } from "@/components/features/provenance/ProvenanceTag";
-import { ArrowLeft, Link as LinkIcon } from "phosphor-react";
+import { ArrowLeft, Link as LinkIcon, Image as ImageIcon, ChartBar, MapPin } from "phosphor-react";
 import { useRouter } from "next/navigation";
 import type { ProvenanceRecord } from "@/types";
 
 export default function ComposePage() {
   const router = useRouter();
+  const { user } = useAuth();
   const { data: topics } = useTopics();
-  useAuth();
   const { createPost, isCreating, createError } = usePosts();
-
   const [body, setBody] = useState("");
   const [topicId, setTopicId] = useState("");
   const [citationUrl, setCitationUrl] = useState("");
-  const [provenanceType, setProvenanceType] = useState<ProvenanceRecord["sourceType"]>("original");
+  const [provenanceType, setProvenanceType] = useState<any>("original");
 
-  // Construct a preview provenance record
-  const previewProvenance: ProvenanceRecord = {
-    postCid: "preview-cid",
-    sourceType: provenanceType,
-    transmissionChain: [],
-    authorAffiliations: [], // Placeholder until real affiliations are connected
+  // Construct a preview post object for the provenance tag
+  const previewPost: any = {
+    id: "preview",
+    content: body,
+    source_type: provenanceType,
+    author: {
+      display_name: (user as any)?.user_metadata?.display_name || user?.email?.split("@")[0] || "You",
+      did: (user as any)?.user_metadata?.did || (user?.id ? `did:agora:${user.id}` : "did:agora:preview"),
+      avatar_url: (user as any)?.user_metadata?.avatar_url,
+      ladder_level: "new",
+      reputation_total: 0,
+    },
+    author_affiliations: [],
+    media_urls: [],
+    topic_tags: topicId ? [topicId] : [],
+    created_at: new Date().toISOString(),
+    _provenance_verified: false,
+    _content_permanent: false,
+    _funding_verified: false,
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -70,7 +82,32 @@ export default function ComposePage() {
             className="w-full bg-transparent border-none focus:ring-0 text-lg font-sans leading-relaxed text-neutral-800 dark:text-neutral-200 placeholder:text-neutral-300 dark:placeholder:text-neutral-700 min-h-[250px] resize-none"
           />
 
-          <div className="flex items-center gap-4 border-y border-neutral-200 dark:border-neutral-800 py-4">
+          <div className="flex flex-col gap-4 border-y border-neutral-200 dark:border-neutral-800 py-4">
+            {/* Rich Media Action Bar */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 -mb-1 hide-scrollbar">
+              <button
+                type="button"
+                className="flex items-center gap-2 px-3 py-2 rounded-sm text-neutral-500 hover:text-cyan-600 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 transition-all text-xs font-bold uppercase tracking-wider font-mono shrink-0"
+              >
+                <ImageIcon size={18} />
+                <span>Media</span>
+              </button>
+              <button
+                type="button"
+                className="flex items-center gap-2 px-3 py-2 rounded-sm text-neutral-500 hover:text-cyan-600 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 transition-all text-xs font-bold uppercase tracking-wider font-mono shrink-0"
+              >
+                <ChartBar size={18} />
+                <span>Poll</span>
+              </button>
+              <button
+                type="button"
+                className="flex items-center gap-2 px-3 py-2 rounded-sm text-neutral-500 hover:text-cyan-600 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 transition-all text-xs font-bold uppercase tracking-wider font-mono shrink-0"
+              >
+                <MapPin size={18} />
+                <span>Location</span>
+              </button>
+            </div>
+
             <div className="flex-1 flex items-center gap-3 group">
               <LinkIcon size={18} className="text-neutral-400 group-focus-within:text-cyan-600 transition-colors" />
               <input
@@ -91,14 +128,13 @@ export default function ComposePage() {
               Topic Category
             </label>
             <select
-              required
               value={topicId}
               onChange={(e) => setTopicId(e.target.value)}
               className="w-full bg-paper-raised border border-neutral-300 dark:border-neutral-700 rounded-sm px-4 py-3 text-sm font-sans focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all appearance-none cursor-pointer text-neutral-900 dark:text-neutral-50"
             >
-              <option value="" disabled>Select a topic...</option>
+              <option value="">No Specific Topic (Optional)</option>
               {topics?.map((t) => (
-                <option key={t.slug} value={t.slug}>
+                <option key={t.id || t.slug} value={t.id || t.slug}>
                   {t.displayName}
                 </option>
               ))}
@@ -135,8 +171,7 @@ export default function ComposePage() {
           </div>
           <div className="pt-2">
             <ProvenanceTag
-              provenance={previewProvenance}
-              postId="preview"
+              post={previewPost}
               expanded={true}
             />
           </div>
@@ -156,7 +191,7 @@ export default function ComposePage() {
         <div className="pt-8">
           <Button
             type="submit"
-            disabled={isCreating || !body || !topicId}
+            disabled={isCreating || !body}
             className="w-full bg-neutral-900 dark:bg-neutral-50 text-neutral-50 dark:text-neutral-900 h-16 rounded-sm font-mono font-bold uppercase tracking-[0.2em] text-xs hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed shadow-2xl"
           >
             {isCreating ? "Witnessing Content..." : "Commit Transfer"}

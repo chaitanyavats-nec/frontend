@@ -7,12 +7,19 @@ import { PostDetail } from "@/components/features/feed/PostDetail";
 import { FeedCard } from "@/components/features/feed/FeedCard";
 import { useMockData } from "@/hooks/useMockData";
 
+import { usePost } from "@/hooks/usePost";
+import { useFeed } from "@/hooks/useFeed";
+
 export default function PostDetailPage() {
   const params = useParams();
-  const { getPostById, posts } = useMockData();
-  const post = getPostById(params.id as string);
+  const { post, loading: isPostLoading, error } = usePost(params.id as string);
+  const { posts: allPosts, loading: isFeedLoading } = useFeed("chronological");
 
-  if (!post) {
+  if (isPostLoading) {
+    return <div className="py-20 text-center animate-pulse text-slate">Loading post details...</div>;
+  }
+
+  if (error || !post) {
     return (
       <div className="py-12 text-center bg-surface border border-paper-dark rounded-lg">
         <p className="font-sans text-sm text-slate">Post not found.</p>
@@ -28,7 +35,7 @@ export default function PostDetailPage() {
   }
 
   // Mock replies: use other posts as mock replies
-  const mockReplies = posts.filter((p) => p.id !== post.id).slice(0, 3);
+  const mockReplies = allPosts.filter((p) => p.id !== post.id).slice(0, 3);
 
   return (
     <div>
@@ -42,18 +49,22 @@ export default function PostDetailPage() {
       </Link>
 
       {/* Post Detail */}
-      <PostDetail post={post} provenance={post.provenance} />
+      <PostDetail post={post} />
 
       {/* Reply Thread */}
-      {mockReplies.length > 0 && (
+      {(isFeedLoading || mockReplies.length > 0) && (
         <div className="mt-8">
           <h3 className="font-semibold text-lg text-ink mb-4 tracking-tight">
-            {post.replyCount} replies
+            {post.reply_count} replies
           </h3>
           <div className="space-y-4">
-            {mockReplies.map((reply) => (
-              <FeedCard key={reply.id} post={reply} showProvenance={false} isReply />
-            ))}
+            {isFeedLoading ? (
+              [1, 2].map(i => <div key={i} className="h-32 bg-surface rounded-lg animate-pulse" />)
+            ) : (
+              mockReplies.map((reply) => (
+                <FeedCard key={reply.id} post={reply} showProvenance={false} isReply />
+              ))
+            )}
           </div>
         </div>
       )}

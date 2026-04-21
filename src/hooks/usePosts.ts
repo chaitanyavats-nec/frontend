@@ -1,106 +1,75 @@
-"use client";
-
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
+import { normalisePost } from "@/lib/normalise";
+import { USE_MOCK_DATA } from "@/lib/config";
+import { mockPosts } from "@/lib/mockData";
 
-export function usePosts(mode: "chronological" | "following" = "chronological") {
+export function usePosts() {
   const supabase = createClient();
   const router = useRouter();
   const queryClient = useQueryClient();
 
   // Get posts for feed (joining profiles)
   const { data: posts, isLoading: isPostsLoading } = useQuery({
-    queryKey: ["posts", mode],
+    queryKey: ["posts"],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      let query = supabase
+      if (USE_MOCK_DATA) {
+        return mockPosts.map(normalisePost);
+      }
+
+      const { data, error } = await supabase
         .from("posts")
         .select(`
           *,
           author:profiles(*)
         `)
         .order("created_at", { ascending: false });
-
-      // Apply "Following" filter if authenticated
-      if (mode === "following" && user) {
-        // Get followed user IDs
-        const { data: follows } = await supabase
-          .from("follows")
-          .select("following_id")
-          .eq("follower_id", user.id);
-        
-        const followedIds = follows?.map(f => f.following_id) || [];
-        
-        // Filter query
-        if (followedIds.length > 0) {
-          query = query.in("author_id", followedIds);
-        } else {
-          // If following no one, return empty or handle differently
-          // For now, let's return an empty array for a clean "Following" feed
-          return [];
-        }
-      }
-      
-      const { data, error } = await query;
       
       if (error) throw error;
-      
-      // Map to frontend Post type (simplified for now)
-      return (data as unknown[]).map((p) => {
-        const post = p as {
-          id: string;
-          author: { did: string; display_name: string; avatar_url?: string };
-          body: string;
-          created_at: string;
-          topic_id: string;
-          provenance_type: "original" | "derived" | "republished" | "institutional";
-          citation_url?: string;
-        };
-        return {
-          id: post.id,
-          authorDid: post.author.did,
-          authorDisplayName: post.author.display_name,
-          authorAvatarUrl: post.author.avatar_url,
-          content: post.body,
-          timestamp: post.created_at,
-          topicId: post.topic_id,
-          topicTags: [], // Placeholder for now
-          provenance: { 
-            postCid: post.id,
-            sourceType: post.provenance_type,
-            originUrl: post.citation_url,
-            transmissionChain: [],
-            authorAffiliations: [],
-          },
-          replyCount: 0,
-          signature: "0x0", // Placeholder for now
-        };
-      });
+      return (data || []).map(normalisePost);
     },
   });
 
   const createPostMutation = useMutation({
     mutationFn: async ({ body, topicId, provenanceType, citationUrl }: Record<string, string | null>) => {
+      if (USE_MOCK_DATA) {
+        console.log("Mock post created:", { body, topicId, provenanceType, citationUrl });
+        return { id: "mock-" + Date.now() };
+      }
+
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Authenticated user required");
 
-      // Step 3 — Confirm profile exists
-      const { data: profile, error: profileCheckError } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("id", user.id)
-        .single();
-      
-      if (!profile || profileCheckError) {
-        throw new Error("Profile not found. Please complete account setup.");
+      // Robust Profile Check with Retry (Handles trigger latency)
+      let profile = null;
+      for (let i = 0; i < 5; i++) {
+        const { data } = await supabase
+          .from("profiles")
+          .select("id")
+          .eq("id", user.id)
+          .single();
+        
+        if (data) {
+          profile = data;
+          break;
+        }
+        // Wait 500ms before retrying
+        await new Promise(resolve => setTimeout(resolve, 500));
       }
+      
+      if (!profile) {
+        throw new Error("Profile not found. Please ensure account setup is complete or try refreshing.");
+      }
+
+      // Validate UUID format for topicId
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      const validTopicId = (topicId && uuidRegex.test(topicId)) ? topicId : null;
 
       const { data, error } = await supabase.from("posts").insert({
         author_id: user.id,
         body,
-        topic_id: topicId,
+        topic_id: validTopicId,
         provenance_type: provenanceType,
         citation_url: citationUrl,
       }).select().single();
@@ -110,6 +79,7 @@ export function usePosts(mode: "chronological" | "following" = "chronological") 
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({ queryKey: ["feed"] });
       router.push("/home");
     },
   });

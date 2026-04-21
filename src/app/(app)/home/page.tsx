@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { FeedCard } from "@/components/features/feed/FeedCard";
 import { FeedModeBar } from "@/components/features/feed/FeedModeBar";
 import { Button } from "@/components/ui/button";
-import { usePosts } from "@/hooks/usePosts";
+import { useFeed } from "@/hooks/useFeed";
 import { useTopics } from "@/hooks/useTopics";
 import { useAuth } from "@/hooks/useAuth";
 import type { FeedMode } from "@/types";
@@ -17,9 +17,9 @@ export default function HomePage() {
   const { user } = useAuth();
   const { data: topics } = useTopics();
   const [mode, setMode] = useState<FeedMode>("chronological");
-  const { posts, isPostsLoading } = usePosts(mode === "following" ? "following" : "chronological");
   
   const [selectedTopic, setSelectedTopic] = useState<string>("");
+  const { posts, loading: isPostsLoading } = useFeed(mode, mode === "topics" ? [selectedTopic] : []);
   const [visibleCount, setVisibleCount] = useState(POSTS_PER_PAGE);
 
   // Load feed config from localStorage (never sent to server)
@@ -59,15 +59,13 @@ export default function HomePage() {
 
   if (mode === "topics" && selectedTopic) {
     filteredPosts = filteredPosts.filter((p) =>
-      p.topicId === selectedTopic || 
-      p.topicTags?.some((tag: string) => tag === selectedTopic)
+      p.topic_tags?.includes(selectedTopic)
     );
   }
 
-  // Chronological sort is handled by usePosts query order if you want, 
-  // but keeping manual sort here for safety since we're using mock mapped types
+  // Sorting
   filteredPosts.sort(
-    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
 
   const visiblePosts = filteredPosts.slice(0, visibleCount);
