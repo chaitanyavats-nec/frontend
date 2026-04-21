@@ -6,20 +6,20 @@ import { usePosts } from "@/hooks/usePosts";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { ProvenanceTag } from "@/components/features/provenance/ProvenanceTag";
-import { ArrowLeft, TextAa, Link as LinkIcon, Info } from "phosphor-react";
+import { ArrowLeft, Link as LinkIcon } from "phosphor-react";
 import { useRouter } from "next/navigation";
-import type { ProvenanceRecord, Post } from "@/types";
+import type { ProvenanceRecord } from "@/types";
 
 export default function ComposePage() {
   const router = useRouter();
-  const { data: topics, isLoading: isTopicsLoading } = useTopics();
-  const { user } = useAuth();
+  const { data: topics } = useTopics();
+  useAuth();
   const { createPost, isCreating, createError } = usePosts();
 
   const [body, setBody] = useState("");
   const [topicId, setTopicId] = useState("");
   const [citationUrl, setCitationUrl] = useState("");
-  const [provenanceType, setProvenanceType] = useState<any>("original");
+  const [provenanceType, setProvenanceType] = useState<ProvenanceRecord["sourceType"]>("original");
 
   // Construct a preview provenance record
   const previewProvenance: ProvenanceRecord = {
@@ -112,7 +112,7 @@ export default function ComposePage() {
             <select
               required
               value={provenanceType}
-              onChange={(e) => setProvenanceType(e.target.value)}
+              onChange={(e) => setProvenanceType(e.target.value as "original" | "derived" | "republished" | "institutional")}
               className="w-full bg-paper-raised border border-neutral-300 dark:border-neutral-700 rounded-sm px-4 py-3 text-sm font-sans focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all appearance-none cursor-pointer text-neutral-900 dark:text-neutral-50"
             >
               <option value="original">Original Contribution</option>
@@ -149,7 +149,7 @@ export default function ComposePage() {
 
         {createError && (
           <p className="text-magenta-600 dark:text-magenta-400 text-[10px] font-mono font-bold uppercase tracking-widest text-center bg-magenta-50 dark:bg-magenta-900/10 py-4 rounded-sm border border-magenta-200 dark:border-magenta-800">
-            {(createError as any).message || "Failed to publish post."}
+            {(createError as Error).message || "Failed to publish post."}
           </p>
         )}
 

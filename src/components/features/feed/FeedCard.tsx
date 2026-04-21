@@ -6,14 +6,10 @@ import { Post } from '@/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   ChatCircle,
-  Link as LinkIcon,
   GitCommit,
-  BookOpen,
   ArrowUpRight,
 } from 'phosphor-react';
-import { ProvenanceTag } from '../provenance/ProvenanceTag';
 import { cn } from '@/lib/utils';
-import { ShieldCheck } from '@phosphor-icons/react';
 import { useAuth } from '@/hooks/useAuth';
 import { useInteractions } from '@/hooks/useInteractions';
 import { useAuthModalStore } from '@/stores/useAuthModalStore';
@@ -24,10 +20,10 @@ interface FeedCardProps {
   isReply?: boolean;
 }
 
-export function FeedCard({ post, showProvenance = false, isReply = false }: FeedCardProps) {
+export function FeedCard({ post, isReply = false }: FeedCardProps) {
   const { user } = useAuth();
   const { open: openAuthModal } = useAuthModalStore();
-  const { likeCount, userHasLiked, toggleLike, isInteracting } = useInteractions(post.id);
+  const { likeCount, userHasLiked, toggleLike } = useInteractions(post.id);
 
   const withAuth = (action: () => void) => {
     if (!user) {

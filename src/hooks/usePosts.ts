@@ -48,21 +48,41 @@ export function usePosts(mode: "chronological" | "following" = "chronological") 
       if (error) throw error;
       
       // Map to frontend Post type (simplified for now)
-      return data.map((p: any) => ({
-        id: p.id,
-        authorDid: p.author.did,
-        authorDisplayName: p.author.display_name,
-        content: p.body,
-        timestamp: p.created_at,
-        topicId: p.topic_id,
-        provenance: { sourceType: p.provenance_type },
-        replyCount: 0,
-      }));
+      return (data as unknown[]).map((p) => {
+        const post = p as {
+          id: string;
+          author: { did: string; display_name: string; avatar_url?: string };
+          body: string;
+          created_at: string;
+          topic_id: string;
+          provenance_type: "original" | "derived" | "republished" | "institutional";
+          citation_url?: string;
+        };
+        return {
+          id: post.id,
+          authorDid: post.author.did,
+          authorDisplayName: post.author.display_name,
+          authorAvatarUrl: post.author.avatar_url,
+          content: post.body,
+          timestamp: post.created_at,
+          topicId: post.topic_id,
+          topicTags: [], // Placeholder for now
+          provenance: { 
+            postCid: post.id,
+            sourceType: post.provenance_type,
+            originUrl: post.citation_url,
+            transmissionChain: [],
+            authorAffiliations: [],
+          },
+          replyCount: 0,
+          signature: "0x0", // Placeholder for now
+        };
+      });
     },
   });
 
   const createPostMutation = useMutation({
-    mutationFn: async ({ body, topicId, provenanceType, citationUrl }: any) => {
+    mutationFn: async ({ body, topicId, provenanceType, citationUrl }: Record<string, string | null>) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Authenticated user required");
 

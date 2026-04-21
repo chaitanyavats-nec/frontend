@@ -101,7 +101,7 @@ export function useMockData(): MockData {
   // If logged in, we try to find the profile. 
   // We assume the Supabase 'profiles' table has been fetched and includes the user.
   const currentUser = userData 
-    ? (profiles.find(p => (p as any).id === userData.id) || profiles.find(p => p.did === userData.id) || mockProfiles[0]) 
+    ? (profiles.find(p => p.id === userData.id) || profiles.find(p => p.did === userData.id) || mockProfiles[0]) 
     : mockProfiles[0];
 
   const isLoading = postsLoading || profilesLoading || proposalsLoading || casesLoading || topicsLoading;

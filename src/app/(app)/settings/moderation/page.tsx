@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { 
   SettingsSection, 
   SettingToggle, 
-  SettingItem, 
   SettingAction 
 } from "@/components/features/settings/SettingsComponents";
 import { ModerationAbout } from "@/components/features/settings/ModerationAbout";

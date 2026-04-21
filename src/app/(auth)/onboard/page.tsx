@@ -67,7 +67,7 @@ export default function OnboardPage() {
 
           {signUpError && (
             <p className="text-terracotta text-xs font-medium text-center">
-              {(signUpError as any).message || "Registration failed."}
+            {(signUpError as Error).message || "Registration failed."}
             </p>
           )}
 

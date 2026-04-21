@@ -6,7 +6,7 @@ import {
   SettingToggle, 
   SettingAction 
 } from "@/components/features/settings/SettingsComponents";
-import { Bank, Coins, History, ArrowSquareOut } from "phosphor-react";
+import { Bank, Coins, ClockCounterClockwise, ArrowSquareOut } from "@phosphor-icons/react";
 
 export default function GovernancePage() {
   const [prefs, setPrefs] = useState({
@@ -33,7 +33,7 @@ export default function GovernancePage() {
           
           <div className="p-4 bg-paper-dark/10 rounded-xl flex flex-col justify-between">
             <div className="flex items-center gap-2 text-slate">
-              <History size={18} />
+              <ClockCounterClockwise size={18} />
               <span className="text-xs font-bold uppercase tracking-widest">Participation Rate</span>
             </div>
             <p className="text-2xl font-display text-ink">92%</p>

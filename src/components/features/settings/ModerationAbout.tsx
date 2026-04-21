@@ -2,7 +2,7 @@
 
 import React from "react";
 import { SettingsSection, SettingItem } from "./SettingsComponents";
-import { Book, Gavel, Envelope, Info, ChartBar } from "phosphor-react";
+import { Book, Gavel, Envelope, Info, ChartBar } from "@phosphor-icons/react";
 
 export function ModerationAbout() {
   return (

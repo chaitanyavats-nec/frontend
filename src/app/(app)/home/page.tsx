@@ -15,7 +15,7 @@ const FEED_TOPIC_KEY = "agora-feed-topic";
 
 export default function HomePage() {
   const { user } = useAuth();
-  const { data: topics, isLoading: isTopicsLoading } = useTopics();
+  const { data: topics } = useTopics();
   const [mode, setMode] = useState<FeedMode>("chronological");
   const { posts, isPostsLoading } = usePosts(mode === "following" ? "following" : "chronological");
   

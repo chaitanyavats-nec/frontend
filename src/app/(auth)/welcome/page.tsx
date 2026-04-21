@@ -79,7 +79,7 @@ export default function WelcomePage() {
 
           {loginError && (
             <p className="text-terracotta text-xs font-medium text-center">
-              {(loginError as any).message || "Invalid credentials."}
+            {(loginError as Error).message || "Invalid credentials."}
             </p>
           )}
 

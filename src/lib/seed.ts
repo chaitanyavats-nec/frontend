@@ -249,7 +249,7 @@ export async function runSeed() {
           results.profilesUpserted++;
         }
       } catch (err) {
-        results.errors.push(`User ${u.displayName} failed: ${(err as any).message}`);
+        results.errors.push(`User ${u.displayName} failed: ${(err as Error).message}`);
       }
     }
 
@@ -260,7 +260,7 @@ export async function runSeed() {
         if (error) throw error;
         results.topicsUpserted++;
       } catch (err) {
-        results.errors.push(`Topic ${t.name} failed: ${(err as any).message}`);
+        results.errors.push(`Topic ${t.name} failed: ${(err as Error).message}`);
       }
     }
 
@@ -285,7 +285,7 @@ export async function runSeed() {
           if (error) throw error;
           results.followsCreated++;
         } catch (err) {
-          results.errors.push(`Follow ${followerName} -> ${followedName} failed: ${(err as any).message}`);
+          results.errors.push(`Follow ${followerName} -> ${followedName} failed: ${(err as Error).message}`);
         }
       }
     }
@@ -315,7 +315,7 @@ export async function runSeed() {
         if (error) throw error;
         results.postsInserted++;
       } catch (err) {
-        results.errors.push(`Post by ${p.authorName} failed: ${(err as any).message}`);
+        results.errors.push(`Post by ${p.authorName} failed: ${(err as Error).message}`);
       }
     }
 

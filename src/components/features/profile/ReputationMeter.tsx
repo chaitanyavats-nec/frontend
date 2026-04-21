@@ -22,12 +22,19 @@ const LADDER_COLORS = {
 };
 
 export function ReputationMeter({ score }: ReputationMeterProps) {
-  // Mock calculate percentage weights for the breakdown bars
+  // Use fallbacks for all score components to prevent crashing
+  const moderationAccuracy = score?.moderationAccuracy || 0;
+  const contentLongevity = score?.contentLongevity || 0;
+  const disputeParticipation = score?.disputeParticipation || 0;
+  const accountAgeWeight = score?.accountAgeWeight || 0;
+  const total = score?.total || 0;
+  const ladderLevel = score?.ladderLevel || "new";
+
   const totalWeight =
-    score.moderationAccuracy +
-    score.contentLongevity +
-    score.disputeParticipation +
-    score.accountAgeWeight;
+    moderationAccuracy +
+    contentLongevity +
+    disputeParticipation +
+    accountAgeWeight;
 
   const getWidth = (val: number) => {
     if (totalWeight === 0) return "0%";
@@ -46,15 +53,15 @@ export function ReputationMeter({ score }: ReputationMeterProps) {
         </div>
         <div className="text-right">
           <span className="font-sans font-bold text-3xl text-ink leading-none block mb-1.5 tracking-tight">
-            {score.total}
+            {total}
           </span>
           <span
             className={cn(
                "inline-block px-2 py-0.5 rounded-full text-xs font-medium capitalize",
-              LADDER_COLORS[score.ladderLevel]
+              LADDER_COLORS[ladderLevel]
             )}
           >
-            {score.ladderLevel}
+            {ladderLevel}
           </span>
         </div>
       </div>
@@ -64,12 +71,12 @@ export function ReputationMeter({ score }: ReputationMeterProps) {
         <div>
           <div className="flex justify-between font-medium text-xs text-slate mb-1.5">
             <span>Moderation Accuracy</span>
-            <span>{(score.moderationAccuracy * 100).toFixed(0)}%</span>
+            <span>{(moderationAccuracy * 100).toFixed(0)}%</span>
           </div>
           <div className="h-2 w-full bg-paper-dark/50 rounded-full overflow-hidden">
             <div
               className="h-full bg-sage transition-all duration-500 ease-out"
-              style={{ width: getWidth(score.moderationAccuracy) }}
+              style={{ width: getWidth(moderationAccuracy) }}
             />
           </div>
         </div>
@@ -77,12 +84,12 @@ export function ReputationMeter({ score }: ReputationMeterProps) {
         <div>
           <div className="flex justify-between font-medium text-xs text-slate mb-1.5">
             <span>Content Longevity</span>
-            <span>{(score.contentLongevity * 100).toFixed(0)}%</span>
+            <span>{(contentLongevity * 100).toFixed(0)}%</span>
           </div>
           <div className="h-2 w-full bg-paper-dark/50 rounded-full overflow-hidden">
             <div
               className="h-full bg-sage transition-all duration-500 ease-out"
-              style={{ width: getWidth(score.contentLongevity) }}
+              style={{ width: getWidth(contentLongevity) }}
             />
           </div>
         </div>
@@ -90,12 +97,12 @@ export function ReputationMeter({ score }: ReputationMeterProps) {
         <div>
           <div className="flex justify-between font-medium text-xs text-slate mb-1.5">
             <span>Dispute Participation</span>
-            <span>{(score.disputeParticipation * 100).toFixed(0)}%</span>
+            <span>{(disputeParticipation * 100).toFixed(0)}%</span>
           </div>
           <div className="h-2 w-full bg-paper-dark/50 rounded-full overflow-hidden">
             <div
               className="h-full bg-sage transition-all duration-500 ease-out"
-              style={{ width: getWidth(score.disputeParticipation) }}
+              style={{ width: getWidth(disputeParticipation) }}
             />
           </div>
         </div>
@@ -103,12 +110,12 @@ export function ReputationMeter({ score }: ReputationMeterProps) {
         <div>
           <div className="flex justify-between font-medium text-xs text-slate mb-1.5">
             <span>Account Age Weight</span>
-            <span>{(score.accountAgeWeight * 100).toFixed(0)}%</span>
+            <span>{(accountAgeWeight * 100).toFixed(0)}%</span>
           </div>
           <div className="h-2 w-full bg-paper-dark/50 rounded-full overflow-hidden">
             <div
               className="h-full bg-sage transition-all duration-500 ease-out"
-              style={{ width: getWidth(score.accountAgeWeight) }}
+              style={{ width: getWidth(accountAgeWeight) }}
             />
           </div>
         </div>
@@ -118,7 +125,7 @@ export function ReputationMeter({ score }: ReputationMeterProps) {
       <div className="pt-4 border-t border-paper-dark">
         <span className="font-medium text-xs text-slate block mb-1">What&apos;s next</span>
         <p className="font-sans text-sm text-ink leading-relaxed">
-          {LADDER_REQUIREMENTS[score.ladderLevel]}
+          {LADDER_REQUIREMENTS[ladderLevel]}
         </p>
       </div>
     </div>

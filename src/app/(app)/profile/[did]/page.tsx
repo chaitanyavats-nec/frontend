@@ -56,7 +56,7 @@ export default function UserProfilePage() {
         Back
       </Link>
 
-      <ProfileHeader profile={profile as any} />
+      <ProfileHeader profile={profile} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column: Feed */}

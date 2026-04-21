@@ -6,7 +6,7 @@ import {
   SettingItem, 
   SettingAction 
 } from "@/components/features/settings/SettingsComponents";
-import { CreditCard, History, ChartLine, ArrowSquareOut, Bank } from "phosphor-react";
+import { ChartLine, ArrowSquareOut, Bank } from "@phosphor-icons/react";
 
 export default function PaymentsPage() {
   const [contribution, setContribution] = useState(30);

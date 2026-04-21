@@ -6,7 +6,7 @@ import {
   SettingItem
 } from "@/components/features/settings/SettingsComponents";
 import { ModerationAbout } from "@/components/features/settings/ModerationAbout";
-import { GithubLogo, BookOpen, ShieldCheck, Heart, Warning, ChatCircleText, UserCheck } from "phosphor-react";
+import { GithubLogo, BookOpen, ShieldCheck, Heart, ChatCircleText, UserCheck } from "@phosphor-icons/react";
 
 export default function AboutLegalPage() {
   return (
@@ -60,7 +60,7 @@ export default function AboutLegalPage() {
             <h3 className="text-sm font-bold text-ink">Request Human Review</h3>
           </div>
           <p className="text-xs text-slate leading-relaxed">
-            If you've exhausted the community moderation appeal process and believe a systemic 
+            If you&apos;ve exhausted the community moderation appeal process and believe a systemic 
             injustice has occurred, you can request an escalation to the Human Review Board.
           </p>
           <button className="text-xs font-bold text-orange hover:underline uppercase tracking-wider">

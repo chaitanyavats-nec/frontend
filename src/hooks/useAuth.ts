@@ -20,7 +20,7 @@ export function useAuth() {
 
   // Sign Up
   const signUpMutation = useMutation({
-    mutationFn: async ({ email, password, displayName }: any) => {
+    mutationFn: async ({ email, password, displayName }: Record<string, string>) => {
       // 1. Authenticate
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
@@ -57,7 +57,7 @@ export function useAuth() {
 
   // Login
   const loginMutation = useMutation({
-    mutationFn: async ({ email, password }: any) => {
+    mutationFn: async ({ email, password }: Record<string, string>) => {
       // 1. Sign in
       const { data, error } = await supabase.auth.signInWithPassword({
         email,

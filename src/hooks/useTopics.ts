@@ -17,10 +17,16 @@ export function useTopics() {
       if (error) throw error;
       
       // Map to frontend Topic type
-      return data.map((t: any) => ({
-        slug: t.slug,
-        displayName: t.name,
-      }));
+      return (data as unknown[]).map((t) => {
+        const topic = t as { slug: string; name: string; domain?: string };
+        return {
+          slug: topic.slug,
+          displayName: topic.name,
+          domain: (topic.domain as "politics" | "science" | "local" | "culture" | "technology" | "economics") || "politics",
+          subscriberCount: 0,
+          postCount: 0,
+        };
+      });
     },
   });
 }

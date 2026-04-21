@@ -5,9 +5,6 @@ import { usePathname } from "next/navigation";
 import {
   House,
   Compass,
-  PlusCircle,
-  Shield,
-  Bank,
   UserCircle,
   Bell,
   Fingerprint,

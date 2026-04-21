@@ -12,13 +12,14 @@ interface ProfileHeaderProps {
   profile: UserProfile;
 }
 
-function getInitials(name: string): string {
+function getInitials(name?: string): string {
+  if (!name) return "??";
   return name
     .split(" ")
     .map((n) => n[0])
     .join("")
     .toUpperCase()
-    .slice(0, 2);
+    .slice(0, 2) || "??";
 }
 
 function truncateDid(did: string): string {
@@ -34,7 +35,7 @@ const LADDER_COLORS = {
 
 export function ProfileHeader({ profile }: ProfileHeaderProps) {
   const { user } = useAuth();
-  const { isFollowing, follow, unfollow, isFollowingLoading } = useFollows((profile as any).id);
+  const { isFollowing, follow, unfollow, isFollowingLoading } = useFollows(profile.id);
 
   const handleFollowToggle = async () => {
     if (isFollowing) {
@@ -44,7 +45,7 @@ export function ProfileHeader({ profile }: ProfileHeaderProps) {
     }
   };
 
-  const isOwnProfile = user?.id === (profile as any).id;
+  const isOwnProfile = user?.id === profile.id;
 
   return (
     <div className="bg-surface p-6 rounded-lg border border-paper-dark">
@@ -68,19 +69,19 @@ export function ProfileHeader({ profile }: ProfileHeaderProps) {
                 <span
                   className={cn(
                     "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider shrink-0",
-                    LADDER_COLORS[profile.reputationScore.ladderLevel]
+                    LADDER_COLORS[profile?.reputationScore?.ladderLevel || "new"]
                   )}
                 >
-                  {profile.reputationScore.ladderLevel}
+                  {profile?.reputationScore?.ladderLevel || "new"}
                 </span>
               </div>
               <div className="flex items-center gap-2 text-slate text-xs font-medium">
                 <span className="font-mono opacity-60 truncate">
-                  {truncateDid(profile.did)}
+                  {profile?.did ? truncateDid(profile.did) : "No DID"}
                 </span>
                 <span>·</span>
                 <span>
-                  Joined {new Date(profile.joinedAt).toLocaleDateString("en-GB", { month: "short", year: "numeric" })}
+                  Joined {profile?.joinedAt ? new Date(profile.joinedAt).toLocaleDateString("en-GB", { month: "short", year: "numeric" }) : "Recently"}
                 </span>
               </div>
             </div>
@@ -103,11 +104,11 @@ export function ProfileHeader({ profile }: ProfileHeaderProps) {
 
           <div className="flex items-center gap-6 mb-4">
             <div className="flex items-center gap-1.5">
-              <span className="font-bold text-ink text-sm">{(profile as any).followersCount || 0}</span>
+              <span className="font-bold text-ink text-sm">{profile.followersCount || 0}</span>
               <span className="text-slate text-xs uppercase tracking-widest font-medium opacity-70">Followers</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="font-bold text-ink text-sm">{(profile as any).followingCount || 0}</span>
+              <span className="font-bold text-ink text-sm">{profile.followingCount || 0}</span>
               <span className="text-slate text-xs uppercase tracking-widest font-medium opacity-70">Following</span>
             </div>
           </div>
@@ -119,7 +120,7 @@ export function ProfileHeader({ profile }: ProfileHeaderProps) {
           )}
 
           {/* Affiliations */}
-          {profile.verifiedAffiliations.length > 0 && (
+          {profile?.verifiedAffiliations && profile.verifiedAffiliations.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {profile.verifiedAffiliations.map((aff) => (
                 <div

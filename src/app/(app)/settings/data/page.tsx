@@ -5,7 +5,7 @@ import {
   SettingsSection, 
   SettingAction 
 } from "@/components/features/settings/SettingsComponents";
-import { Download, Upload, FileJson, FileCsv, Archive, Warning } from "phosphor-react";
+import { Download, FileCode, Archive, Warning } from "@phosphor-icons/react";
 
 export default function DataExportImportPage() {
   return (
@@ -17,7 +17,7 @@ export default function DataExportImportPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="p-4 bg-paper-dark/10 rounded-xl space-y-3">
             <div className="flex items-center gap-2 text-ink">
-              <FileJson size={18} className="text-teal" />
+              <FileCode size={18} className="text-teal" />
               <span className="text-xs font-bold uppercase tracking-wider">Posts & Content</span>
             </div>
             <p className="text-xs text-slate">Full history of your posts, replies, and citations.</p>
@@ -29,7 +29,7 @@ export default function DataExportImportPage() {
 
           <div className="p-4 bg-paper-dark/10 rounded-xl space-y-3">
             <div className="flex items-center gap-2 text-ink">
-              <FileJson size={18} className="text-teal" />
+              <FileCode size={18} className="text-teal" />
               <span className="text-xs font-bold uppercase tracking-wider">Social Graph</span>
             </div>
             <p className="text-xs text-slate">Your following list and follower counts in JSON format.</p>

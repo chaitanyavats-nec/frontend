@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/utils/supabase/client";
-import { Database, Plus, Check, Users, Chat } from "phosphor-react";
+import { Database, Users, Chat } from "phosphor-react";
 
 export function SeedUtility() {
   const [isSeeding, setIsSeeding] = useState(false);
@@ -25,7 +25,7 @@ export function SeedUtility() {
       if (error) throw error;
       setStatus("Topics seeded!");
     } catch (err) {
-      alert((err as any).message);
+      alert((err as Error).message);
     } finally {
       setIsSeeding(false);
     }
@@ -61,7 +61,7 @@ export function SeedUtility() {
       }
       setStatus("Test accounts ready! (You may need to sign in)");
     } catch (err) {
-      alert((err as any).message);
+      alert((err as Error).message);
     } finally {
       setIsSeeding(false);
     }
@@ -132,7 +132,7 @@ export function SeedUtility() {
       }
       setStatus("Chronological feed seeded!");
     } catch (err) {
-      alert((err as any).message);
+      alert((err as Error).message);
     } finally {
       setIsSeeding(false);
     }

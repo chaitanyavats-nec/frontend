@@ -14,6 +14,7 @@ const cid = (suffix: string) => `Qm${suffix.padEnd(44, "abcdef1234567890")}`;
 // ─── User Profiles ──────────────────────────────────────────
 export const mockProfiles: UserProfile[] = [
   {
+    id: "mock-user-chaitanya",
     did: did("R7vX2pQnKz8WfH3jL9mYcTbNsA4gE6dU"),
     displayName: "Chaitanya Vats",
     avatarUrl: undefined,
@@ -48,6 +49,7 @@ export const mockProfiles: UserProfile[] = [
     joinedAt: "2024-03-15T09:00:00Z",
   },
   {
+    id: "mock-user-tomas",
     did: did("J4kP8rWxN5sLmQ2vY7hFcT9bGa3eD6uZ"),
     displayName: "Tomás Herrera",
     avatarUrl: undefined,
@@ -67,6 +69,7 @@ export const mockProfiles: UserProfile[] = [
     joinedAt: "2024-11-02T14:30:00Z",
   },
   {
+    id: "mock-user-suki",
     did: did("B9nM3xKfV6wLpH8jS2cYtR5gA7eQ4dUz"),
     displayName: "Suki Patel",
     avatarUrl: undefined,

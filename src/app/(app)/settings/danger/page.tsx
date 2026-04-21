@@ -7,7 +7,7 @@ import {
   Input
 } from "@/components/features/settings/SettingsComponents";
 import { useFeedStore, useProvenanceStore, useAccessibilityStore } from "@/stores/useSettingsStore";
-import { Warning, Trash, SignOut, ArrowsCounterClockwise } from "phosphor-react";
+import { Warning } from "@phosphor-icons/react";
 
 export default function DangerZonePage() {
   const feed = useFeedStore();

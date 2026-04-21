@@ -44,7 +44,7 @@ export default function AccessibilityPage() {
         <SettingItem label="Text Size" description="Adjust the baseline font size across the platform.">
           <select 
             value={acc.textSize}
-            onChange={(e) => acc.update({ textSize: e.target.value as any })}
+            onChange={(e) => acc.update({ textSize: e.target.value as "small" | "medium" | "large" | "extra-large" })}
             className="bg-surface border border-paper-dark rounded px-2 py-1 text-xs font-medium text-ink outline-none focus:ring-1 focus:ring-teal"
           >
             <option value="small">Small</option>

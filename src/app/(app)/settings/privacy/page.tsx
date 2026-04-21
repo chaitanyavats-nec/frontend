@@ -7,7 +7,7 @@ import {
   SettingItem, 
   SettingAction 
 } from "@/components/features/settings/SettingsComponents";
-import { Lock, Fingerprint, ShieldCheck, Devices, Globe, MagnifyingGlass, Quotes } from "phosphor-react";
+import { Lock, Fingerprint } from "@phosphor-icons/react";
 
 export default function PrivacyReachSecurityPage() {
   const [settings, setSettings] = useState({

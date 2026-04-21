@@ -10,13 +10,14 @@ interface PostDetailProps {
   provenance: ProvenanceRecord;
 }
 
-function getInitials(name: string): string {
+function getInitials(name?: string): string {
+  if (!name) return "??";
   return name
     .split(" ")
     .map((n) => n[0])
     .join("")
     .toUpperCase()
-    .slice(0, 2);
+    .slice(0, 2) || "??";
 }
 
 export function PostDetail({ post, provenance }: PostDetailProps) {

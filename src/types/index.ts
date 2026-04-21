@@ -65,6 +65,9 @@ export interface ProvenanceRecord {
   fundingDisclosure?: FundingDisclosure;
   coordinationFlag?: CoordinationFlag;
   proportionalityScore?: ProportionalityData;
+  socialContext?: {
+    sourceNode?: string;
+  };
 }
 
 // ─── Post ───────────────────────────────────────────────────
@@ -95,6 +98,7 @@ export interface ReputationScore {
 }
 
 export interface UserProfile {
+  id: string;
   did: string;
   displayName: string;
   avatarUrl?: string;

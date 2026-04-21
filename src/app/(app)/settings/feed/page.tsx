@@ -9,7 +9,7 @@ import {
   Input
 } from "@/components/features/settings/SettingsComponents";
 import { useFeedStore, useProvenanceStore } from "@/stores/useSettingsStore";
-import { Plus, X } from "phosphor-react";
+import { X } from "@phosphor-icons/react";
 
 export default function FeedSettingsPage() {
   const feed = useFeedStore();
@@ -40,7 +40,7 @@ export default function FeedSettingsPage() {
         <SettingItem label="Default Feed Type" description="Select your initial view when opening Agora.">
           <select 
             value={feed.defaultType}
-            onChange={(e) => feed.update({ defaultType: e.target.value as any })}
+            onChange={(e) => feed.update({ defaultType: e.target.value as "chronological" | "topic-filtered" | "curated" })}
             className="bg-surface border border-paper-dark rounded px-2 py-1 text-xs font-medium text-ink outline-none focus:ring-1 focus:ring-teal"
           >
             <option value="chronological">Chronological (default)</option>
@@ -52,7 +52,7 @@ export default function FeedSettingsPage() {
         <SettingItem label="Default Feed Scope" description="Control the source of your main feed.">
           <select 
             value={feed.defaultScope}
-            onChange={(e) => feed.update({ defaultScope: e.target.value as any })}
+            onChange={(e) => feed.update({ defaultScope: e.target.value as "everyone" | "people-you-follow" | "topics-you-follow" })}
             className="bg-surface border border-paper-dark rounded px-2 py-1 text-xs font-medium text-ink outline-none focus:ring-1 focus:ring-teal"
           >
             <option value="everyone">Everyone</option>
@@ -64,7 +64,7 @@ export default function FeedSettingsPage() {
         <SettingItem label="Pagination Size" description="Number of posts per page.">
           <select 
             value={feed.paginationSize}
-            onChange={(e) => feed.update({ paginationSize: parseInt(e.target.value) as any })}
+            onChange={(e) => feed.update({ paginationSize: parseInt(e.target.value) as 10 | 25 | 50 })}
             className="bg-surface border border-paper-dark rounded px-2 py-1 text-xs font-medium text-ink outline-none focus:ring-1 focus:ring-teal"
           >
             <option value={10}>10</option>
@@ -96,7 +96,7 @@ export default function FeedSettingsPage() {
         <SettingItem label="Default Tag State" description="How the source identifier appears initially.">
           <select 
             value={provenance.tagDefaultState}
-            onChange={(e) => provenance.update({ tagDefaultState: e.target.value as any })}
+            onChange={(e) => provenance.update({ tagDefaultState: e.target.value as "collapsed" | "expanded" | "full-chain" })}
             className="bg-surface border border-paper-dark rounded px-2 py-1 text-xs font-medium text-ink outline-none focus:ring-1 focus:ring-teal"
           >
             <option value="collapsed">Collapsed Pill (default)</option>
@@ -115,7 +115,7 @@ export default function FeedSettingsPage() {
         <SettingItem label="Funding Warnings" description="How disclosed funding status is surfaced.">
           <select 
             value={provenance.showFundingWarnings}
-            onChange={(e) => provenance.update({ showFundingWarnings: e.target.value as any })}
+            onChange={(e) => provenance.update({ showFundingWarnings: e.target.value as "always" | "funded-only" | "never" })}
             className="bg-surface border border-paper-dark rounded px-2 py-1 text-xs font-medium text-ink outline-none focus:ring-1 focus:ring-teal"
           >
             <option value="always">Always show</option>

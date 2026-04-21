@@ -19,14 +19,6 @@ const modeOptions: { value: FeedMode; label: string }[] = [
   { value: "curated", label: "Curated" },
 ];
 
-const domainColors: Record<string, string> = {
-  politics: "border-orange/20 text-orange bg-orange/5",
-  science: "border-teal/20 text-teal-dark bg-teal/5",
-  local: "border-violet/20 text-violet bg-violet/5",
-  culture: "border-slate/40 text-slate",
-  technology: "border-teal/20 text-teal bg-teal/5",
-  economics: "border-violet/20 text-violet bg-violet/5",
-};
 
 export function FeedModeBar({
   mode,
