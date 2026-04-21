@@ -151,4 +151,4 @@ export interface Topic {
   postCount: number;
 }
 
-export type FeedMode = "chronological" | "topics" | "curated";
+export type FeedMode = "chronological" | "topics" | "curated" | "following";

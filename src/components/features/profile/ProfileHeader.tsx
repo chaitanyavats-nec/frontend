@@ -4,6 +4,9 @@ import { CheckCircle } from "phosphor-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import type { UserProfile } from "@/types";
+import { useFollows } from "@/hooks/useFollows";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 
 interface ProfileHeaderProps {
   profile: UserProfile;
@@ -30,6 +33,19 @@ const LADDER_COLORS = {
 };
 
 export function ProfileHeader({ profile }: ProfileHeaderProps) {
+  const { user } = useAuth();
+  const { isFollowing, follow, unfollow, isFollowingLoading } = useFollows((profile as any).id);
+
+  const handleFollowToggle = async () => {
+    if (isFollowing) {
+      await unfollow();
+    } else {
+      await follow();
+    }
+  };
+
+  const isOwnProfile = user?.id === (profile as any).id;
+
   return (
     <div className="bg-surface p-6 rounded-lg border border-paper-dark">
       <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-center">
@@ -37,34 +53,63 @@ export function ProfileHeader({ profile }: ProfileHeaderProps) {
           {profile.avatarUrl && (
             <AvatarImage src={profile.avatarUrl} alt={profile.displayName} />
           )}
-          <AvatarFallback className="text-2xl font-semibold">
+          <AvatarFallback className="text-2xl font-semibold bg-paper-dark/10">
             {getInitials(profile.displayName)}
           </AvatarFallback>
         </Avatar>
 
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-3 mb-1.5">
-            <h1 className="font-sans font-bold text-2xl text-ink truncate tracking-tight">
-              {profile.displayName}
-            </h1>
-            <span
-              className={cn(
-                "px-2 py-0.5 rounded-full text-xs font-medium capitalize shrink-0",
-                LADDER_COLORS[profile.reputationScore.ladderLevel]
-              )}
-            >
-              {profile.reputationScore.ladderLevel}
-            </span>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
+            <div className="min-w-0">
+              <div className="flex items-center gap-3 mb-1">
+                <h1 className="font-sans font-bold text-2xl text-ink truncate tracking-tight leading-tight">
+                  {profile.displayName}
+                </h1>
+                <span
+                  className={cn(
+                    "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider shrink-0",
+                    LADDER_COLORS[profile.reputationScore.ladderLevel]
+                  )}
+                >
+                  {profile.reputationScore.ladderLevel}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 text-slate text-xs font-medium">
+                <span className="font-mono opacity-60 truncate">
+                  {truncateDid(profile.did)}
+                </span>
+                <span>·</span>
+                <span>
+                  Joined {new Date(profile.joinedAt).toLocaleDateString("en-GB", { month: "short", year: "numeric" })}
+                </span>
+              </div>
+            </div>
+
+            {!isOwnProfile && user && (
+              <Button
+                onClick={handleFollowToggle}
+                disabled={isFollowingLoading}
+                className={cn(
+                  "rounded-full px-6 font-bold uppercase tracking-widest text-[10px] transition-all duration-300 shadow-sm",
+                  isFollowing 
+                    ? "bg-transparent border border-paper-dark text-ink hover:text-terracotta hover:border-terracotta/30" 
+                    : "bg-ink text-paper hover:bg-teal"
+                )}
+              >
+                {isFollowingLoading ? "..." : isFollowing ? "Following" : "Follow"}
+              </Button>
+            )}
           </div>
 
-          <div className="flex items-center gap-2 mb-3">
-            <span className="font-mono text-xs text-slate truncate">
-              {truncateDid(profile.did)}
-            </span>
-            <span className="text-slate/40">·</span>
-            <span className="font-medium text-xs text-slate">
-              Joined {new Date(profile.joinedAt).toLocaleDateString("en-GB", { month: "short", year: "numeric" })}
-            </span>
+          <div className="flex items-center gap-6 mb-4">
+            <div className="flex items-center gap-1.5">
+              <span className="font-bold text-ink text-sm">{(profile as any).followersCount || 0}</span>
+              <span className="text-slate text-xs uppercase tracking-widest font-medium opacity-70">Followers</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="font-bold text-ink text-sm">{(profile as any).followingCount || 0}</span>
+              <span className="text-slate text-xs uppercase tracking-widest font-medium opacity-70">Following</span>
+            </div>
           </div>
 
           {profile.bio && (

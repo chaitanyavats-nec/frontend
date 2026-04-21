@@ -1,0 +1,26 @@
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import { createClient } from "@/utils/supabase/client";
+
+export function useTopics() {
+  const supabase = createClient();
+
+  return useQuery({
+    queryKey: ["topics"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("topics")
+        .select("*")
+        .order("name");
+      
+      if (error) throw error;
+      
+      // Map to frontend Topic type
+      return data.map((t: any) => ({
+        slug: t.slug,
+        displayName: t.name,
+      }));
+    },
+  });
+}

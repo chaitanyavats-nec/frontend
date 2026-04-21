@@ -1,107 +1,122 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=IBM+Plex+Sans:wght@300;400;500&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    /* ── Lino Print Palette (RGB) ───────────────────────── */
-    --teal-0: 255 255 255;
-    --teal-50: 235 245 245;
-    --teal-100: 204 228 228;
-    --teal-200: 164 204 204;
-    --teal-300: 124 180 180;
-    --teal-400: 84 156 156;
-    --teal-500: 38 102 102;  /* Primary Teal */
-    --teal-600: 30 84 84;
-    --teal-700: 22 64 64;
-    --teal-800: 16 48 48;
-    --teal-900: 10 32 32;
-    --teal-1000: 0 0 0;
+    /* ── NEUTRAL BASE (warm-neutral, barely tinted) ── */
+    --n-50: #F7F6F4;
+    --n-100: #EDECEA;
+    --n-200: #DDDCDA;
+    --n-300: #C8C7C4;
+    --n-400: #A9A8A5;
+    --n-500: #8A8986;
+    --n-600: #6B6A68;
+    --n-700: #4E4D4B;
+    --n-800: #323130;
+    --n-900: #1A1918;
 
-    --orange-0: 255 255 255;
-    --orange-50: 254 245 242;
-    --orange-100: 252 230 221;
-    --orange-200: 247 201 182;
-    --orange-300: 242 171 140;
-    --orange-400: 236 141 98;
-    --orange-500: 231 111 81;  /* Primary Orange */
-    --orange-600: 204 92 64;
-    --orange-700: 173 74 50;
-    --orange-800: 140 56 38;
-    --orange-900: 102 38 26;
-    --orange-1000: 0 0 0;
+    /* ── CMY PRIMARY PLATES (Converted to RGB for Tailwind) ── */
+    /* Cyan families */
+    --cy-50: 232 250 248;
+    --cy-100: 196 242 238;
+    --cy-200: 147 232 226;
+    --cy-300: 87 216 208;
+    --cy-400: 46 196 187;
+    --cy-500: 26 173 164;
+    --cy-600: 18 143 136;
+    --cy-700: 13 112 106;
+    --cy-800: 9 83 80;
+    --cy-900: 5 54 51;
 
-    --violet-0: 255 255 255;
-    --violet-50: 248 244 252;
-    --violet-100: 236 225 245;
-    --violet-200: 212 191 230;
-    --violet-300: 188 157 214;
-    --violet-400: 164 123 199;
-    --violet-500: 100 80 140;  /* Primary Violet */
-    --violet-600: 84 64 122;
-    --violet-700: 68 48 102;
-    --violet-800: 52 32 82;
-    --violet-900: 36 16 61;
-    --violet-1000: 0 0 0;
+    /* Magenta families */
+    --mg-50: 253 232 242;
+    --mg-100: 250 196 223;
+    --mg-200: 246 144 194;
+    --mg-300: 240 93 164;
+    --mg-400: 232 67 147;
+    --mg-500: 212 47 126;
+    --mg-600: 176 30 103;
+    --mg-700: 140 19 81;
+    --mg-800: 104 11 61;
+    --mg-900: 68 5 42;
 
-    /* Paper/Ink Scale (Journalism Tint) */
-    --paper-0: 255 255 255;
-    --paper-50: 252 250 248;
-    --paper-100: 245 242 237;  /* Tinted Journal Base */
-    --paper-200: 235 231 224;
-    --paper-300: 224 218 208;
-    --paper-400: 204 196 182;
-    --paper-500: 178 168 152;
-    --paper-600: 148 138 122;
-    --paper-700: 118 108 92;
-    --paper-800: 88 78 68;
-    --paper-900: 58 48 44;
-    --paper-1000: 18 18 18;
+    /* Yellow families */
+    --yl-50: 255 251 230;
+    --yl-100: 255 243 176;
+    --yl-200: 255 233 107;
+    --yl-300: 255 225 77;
+    --yl-400: 245 209 48;
+    --yl-500: 224 187 24;
+    --yl-600: 191 158 13;
+    --yl-700: 149 124 8;
+    --yl-800: 108 90 5;
+    --yl-900: 67 56 3;
 
-    --ink-500: 45 45 45;
-    --ink-900: 18 18 18;
+    /* ── SEMANTIC ── */
+    --su-500: 26 154 85;
+    --su-50: 232 247 238;
+    --wa-500: 251 140 0;
+    --wa-50: 255 244 229;
+    --da-500: 229 57 53;
+    --da-50: 255 235 238;
+    --in-500: 26 95 212;
+    --in-50: 232 241 253;
 
-    /* ── Semantic Aliases (Light) ──────────────────────── */
-    --color-paper: var(--paper-100);
-    --color-paper-dark: var(--paper-300);
-    --color-surface: 255 255 255;
-    --color-ink: var(--ink-900);
+    /* ── APPLIED TOKENS ── */
+    --bg-page: var(--n-50);
+    --bg-surface: var(--n-100);
+    --bg-raised: #FFFFFF;
+    --bg-sunken: var(--n-200);
 
-    --color-teal: var(--teal-500);
-    --color-teal-dark: var(--teal-700);
-    --color-teal-light: var(--teal-100);
-    
-    --color-orange: var(--orange-500);
-    --color-orange-light: var(--orange-100);
-    
-    --color-violet: var(--violet-500);
-    --color-violet-light: var(--violet-100);
-    
-    /* ── Typography & Focus ── */
-    --font-editorial: var(--font-fraunces), serif;
-    --color-slate: 115 115 115;
-    --color-slate-light: 212 212 212;
+    --text-primary: var(--n-900);
+    --text-secondary: var(--n-600);
+    --text-tertiary: var(--n-400);
+    --text-disabled: var(--n-300);
+
+    --border-subtle: var(--n-200);
+    --border-default: var(--n-300);
+    --border-strong: var(--n-600);
+
+    /* Fonts */
+    --font-serif: 'Playfair Display', Georgia, serif;
+    --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+    --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+
+    /* Radius */
+    --r-xs: 2px;
+    --r-sm: 3px;
+    --r-md: 5px;
+    --r-lg: 8px;
+    --r-xl: 12px;
+
+    /* Legacy mapping (to prevent total breakage while migrating) */
+    --color-paper: 247 246 244;
+    --color-ink: 26 25 24;
+    --color-teal: var(--cy-500);
+    --color-orange: var(--yl-500);
+    --color-violet: var(--mg-500);
   }
 
   .dark {
-    /* ── Semantic Aliases (Dark) ───────────────────────── */
-    --color-paper: 18 18 18;
-    --color-paper-dark: 45 45 45;
-    --color-surface: 28 28 28;
-    --color-ink: 245 242 237;
+    --bg-page: var(--n-900);
+    --bg-surface: var(--n-800);
+    --bg-raised: var(--n-700);
+    --bg-sunken: #000000;
 
-    --color-teal: var(--teal-400);
-    --color-teal-dark: var(--teal-200);
-    --color-teal-light: var(--teal-900);
+    --text-primary: var(--n-50);
+    --text-secondary: var(--n-300);
+    --text-tertiary: var(--n-500);
+    --text-disabled: var(--n-600);
 
-    --color-orange: var(--orange-400);
-    --color-orange-light: var(--orange-900);
+    --border-subtle: #252423;
+    --border-default: var(--n-700);
+    --border-strong: var(--n-400);
 
-    --color-violet: var(--violet-400);
-    --color-violet-light: var(--violet-900);
-
-    --color-slate: 163 163 163;
-    --color-slate-light: 64 64 64;
+    --color-paper: 26 25 24;
+    --color-ink: 247 246 244;
   }
 
   *,
@@ -118,25 +133,79 @@
   }
 
   body {
-    @apply bg-paper text-ink font-sans text-base;
+    background: var(--bg-page);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.6;
     min-height: 100vh;
     overflow-x: hidden;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
   }
 
-  h1, h2, h3, h4, .font-editorial {
-    font-family: var(--font-editorial);
+  h1,
+  h2,
+  h3,
+  h4,
+  .font-serif {
+    font-family: var(--font-serif);
     @apply tracking-tight font-semibold;
+  }
+
+  .font-mono {
+    font-family: var(--font-mono);
+  }
+
+  /* ── PAPER TEXTURE UTILS ── */
+  .tex-dot {
+    background-image: radial-gradient(circle, var(--n-300) 1px, transparent 1px);
+    background-size: 12px 12px;
+  }
+
+  .tex-line {
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 23px, var(--n-200) 23px, var(--n-200) 24px);
+  }
+
+  .tex-grid {
+    background-image:
+      linear-gradient(var(--n-200) 1px, transparent 1px),
+      linear-gradient(90deg, var(--n-200) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  /* ── UTILITIES ── */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .eyebrow::after {
+    content: '';
+    flex: 1;
+    height: 0.5px;
+    background: var(--border-subtle);
+  }
+
+  .sublabel {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
   }
 
   /* Focus styles for accessibility */
   :focus-visible {
-    @apply outline-2 outline-offset-2 outline-teal;
-  }
-
-  /* Remove default button styles */
-  button {
-    @apply cursor-pointer;
+    outline: 2px solid rgb(var(--cy-500));
+    outline-offset: 2px;
   }
 
   /* Scrollbar styling */
@@ -145,14 +214,15 @@
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-paper;
+    background: var(--bg-page);
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-teal-light rounded-lg;
+    background: rgb(var(--cy-200));
+    border-radius: 8px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-teal;
+    background: rgb(var(--cy-500));
   }
 }

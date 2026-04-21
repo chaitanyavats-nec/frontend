@@ -19,6 +19,11 @@ export default function WelcomePage() {
     }
   };
 
+  const handleGuestEntry = () => {
+    document.cookie = "agora_guest=true; path=/; max-age=86400"; // 24 hours
+    window.location.href = "/home";
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-surface p-6 font-sans">
       <div className="w-full max-w-md space-y-12">
@@ -51,6 +56,25 @@ export default function WelcomePage() {
                 placeholder="••••••••"
               />
             </div>
+            
+            <div className="space-y-6 pt-4">
+              <Button
+                type="submit"
+                disabled={isLoggingIn}
+                className="w-full bg-ink text-paper h-14 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-teal transition-all duration-300 shadow-xl shadow-ink/10"
+              >
+                {isLoggingIn ? "Authenticating..." : "Enter Agora"}
+              </Button>
+
+              <Button
+                type="button"
+                onClick={handleGuestEntry}
+                variant="ghost"
+                className="w-full text-[10px] font-bold uppercase tracking-[0.2em] text-slate hover:text-ink transition-colors"
+              >
+                Browse as Guest
+              </Button>
+            </div>
           </div>
 
           {loginError && (
@@ -59,15 +83,7 @@ export default function WelcomePage() {
             </p>
           )}
 
-          <Button
-            type="submit"
-            disabled={isLoggingIn}
-            className="w-full bg-ink text-paper h-14 rounded-full font-bold uppercase tracking-widest text-[11px] hover:bg-teal transition-all duration-300 shadow-lg shadow-ink/10"
-          >
-            {isLoggingIn ? "Authenticating..." : "Enter Agora"}
-          </Button>
-
-          <div className="text-center pt-2">
+          <div className="flex flex-col items-center gap-4 pt-2 border-t border-paper-dark/30 mt-4">
             <Link href="/onboard" className="text-[10px] font-bold uppercase tracking-widest text-slate hover:text-teal transition-colors">
               Request credentials (Sign Up)
             </Link>

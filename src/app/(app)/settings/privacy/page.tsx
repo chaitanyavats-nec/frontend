@@ -1,175 +1,155 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Toast, ToastDescription, ToastProvider, ToastViewport } from "@/components/ui/toast";
-import { mockProfiles, mockPosts } from "@/lib/mockData";
+import React, { useState } from "react";
+import { 
+  SettingsSection, 
+  SettingToggle, 
+  SettingItem, 
+  SettingAction 
+} from "@/components/features/settings/SettingsComponents";
+import { Lock, Fingerprint, ShieldCheck, Devices, Globe, MagnifyingGlass, Quotes } from "phosphor-react";
 
-export default function PrivacySettingsPage() {
-  const router = useRouter();
-  
-  // Dialog flow state: 0 = closed, 1 = initial confirmation, 2 = after download, 3 = final deletion
-  const [dialogStep, setDialogStep] = useState<0 | 1 | 2 | 3>(0);
-  const [deleteInput, setDeleteInput] = useState("");
-  const [showToast, setShowToast] = useState(false);
-
-  const handleDownloadData = () => {
-    // Simulate export
-    const currentUser = mockProfiles[0];
-    const userPosts = mockPosts.filter((p) => p.authorDid === currentUser.did);
-    const exportData = {
-      profile: currentUser,
-      posts: userPosts,
-    };
-    
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `agora-data-export-${new Date().getTime()}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-    // Move to next step
-    setDialogStep(2);
-  };
-
-  const handleDeleteAccount = () => {
-    setDialogStep(0);
-    setShowToast(true);
-    
-    setTimeout(() => {
-      router.push("/welcome");
-    }, 2000);
-  };
+export default function PrivacyReachSecurityPage() {
+  const [settings, setSettings] = useState({
+    followingListPublic: false,
+    discoverable: "did-only",
+    dmFrom: "following",
+    sensitiveContent: "blur",
+    federated: true,
+    searchIndexing: false,
+    allowQuotes: true,
+  });
 
   return (
-    <ToastProvider>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-display text-ink mb-2">Privacy Settings</h1>
-          <p className="text-slate text-sm">Manage your data, visibility, and account lifecycle.</p>
-        </div>
+    <div className="space-y-8 animate-in fade-in duration-500">
+      {/* Privacy Section */}
+      <SettingsSection 
+        title="Privacy" 
+        description="Control who can see your activity and how you interact with others."
+      >
+        <SettingToggle 
+          label="Public Following List" 
+          description="Allow others to see the accounts you follow. Default is private."
+          checked={settings.followingListPublic}
+          onCheckedChange={(v) => setSettings({ ...settings, followingListPublic: v })}
+        />
+        
+        <SettingItem label="Profile Discoverability" description="How others find your account.">
+          <select 
+            value={settings.discoverable}
+            onChange={(e) => setSettings({ ...settings, discoverable: e.target.value })}
+            className="bg-surface border border-paper-dark rounded px-2 py-1 text-xs font-medium text-ink outline-none focus:ring-1 focus:ring-teal"
+          >
+            <option value="searchable">Searchable (Display name)</option>
+            <option value="did-only">DID Only</option>
+            <option value="none">Not Discoverable</option>
+          </select>
+        </SettingItem>
 
-        {/* Placeholder for other settings if there were any */}
-        <div className="space-y-4">
-          <div className="flex justify-between items-center py-4 border-b border-paper-dark">
-            <div>
-              <p className="font-medium text-ink">Public Profile</p>
-              <p className="text-sm text-slate">Allow your profile to be discovered via search.</p>
+        <SettingItem label="Direct Messages" description="Who can send you private messages.">
+          <select 
+            value={settings.dmFrom}
+            onChange={(e) => setSettings({ ...settings, dmFrom: e.target.value })}
+            className="bg-surface border border-paper-dark rounded px-2 py-1 text-xs font-medium text-ink outline-none focus:ring-1 focus:ring-teal"
+          >
+            <option value="everyone">Everyone</option>
+            <option value="following">People you follow</option>
+            <option value="none">No one</option>
+          </select>
+        </SettingItem>
+
+        <SettingItem label="Sensitive Content" description="How sensitive media is displayed in your feed.">
+          <select 
+            value={settings.sensitiveContent}
+            onChange={(e) => setSettings({ ...settings, sensitiveContent: e.target.value })}
+            className="bg-surface border border-paper-dark rounded px-2 py-1 text-xs font-medium text-ink outline-none focus:ring-1 focus:ring-teal"
+          >
+            <option value="show">Show always</option>
+            <option value="blur">Blur (default)</option>
+            <option value="hide">Hide completely</option>
+          </select>
+        </SettingItem>
+
+        <div className="p-4 bg-paper-dark/10 rounded-xl mt-4">
+          <div className="flex items-start gap-3">
+            <Lock size={20} className="text-teal shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <p className="text-sm font-bold text-ink">Data Collection Opt-out</p>
+              <p className="text-xs text-slate leading-relaxed">
+                Agora is architected for structural privacy. We cannot collect your private keys, 
+                your physical location history, or your un-hashed IP addresses by design. 
+                All analytical data processed is client-side or aggregated in a way that respects your 
+                sovereign identity.
+              </p>
             </div>
-            {/* Toggle placeholder */}
-            <div className="w-10 h-6 bg-sage rounded-full opacity-50 cursor-not-allowed"></div>
+          </div>
+        </div>
+      </SettingsSection>
+
+      {/* Reach Section */}
+      <SettingsSection 
+        title="Reach" 
+        description="Publicity and federation settings for your shared content."
+      >
+        <SettingToggle 
+          label="ActivityPub Federation" 
+          description="Allow your posts to be federated to Mastodon and other decentralised instances."
+          checked={settings.federated}
+          onCheckedChange={(v) => setSettings({ ...settings, federated: v })}
+        />
+        <SettingToggle 
+          label="Search Indexing" 
+          description="Allow your public posts to be indexed by global search engines."
+          checked={settings.searchIndexing}
+          onCheckedChange={(v) => setSettings({ ...settings, searchIndexing: v })}
+        />
+        <SettingToggle 
+          label="Allow Quoting" 
+          description="Allow others to quote-post your content."
+          checked={settings.allowQuotes}
+          onCheckedChange={(v) => setSettings({ ...settings, allowQuotes: v })}
+        />
+      </SettingsSection>
+
+      {/* Security Section */}
+      <SettingsSection 
+        title="Security" 
+        description="Manage your account access, authentication, and cryptographic keys."
+      >
+        <SettingAction label="Email Address" description="Current: chaitanya.v...@example.com" actionLabel="Change" onClick={() => {}} />
+        <SettingAction label="Password" description="Last changed 3 months ago." actionLabel="Update" onClick={() => {}} />
+        
+        <SettingItem label="Two-Factor Authentication" description="Add an extra layer of security to your account.">
+          <span className="text-xs font-bold text-orange bg-orange/10 px-2 py-0.5 rounded uppercase tracking-wider">Not Enabled</span>
+        </SettingItem>
+
+        <SettingAction label="Active Sessions" description="3 devices currently logged in." actionLabel="Manage" onClick={() => {}} />
+        <SettingAction label="Authorised Applications" description="2 third-party apps have limited access." actionLabel="View" onClick={() => {}} />
+        
+        <div className="p-4 border border-paper-dark/30 rounded-xl space-y-4">
+          <div className="flex items-center gap-2">
+            <Fingerprint size={18} className="text-teal" />
+            <h3 className="text-sm font-bold text-ink">Cryptographic Key Management</h3>
+          </div>
+          <p className="text-xs text-slate">
+            Your identity is tied to your cryptographic keypair. Rotating your keys is a major action 
+            that will require re-signing existing affiliations.
+          </p>
+          <div className="flex gap-2">
+            <button className="text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 bg-paper-dark/20 hover:bg-paper-dark/40 rounded transition-colors">
+              BACKUP KEYS
+            </button>
+            <button className="text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 bg-orange/10 text-orange hover:bg-orange hover:text-paper rounded transition-colors border border-orange/20">
+              ROTATE KEYPAIR
+            </button>
           </div>
         </div>
 
-        <hr className="border-paper-dark my-8" />
+        <SettingAction label="Login History" description="View last 10 login attempts and locations." actionLabel="View" onClick={() => {}} />
+        <SettingAction label="Account Recovery" description="Set up backup recovery methods." actionLabel="Setup" onClick={() => {}} />
+      </SettingsSection>
 
-        <section className="space-y-4">
-          <h2 className="text-lg font-display text-terracotta">Leave Agora</h2>
-          <p className="text-slate text-sm">
-            Permanently remove your account and all associated data from this node. 
-            This action cannot be undone.
-          </p>
-          <Button variant="destructive" onClick={() => setDialogStep(1)}>
-            Export and delete account
-          </Button>
-        </section>
-
-        <Dialog open={dialogStep > 0} onOpenChange={(open) => {
-          if (!open) { setDialogStep(0); setDeleteInput(""); }
-        }}>
-          <DialogContent>
-            {dialogStep === 1 && (
-              <>
-                <DialogHeader>
-                  <DialogTitle>Before you go</DialogTitle>
-                  <DialogDescription>
-                    You can download everything Agora holds about you before deleting your account. 
-                    This includes your posts, your affiliation declarations, your reputation history, 
-                    and your governance participation record.
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter className="mt-4 gap-2 sm:gap-0">
-                  <Button variant="destructive" onClick={() => setDialogStep(3)}>
-                    Skip and delete account
-                  </Button>
-                  <Button variant="default" onClick={handleDownloadData}>
-                    Download my data
-                  </Button>
-                </DialogFooter>
-              </>
-            )}
-
-            {dialogStep === 2 && (
-              <>
-                <DialogHeader>
-                  <DialogTitle>Before you go</DialogTitle>
-                  <DialogDescription>
-                    Your data has been downloaded. Ready to delete your account?
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter className="mt-4">
-                  <Button variant="destructive" onClick={() => setDialogStep(3)}>
-                    Delete my account permanently
-                  </Button>
-                </DialogFooter>
-              </>
-            )}
-
-            {dialogStep === 3 && (
-              <>
-                <DialogHeader>
-                  <DialogTitle>Final Confirmation</DialogTitle>
-                  <DialogDescription>
-                    Type DELETE to confirm your account deletion.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="my-4">
-                  <label htmlFor="delete-confirm" className="mb-2 block text-sm font-medium text-slate">
-                    Type DELETE to confirm
-                  </label>
-                  <input
-                    id="delete-confirm"
-                    type="text"
-                    className="w-full rounded-md border border-paper-dark bg-surface px-3 py-2 text-sm text-ink focus:outline-none focus:border-terracotta focus:ring-1 focus:ring-terracotta"
-                    placeholder="DELETE"
-                    value={deleteInput}
-                    onChange={(e) => setDeleteInput(e.target.value)}
-                  />
-                </div>
-                <DialogFooter>
-                  <Button 
-                    variant="destructive" 
-                    disabled={deleteInput !== "DELETE"} 
-                    onClick={handleDeleteAccount}
-                  >
-                    Confirm deletion
-                  </Button>
-                </DialogFooter>
-              </>
-            )}
-          </DialogContent>
-        </Dialog>
-
-        <Toast open={showToast} onOpenChange={setShowToast} className="bg-surface border-paper-dark">
-          <ToastDescription className="text-ink text-sm">
-            Account deleted. Your data has been removed.
-          </ToastDescription>
-        </Toast>
-        <ToastViewport />
-      </div>
-    </ToastProvider>
+      <div className="pb-12" />
+    </div>
   );
 }

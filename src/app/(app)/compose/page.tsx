@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useMockData } from "@/hooks/useMockData";
+import { useTopics } from "@/hooks/useTopics";
 import { usePosts } from "@/hooks/usePosts";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -12,9 +12,10 @@ import type { ProvenanceRecord, Post } from "@/types";
 
 export default function ComposePage() {
   const router = useRouter();
-  const { topics, currentUser } = useMockData();
+  const { data: topics, isLoading: isTopicsLoading } = useTopics();
+  const { user } = useAuth();
   const { createPost, isCreating, createError } = usePosts();
-  
+
   const [body, setBody] = useState("");
   const [topicId, setTopicId] = useState("");
   const [citationUrl, setCitationUrl] = useState("");
@@ -25,7 +26,7 @@ export default function ComposePage() {
     postCid: "preview-cid",
     sourceType: provenanceType,
     transmissionChain: [],
-    authorAffiliations: currentUser.verifiedAffiliations || [],
+    authorAffiliations: [], // Placeholder until real affiliations are connected
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -43,38 +44,41 @@ export default function ComposePage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto py-8 px-4 font-sans min-h-screen">
+    <div className="max-w-2xl mx-auto py-12 px-6 font-sans min-h-screen bg-paper-page">
       <header className="flex items-center justify-between mb-12">
-        <button 
+        <button
           onClick={() => router.back()}
-          className="p-2 -ml-2 rounded-full hover:bg-paper-dark/30 transition-colors text-slate"
+          className="p-2 -ml-2 rounded-sm hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-neutral-400"
         >
           <ArrowLeft size={20} />
         </button>
-        <h1 className="font-editorial font-bold text-2xl tracking-tight text-ink">New Contribution</h1>
+        <div className="text-center">
+          <div className="sublabel mb-1">New Witness</div>
+          <h1 className="font-serif font-bold text-2xl tracking-tight text-neutral-900 dark:text-neutral-50">Publish Contribution</h1>
+        </div>
         <div className="w-9" /> {/* Spacer */}
       </header>
 
-      <form onSubmit={handleSubmit} className="space-y-10">
+      <form onSubmit={handleSubmit} className="space-y-12">
         {/* Editor Area */}
         <div className="space-y-6">
           <textarea
             required
             value={body}
             onChange={(e) => setBody(e.target.value)}
-            placeholder="What is the evidence? What is the context?"
-            className="w-full bg-transparent border-none focus:ring-0 text-xl font-sans leading-relaxed text-ink placeholder:text-slate/40 min-h-[200px] resize-none"
+            placeholder="What needs witnessing today? Provide context, evidence, and perspective..."
+            className="w-full bg-transparent border-none focus:ring-0 text-lg font-sans leading-relaxed text-neutral-800 dark:text-neutral-200 placeholder:text-neutral-300 dark:placeholder:text-neutral-700 min-h-[250px] resize-none"
           />
 
-          <div className="flex items-center gap-4 border-y border-paper-dark py-4">
-            <div className="flex-1 flex items-center gap-2 group">
-              <LinkIcon size={18} className="text-slate group-focus-within:text-teal transition-colors" />
+          <div className="flex items-center gap-4 border-y border-neutral-200 dark:border-neutral-800 py-4">
+            <div className="flex-1 flex items-center gap-3 group">
+              <LinkIcon size={18} className="text-neutral-400 group-focus-within:text-cyan-600 transition-colors" />
               <input
                 type="url"
                 value={citationUrl}
                 onChange={(e) => setCitationUrl(e.target.value)}
-                placeholder="Primary source URL (optional)"
-                className="bg-transparent border-none focus:ring-0 text-sm font-mono text-teal w-full placeholder:text-slate/30"
+                placeholder="PRIMARY SOURCE URL (OPTIONAL)"
+                className="bg-transparent border-none focus:ring-0 text-[10px] font-mono text-cyan-700 dark:text-cyan-300 w-full placeholder:text-neutral-300 dark:placeholder:text-neutral-700 uppercase tracking-widest"
               />
             </div>
           </div>
@@ -83,18 +87,18 @@ export default function ComposePage() {
         {/* Metadata section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
           <div className="space-y-3">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-slate flex items-center gap-1.5">
+            <label className="sublabel flex items-center gap-1.5">
               Topic Category
             </label>
             <select
               required
               value={topicId}
               onChange={(e) => setTopicId(e.target.value)}
-              className="w-full bg-paper border border-paper-dark rounded-lg px-4 py-3 text-sm font-sans focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all appearance-none cursor-pointer"
+              className="w-full bg-paper-raised border border-neutral-300 dark:border-neutral-700 rounded-sm px-4 py-3 text-sm font-sans focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all appearance-none cursor-pointer text-neutral-900 dark:text-neutral-50"
             >
               <option value="" disabled>Select a topic...</option>
-              {topics.map((t) => (
-                <option key={t.slug} value={(t as any).id || t.slug}>
+              {topics?.map((t) => (
+                <option key={t.slug} value={t.slug}>
                   {t.displayName}
                 </option>
               ))}
@@ -102,14 +106,14 @@ export default function ComposePage() {
           </div>
 
           <div className="space-y-3">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-slate flex items-center gap-1.5">
+            <label className="sublabel flex items-center gap-1.5">
               Provenance Type
             </label>
             <select
               required
               value={provenanceType}
               onChange={(e) => setProvenanceType(e.target.value)}
-              className="w-full bg-paper border border-paper-dark rounded-lg px-4 py-3 text-sm font-sans focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all appearance-none cursor-pointer"
+              className="w-full bg-paper-raised border border-neutral-300 dark:border-neutral-700 rounded-sm px-4 py-3 text-sm font-sans focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all appearance-none cursor-pointer text-neutral-900 dark:text-neutral-50"
             >
               <option value="original">Original Contribution</option>
               <option value="institutional">Institutional / Official</option>
@@ -119,26 +123,32 @@ export default function ComposePage() {
           </div>
         </div>
 
-        {/* Preview section */}
-        <div className="bg-surface border border-paper-dark p-6 rounded-xl space-y-4 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-slate">Live Provenance Preview</span>
-            <Info size={14} className="text-slate/50" />
+        {/* Live Preview section */}
+        <div className="bg-paper-raised border border-neutral-200 dark:border-neutral-800 p-8 rounded-md space-y-6 shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between border-b border-dotted border-neutral-200 dark:border-neutral-800 pb-2">
+            <span className="sublabel">Live Provenance Preview</span>
+            <div className="relative w-4 h-4">
+              <div className="absolute top-0 left-0.5 w-2.5 h-2.5 bg-cyan-300/60 rounded-full" />
+              <div className="absolute bottom-0 left-0 w-2.5 h-2.5 bg-magenta-300/60 rounded-full" />
+              <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-yellow-300/60 rounded-full" />
+            </div>
           </div>
           <div className="pt-2">
-            <ProvenanceTag 
-              provenance={previewProvenance} 
-              postId="preview" 
+            <ProvenanceTag
+              provenance={previewProvenance}
+              postId="preview"
               expanded={true}
             />
           </div>
-          <p className="text-[10px] text-slate italic pt-2">
-            Your verified affiliations ({currentUser.verifiedAffiliations.length}) will be automatically attached to this post's provenance chain.
-          </p>
+          <div className="bg-neutral-50 dark:bg-neutral-900/50 rounded-sm p-3 border border-dashed border-neutral-200 dark:border-neutral-800">
+            <p className="text-[10px] font-mono text-neutral-400 leading-relaxed">
+              SIGNATURE PROCESS: YOUR VERIFIED LOCAL EXPERTISE AND PROFESSIONAL AFFILIATIONS WILL BE AUTOMATICALLY ATTACHED TO THIS POST&apos;S PROVENANCE CHAIN UPON PUBLICATION.
+            </p>
+          </div>
         </div>
 
         {createError && (
-          <p className="text-terracotta text-xs font-medium text-center bg-terracotta/5 py-3 rounded-lg border border-terracotta/20">
+          <p className="text-magenta-600 dark:text-magenta-400 text-[10px] font-mono font-bold uppercase tracking-widest text-center bg-magenta-50 dark:bg-magenta-900/10 py-4 rounded-sm border border-magenta-200 dark:border-magenta-800">
             {(createError as any).message || "Failed to publish post."}
           </p>
         )}
@@ -147,12 +157,13 @@ export default function ComposePage() {
           <Button
             type="submit"
             disabled={isCreating || !body || !topicId}
-            className="w-full bg-ink text-paper h-14 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-teal transition-all duration-300 shadow-xl shadow-ink/10 disabled:opacity-50 disabled:hover:bg-ink"
+            className="w-full bg-neutral-900 dark:bg-neutral-50 text-neutral-50 dark:text-neutral-900 h-16 rounded-sm font-mono font-bold uppercase tracking-[0.2em] text-xs hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed shadow-2xl"
           >
-            {isCreating ? "Publishing to Agora..." : "Publish Contribution"}
+            {isCreating ? "Witnessing Content..." : "Commit Transfer"}
           </Button>
         </div>
       </form>
     </div>
+
   );
 }

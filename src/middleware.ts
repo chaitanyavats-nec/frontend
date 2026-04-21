@@ -25,13 +25,14 @@ export async function middleware(request: NextRequest) {
   );
 
   const { data: { user } } = await supabase.auth.getUser();
+  const isGuest = request.cookies.get("agora_guest")?.value === "true";
 
-  // If no user and trying to access app routes, redirect to welcome
+  // If no user AND no guest cookie, AND trying to access app routes, redirect to welcome
   // We exclude /welcome, /onboard, and auth/callback if it exists
   const isAuthRoute = request.nextUrl.pathname.startsWith("/welcome") || 
                       request.nextUrl.pathname.startsWith("/onboard");
   
-  if (!user && !isAuthRoute) {
+  if (!user && !isGuest && !isAuthRoute) {
     return NextResponse.redirect(new URL("/welcome", request.url));
   }
 

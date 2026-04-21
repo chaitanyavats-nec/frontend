@@ -4,7 +4,9 @@ import { useState, useEffect } from "react";
 import { FeedCard } from "@/components/features/feed/FeedCard";
 import { FeedModeBar } from "@/components/features/feed/FeedModeBar";
 import { Button } from "@/components/ui/button";
-import { useMockData } from "@/hooks/useMockData";
+import { usePosts } from "@/hooks/usePosts";
+import { useTopics } from "@/hooks/useTopics";
+import { useAuth } from "@/hooks/useAuth";
 import type { FeedMode } from "@/types";
 
 const POSTS_PER_PAGE = 5;
@@ -12,8 +14,11 @@ const FEED_MODE_KEY = "agora-feed-mode";
 const FEED_TOPIC_KEY = "agora-feed-topic";
 
 export default function HomePage() {
-  const { posts, topics } = useMockData();
+  const { user } = useAuth();
+  const { data: topics, isLoading: isTopicsLoading } = useTopics();
   const [mode, setMode] = useState<FeedMode>("chronological");
+  const { posts, isPostsLoading } = usePosts(mode === "following" ? "following" : "chronological");
+  
   const [selectedTopic, setSelectedTopic] = useState<string>("");
   const [visibleCount, setVisibleCount] = useState(POSTS_PER_PAGE);
 
@@ -21,9 +26,21 @@ export default function HomePage() {
   useEffect(() => {
     const savedMode = localStorage.getItem(FEED_MODE_KEY) as FeedMode | null;
     const savedTopic = localStorage.getItem(FEED_TOPIC_KEY);
-    if (savedMode) setMode(savedMode);
+    
+    // Default to following if logged in and no saved mode
+    if (user && !savedMode) {
+      setMode("following");
+    } else if (savedMode) {
+      // Validate saved mode (guest can't see following)
+      if (savedMode === "following" && !user) {
+        setMode("chronological");
+      } else {
+        setMode(savedMode);
+      }
+    }
+    
     if (savedTopic) setSelectedTopic(savedTopic);
-  }, []);
+  }, [user]);
 
   const handleModeChange = (newMode: FeedMode) => {
     setMode(newMode);
@@ -38,15 +55,17 @@ export default function HomePage() {
   };
 
   // Filter and sort posts
-  let filteredPosts = [...posts];
+  let filteredPosts = posts ? [...posts] : [];
 
   if (mode === "topics" && selectedTopic) {
     filteredPosts = filteredPosts.filter((p) =>
-      p.topicTags.some((tag) => tag === selectedTopic || tag.includes(selectedTopic.replace(/-/g, " ")))
+      p.topicId === selectedTopic || 
+      p.topicTags?.some((tag: string) => tag === selectedTopic)
     );
   }
 
-  // Chronological sort (latest first)
+  // Chronological sort is handled by usePosts query order if you want, 
+  // but keeping manual sort here for safety since we're using mock mapped types
   filteredPosts.sort(
     (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
   );
@@ -65,14 +84,21 @@ export default function HomePage() {
       <FeedModeBar
         mode={mode}
         onModeChange={handleModeChange}
-        topics={topics}
+        topics={topics || []}
         selectedTopic={selectedTopic}
         onTopicSelect={handleTopicSelect}
+        showFollowing={!!user}
       />
 
       {/* Feed Cards */}
       <div className="space-y-4">
-        {visiblePosts.length === 0 ? (
+        {isPostsLoading ? (
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-48 bg-surface rounded-xl animate-pulse border border-paper-dark" />
+            ))}
+          </div>
+        ) : visiblePosts.length === 0 ? (
           <div className="py-12 text-center bg-surface rounded-lg border border-paper-dark">
             <p className="font-sans text-sm text-slate">
               No posts found{selectedTopic ? ` for topic "${selectedTopic}"` : ""}.
@@ -99,7 +125,7 @@ export default function HomePage() {
       )}
 
       {/* Natural stopping point */}
-      {!hasMore && visiblePosts.length > 0 && (
+      {!hasMore && visiblePosts.length > 0 && !isPostsLoading && (
         <div className="py-10 mt-6 text-center border-t border-paper-dark">
           <p className="font-sans text-sm text-slate">
             You&apos;ve reached the end. Take a break.
