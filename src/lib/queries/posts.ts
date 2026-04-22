@@ -19,7 +19,11 @@ const POST_ENRICHED_SELECT = `
     *,
     affiliations(*)
   ),
-  citations(*)
+  citations(*),
+  provenance_updates(
+    *,
+    user:profiles(*)
+  )
 `;
 
 export async function getFeedPosts(options: {

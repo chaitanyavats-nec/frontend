@@ -316,6 +316,25 @@ export const mockPosts: any[] = [
     ],
     topicTags: ["platform-cooperativism", "data-sovereignty"],
     provenance: provenanceOriginal1,
+    provenance_updates: [
+      {
+        id: "update-001",
+        post_id: cid("Post01Content"),
+        user_id: mockProfiles[1].id,
+        update_type: "added_context",
+        body: "A relevant 2024 study by LSE explicitly shows that removing like counts alone decreased polarisation metrics by 14%.",
+        evidence_url: "https://example.com/lse-study-2024",
+        evidence_text: null,
+        status: "accepted",
+        created_at: "2025-03-21T10:00:00Z",
+        user: {
+          id: mockProfiles[1].id,
+          display_name: mockProfiles[1].displayName,
+          avatar_url: mockProfiles[1].avatarUrl,
+          did: mockProfiles[1].did,
+        }
+      }
+    ],
     replyCount: 23,
     timestamp: "2025-03-20T14:30:00Z",
     signature: "sig_z6MkR7vX2p_0x1a2b3c4d",
@@ -335,6 +354,25 @@ export const mockPosts: any[] = [
     ],
     topicTags: ["journalism", "transparency"],
     provenance: provenanceOriginal2,
+    provenance_updates: [
+      {
+        id: "update-002",
+        post_id: cid("Post02Content"),
+        user_id: mockProfiles[2].id,
+        update_type: "misleading_framing",
+        body: "The Oaxaca mining concessions mentioned actually began under the previous administration, according to the public registry. Framing it as entirely new is misleading.",
+        evidence_url: "https://example.com/oaxaca-registry",
+        evidence_text: null,
+        status: "pending",
+        created_at: "2025-03-21T11:00:00Z",
+        user: {
+          id: mockProfiles[2].id,
+          display_name: mockProfiles[2].displayName,
+          avatar_url: mockProfiles[2].avatarUrl,
+          did: mockProfiles[2].did,
+        }
+      }
+    ],
     replyCount: 8,
     timestamp: "2025-03-20T12:15:00Z",
     signature: "sig_z6MkJ4kP8r_0x5e6f7g8h",

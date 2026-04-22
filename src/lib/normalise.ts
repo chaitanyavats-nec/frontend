@@ -36,6 +36,7 @@ export function normalisePost(raw: any): PostWithProvenance {
     topic_tags,
     // Surfacing affiliations as requested
     author_affiliations: author?.affiliations || [],
+    provenance_updates: raw.provenance_updates || [],
     // Derived blockchain readiness metadata
     _provenance_verified: raw.provenance_tx_hash ? true : (raw.provenance ? true : false),
     _content_permanent: raw.ipfs_cid ? true : false,

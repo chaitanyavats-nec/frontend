@@ -46,6 +46,9 @@ export interface DbPost {
   reply_count: number;
   topic_tags: string[] | null;
   is_published: boolean;
+  trust_score: number;
+  context_completeness: number;
+  has_disputed_framing: boolean;
   created_at: string;
 }
 
@@ -143,7 +146,22 @@ export type PostWithAuthor = DbPost & {
 export type PostWithProvenance = PostWithAuthor & {
   citations: DbCitation[];
   author_affiliations: DbAffiliation[]; // Same as author.affiliations, surfaced as requested
+  provenance_updates: (DbProvenanceUpdate & {
+    user: Pick<DbProfile, "id" | "display_name" | "avatar_url" | "did">
+  })[];
 };
+
+export interface DbProvenanceUpdate {
+  id: string;
+  post_id: string;
+  user_id: string;
+  update_type: "added_context" | "incomplete_provenance" | "misleading_framing" | "undisclosed_funding";
+  body: string;
+  evidence_url: string | null;
+  evidence_text: string | null;
+  status: "pending" | "accepted" | "disputed" | "dismissed";
+  created_at: string;
+}
 
 export type UserWithReputation = DbProfile & {
   affiliations: DbAffiliation[];

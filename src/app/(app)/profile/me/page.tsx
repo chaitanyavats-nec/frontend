@@ -37,7 +37,7 @@ export default function MyProfilePage() {
     return (
       <div className="py-12 text-center bg-surface border border-paper-dark rounded-lg">
         <p className="font-sans text-sm text-slate">Profile is being initialized. This usually takes just a second.</p>
-        <button 
+        <button
           onClick={() => window.location.reload()}
           className="mt-4 px-4 py-2 bg-sage text-white-0 rounded-lg text-sm font-bold"
         >
@@ -68,7 +68,7 @@ export default function MyProfilePage() {
 
       <ProfileHeader profile={profile} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" style={{ display: "flex", flexDirection: "column-reverse" }}>
         {/* Left Column: Feed */}
         <div className="lg:col-span-2 order-2 lg:order-1">
           <h2 className="font-sans font-semibold text-lg text-ink mb-4 tracking-tight">

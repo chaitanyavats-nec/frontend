@@ -1,6 +1,7 @@
 "use client";
 
 import { CheckCircle } from "phosphor-react";
+import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import type { UserWithReputation } from "@/types";
@@ -38,10 +39,15 @@ export function ProfileHeader({ profile }: ProfileHeaderProps) {
   const { isFollowing, follow, unfollow, isFollowingLoading } = useFollows(profile.id);
 
   const handleFollowToggle = async () => {
-    if (isFollowing) {
-      await unfollow();
-    } else {
-      await follow();
+    try {
+      if (isFollowing) {
+        await unfollow();
+      } else {
+        await follow();
+      }
+    } catch (error: any) {
+      console.error(error);
+      alert(error?.message || "Failed to toggle follow status");
     }
   };
 
@@ -103,14 +109,20 @@ export function ProfileHeader({ profile }: ProfileHeaderProps) {
           </div>
 
           <div className="flex items-center gap-6 mb-4">
-            <div className="flex items-center gap-1.5">
+            <Link 
+              href={`/profile/${profile.did}/follows?tab=followers`}
+              className="flex items-center gap-1.5 hover:opacity-70 transition-opacity"
+            >
               <span className="font-bold text-ink text-sm">{profile.follower_count || 0}</span>
               <span className="text-slate text-xs uppercase tracking-widest font-medium opacity-70">Followers</span>
-            </div>
-            <div className="flex items-center gap-1.5">
+            </Link>
+            <Link 
+              href={`/profile/${profile.did}/follows?tab=following`}
+              className="flex items-center gap-1.5 hover:opacity-70 transition-opacity"
+            >
               <span className="font-bold text-ink text-sm">{profile.following_count || 0}</span>
               <span className="text-slate text-xs uppercase tracking-widest font-medium opacity-70">Following</span>
-            </div>
+            </Link>
           </div>
 
           {profile.bio && (

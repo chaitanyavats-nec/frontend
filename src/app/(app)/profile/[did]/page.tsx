@@ -12,7 +12,7 @@ import { FeedCard } from "@/components/features/feed/FeedCard";
 export default function UserProfilePage() {
   const params = useParams();
   const did = params.did as string;
-  
+
   const { profile, loading: isProfileLoading } = useProfile(did);
   const { posts, loading: isPostsLoading } = useFeed("chronological");
 
@@ -68,7 +68,7 @@ export default function UserProfilePage() {
 
       <ProfileHeader profile={profile} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" style={{ display: "flex", flexDirection: "column-reverse" }}>
         {/* Left Column: Feed */}
         <div className="lg:col-span-2 order-2 lg:order-1">
           <h2 className="font-sans font-semibold text-lg text-ink mb-4 tracking-tight">

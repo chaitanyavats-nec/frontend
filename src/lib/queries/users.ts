@@ -11,16 +11,17 @@ import { normaliseProfile } from "../normalise";
 const supabase = createClient();
 
 export async function getUserProfile(userId: string): Promise<UserWithReputation | null> {
-  const queryField = userId.startsWith("did:") ? "did" : "id";
+  const decodedId = decodeURIComponent(userId);
+  const queryField = decodedId.startsWith("did:") ? "did" : "id";
 
   const { data, error } = await supabase
     .from("profiles")
     .select("*")
-    .eq(queryField, userId)
+    .eq(queryField, decodedId)
     .single();
 
   if (error) {
-    if (error.code === "PGRST116") return null;
+    if (error.code === "PGRST116" || error.code === "22P02") return null; // Not found or invalid UUID format
     throw error;
   }
 
@@ -50,18 +51,24 @@ export async function getUserProfile(userId: string): Promise<UserWithReputation
   // Filter current affiliations
   const currentAffiliations = (data.affiliations || []).filter((a: any) => a.is_current);
 
-  // For followers/following, we'd need another join/count, 
-  // but for now we'll return the profile with these counts (assuming they might be columns or placeholder logic)
-  // The prompt schema SECTION 1 did NOT list followers_count in profiles, 
-  // but SECTION 2 UserWithReputation requires counts.
-  // I will assume they are derived or present.
-  
+  // Get followers count
+  const { count: followersCount } = await supabase
+    .from("follows")
+    .select("*", { count: "exact", head: true })
+    .eq("following_id", internalId);
+
+  // Get following count
+  const { count: followingCount } = await supabase
+    .from("follows")
+    .select("*", { count: "exact", head: true })
+    .eq("follower_id", internalId);
+
   return normaliseProfile({
     ...data,
     affiliations: currentAffiliations,
     post_count: postCount || 0,
-    follower_count: 0, // Placeholder
-    following_count: 0, // Placeholder
+    follower_count: followersCount || 0,
+    following_count: followingCount || 0,
   });
 }
 
@@ -75,4 +82,52 @@ export async function getAffiliationsByUser(userId: string): Promise<DbAffiliati
 
   if (error) throw error;
   return data || [];
+}
+
+export async function getFollowers(userId: string): Promise<UserWithReputation[]> {
+  const decodedId = decodeURIComponent(userId);
+  const { data: profile, error: pError } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq(decodedId.startsWith("did:") ? "did" : "id", decodedId)
+    .single();
+  
+  if (pError || !profile) return [];
+
+  const { data, error } = await supabase
+    .from("follows")
+    .select(`
+      profiles:follower_id (
+        *,
+        affiliations(*)
+      )
+    `)
+    .eq("following_id", profile.id);
+
+  if (error) throw error;
+  return (data || []).map((row: any) => normaliseProfile(row.profiles));
+}
+
+export async function getFollowing(userId: string): Promise<UserWithReputation[]> {
+  const decodedId = decodeURIComponent(userId);
+  const { data: profile, error: pError } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq(decodedId.startsWith("did:") ? "did" : "id", decodedId)
+    .single();
+  
+  if (pError || !profile) return [];
+
+  const { data, error } = await supabase
+    .from("follows")
+    .select(`
+      profiles:following_id (
+        *,
+        affiliations(*)
+      )
+    `)
+    .eq("follower_id", profile.id);
+
+  if (error) throw error;
+  return (data || []).map((row: any) => normaliseProfile(row.profiles));
 }

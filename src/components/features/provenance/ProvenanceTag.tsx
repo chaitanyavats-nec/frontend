@@ -33,6 +33,13 @@ const sourceTypeConfig = {
   },
 } as const;
 
+export const updateTypeConfig = {
+  added_context: { label: "Added Context", classes: "bg-teal/10 text-teal-dark border-teal/20" },
+  incomplete_provenance: { label: "Incomplete Provenance", classes: "bg-orange/10 text-orange border-orange/20" },
+  misleading_framing: { label: "Misleading Framing", classes: "bg-terracotta/10 text-terracotta border-terracotta/20" },
+  undisclosed_funding: { label: "Undisclosed Funding", classes: "bg-terracotta/10 text-terracotta border-terracotta/20" },
+} as const;
+
 // ─── STATE 1: Collapsed Pill ────────────────────────────────
 function CollapsedPill({
   post,
@@ -184,6 +191,38 @@ function ExpandedSummary({
                   Coordination detected ({Math.round((post.coordination_confidence || 0) * 100)}% confidence)
                 </span>
               </div>
+            </div>
+          )}
+
+          {/* Community Additions */}
+          {post.provenance_updates && post.provenance_updates.length > 0 && (
+            <div className="pt-2 border-t border-paper-dark">
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-mono text-xs text-slate uppercase tracking-wider">
+                  Community additions <span className="opacity-60 ml-1">({post.provenance_updates.length})</span>
+                </span>
+                <span className={cn("px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border", updateTypeConfig[post.provenance_updates[0].update_type].classes)}>
+                  {updateTypeConfig[post.provenance_updates[0].update_type].label}
+                </span>
+              </div>
+              <div className="space-y-1.5 mb-2">
+                {post.provenance_updates.slice(0, 2).map((update) => (
+                  <div key={update.id} className="text-xs font-sans p-2 rounded bg-paper-dark/20 border border-paper-dark/50">
+                    <span className="font-semibold text-ink mr-2">{update.user?.display_name || "Unknown"}</span>
+                    <span className={cn("px-1 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest bg-white-0 border shadow-sm mr-2", update.status === 'pending' ? 'text-gold border-gold/30' : 'text-slate border-paper-dark')}>
+                      {update.status === 'pending' ? 'Under Review' : updateTypeConfig[update.update_type].label}
+                    </span>
+                    <span className="text-slate line-clamp-1 mt-1">{update.body}</span>
+                  </div>
+                ))}
+              </div>
+              <Link
+                href={`/post/${post.id}/provenance`}
+                onClick={(e) => e.stopPropagation()}
+                className="inline-flex items-center gap-1 font-sans text-xs font-semibold text-teal hover:text-teal-dark transition-colors"
+              >
+                View all additions <ArrowRight size={12} />
+              </Link>
             </div>
           )}
 
