@@ -69,16 +69,16 @@ export default function FollowsPage() {
       {/* Tabs */}
       <Tabs defaultValue={initialTab} className="w-full">
         <TabsList className="w-full bg-paper-raised border border-neutral-200 dark:border-neutral-800 p-1 mb-6">
-          <TabsTrigger 
-            value="followers" 
+          <TabsTrigger
+            value="followers"
             className="flex-1 gap-2 data-[state=active]:bg-cyan-500 data-[state=active]:text-white"
           >
             <Users size={14} />
             Followers
             <span className="ml-1 opacity-60">({profile.follower_count})</span>
           </TabsTrigger>
-          <TabsTrigger 
-            value="following" 
+          <TabsTrigger
+            value="following"
             className="flex-1 gap-2 data-[state=active]:bg-cyan-500 data-[state=active]:text-white"
           >
             <UserPlus size={14} />
@@ -88,17 +88,17 @@ export default function FollowsPage() {
         </TabsList>
 
         <TabsContent value="followers" className="mt-0 focus-visible:ring-0">
-          <FollowList 
-            userId={profile.did} 
-            type="followers" 
-            fetchFn={getFollowers} 
+          <FollowList
+            userId={did}
+            type="followers"
+            fetchFn={getFollowers}
           />
         </TabsContent>
         <TabsContent value="following" className="mt-0 focus-visible:ring-0">
-          <FollowList 
-            userId={profile.did} 
-            type="following" 
-            fetchFn={getFollowing} 
+          <FollowList
+            userId={did}
+            type="following"
+            fetchFn={getFollowing}
           />
         </TabsContent>
       </Tabs>
