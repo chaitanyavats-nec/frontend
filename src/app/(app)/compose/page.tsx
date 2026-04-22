@@ -29,7 +29,7 @@ export default function ComposePage() {
       id: user?.id || "preview",
       display_name: (user as { user_metadata?: { display_name?: string } } | null)?.user_metadata?.display_name || user?.email?.split("@")[0] || "You",
       did: (user as { user_metadata?: { did?: string } } | null)?.user_metadata?.did || (user?.id ? `did:agora:${user.id}` : "did:agora:preview"),
-      avatar_url: (user as { user_metadata?: { avatar_url?: string } } | null)?.user_metadata?.avatar_url,
+      avatar_url: (user as { user_metadata?: { avatar_url?: string } } | null)?.user_metadata?.avatar_url ?? null,
       ladder_level: "new",
       reputation_total: 0,
       affiliations: [],
