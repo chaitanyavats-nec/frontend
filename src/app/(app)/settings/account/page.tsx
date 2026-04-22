@@ -124,20 +124,12 @@ export default function AccountSettingsPage() {
             </span>
           </SettingItem>
 
-          <SettingItem label="Affiliation Declarations" description="Manage your verified institutional and community ties.">
-            <button className="text-teal hover:text-teal-dark transition-colors">
-              <Plus size={20} weight="bold" />
-            </button>
-          </SettingItem>
-
-          <div className="pl-4 space-y-2 border-l-2 border-paper-dark/50 ml-2">
-            {profile.affiliations?.map((aff: DbAffiliation, i: number) => (
-              <div key={aff.id || i} className="flex justify-between items-center text-sm py-1">
-                <span className="text-ink">{aff.organization_name} ({aff.affiliation_type})</span>
-                <button className="text-xs font-bold text-slate hover:text-orange transition-colors">REVOKE</button>
-              </div>
-            ))}
-          </div>
+          <SettingAction 
+            label="Affiliation Declarations" 
+            description="Manage your verified institutional and community ties on the dedicated declaration page." 
+            actionLabel="Manage Declarations" 
+            onClick={() => window.location.href = '/settings/affiliations'} 
+          />
 
           <SettingAction 
             label="Funding Disclosures" 

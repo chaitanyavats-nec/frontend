@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft } from "phosphor-react";
 import { PostDetail } from "@/components/features/feed/PostDetail";
 import { FeedCard } from "@/components/features/feed/FeedCard";
+import { AuthorSidebarCard } from "@/components/features/feed/AuthorSidebarCard";
 import { useMockData } from "@/hooks/useMockData";
 
 import { usePost } from "@/hooks/usePost";
@@ -38,36 +39,49 @@ export default function PostDetailPage() {
   const mockReplies = allPosts.filter((p) => p.id !== post.id).slice(0, 3);
 
   return (
-    <div>
+    <div className="max-w-6xl mx-auto pb-20">
       {/* Back navigation */}
       <Link
         href="/home"
-        className="inline-flex items-center gap-1.5 font-medium text-xs text-slate hover:text-ink mb-4 transition-colors duration-150 bg-surface px-3 py-1.5 rounded-lg border border-paper-dark"
+        className="inline-flex items-center gap-1.5 font-medium text-xs text-slate hover:text-ink mb-2 transition-colors duration-150 bg-surface px-3 py-1.5 rounded-lg border border-paper-dark"
       >
         <ArrowLeft size={14} />
         Back
       </Link>
 
-      {/* Post Detail */}
-      <PostDetail post={post} />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start mt-4">
+        {/* Main Column */}
+        <div className="lg:col-span-2 space-y-8">
+          {/* Post Detail */}
+          <PostDetail post={post} />
 
-      {/* Reply Thread */}
-      {(isFeedLoading || mockReplies.length > 0) && (
-        <div className="mt-8">
-          <h3 className="font-semibold text-lg text-ink mb-4 tracking-tight">
-            {post.reply_count} replies
-          </h3>
-          <div className="space-y-4">
-            {isFeedLoading ? (
-              [1, 2].map(i => <div key={i} className="h-32 bg-surface rounded-lg animate-pulse" />)
-            ) : (
-              mockReplies.map((reply) => (
-                <FeedCard key={reply.id} post={reply} showProvenance={false} isReply />
-              ))
-            )}
-          </div>
+          {/* Reply Thread */}
+          {(isFeedLoading || mockReplies.length > 0) && (
+            <div>
+              <h3 className="font-semibold text-lg text-ink mb-4 tracking-tight">
+                Replies
+              </h3>
+              <div className="space-y-4">
+                {isFeedLoading ? (
+                  [1, 2].map(i => <div key={i} className="h-32 bg-surface rounded-lg animate-pulse" />)
+                ) : (
+                  mockReplies.map((reply) => (
+                    <FeedCard key={reply.id} post={reply} showProvenance={false} isReply />
+                  ))
+                )}
+              </div>
+            </div>
+          )}
         </div>
-      )}
+
+        {/* Right Sidebar */}
+        <div className="hidden lg:block lg:col-span-1 sticky top-24">
+          <AuthorSidebarCard 
+            post={post} 
+            topicPosts={allPosts.filter(p => !post.topic_tags || (p.topic_tags && p.topic_tags.some(tag => post.topic_tags!.includes(tag))) && p.id !== post.id).slice(0, 3)} 
+          />
+        </div>
+      </div>
     </div>
   );
 }

@@ -17,19 +17,19 @@ interface ProvenanceTagProps {
 const sourceTypeConfig = {
   original: {
     label: "Original",
-    pillClasses: "bg-teal-light text-teal-dark border-teal-light",
+    pillClasses: "bg-sage/10 text-sage-dark border-sage/30",
   },
   derived: {
     label: "Derived",
-    pillClasses: "bg-teal-light text-teal-dark border-teal-light",
+    pillClasses: "bg-sage/10 text-sage-dark border-sage/30",
   },
   republished: {
     label: "Republished",
-    pillClasses: "bg-teal-light text-teal-dark border-teal-light",
+    pillClasses: "bg-sage/10 text-sage-dark border-sage/30",
   },
   institutional: {
     label: "Institutional",
-    pillClasses: "bg-violet/10 text-violet border-violet/20",
+    pillClasses: "bg-gold/10 text-gold-dark border-gold/30",
   },
 } as const;
 
@@ -43,9 +43,9 @@ function CollapsedPill({
 }) {
   const summary = useProvenance(post);
   const config = summary.has_coordination_flag 
-    ? { label: "Coordinated", pillClasses: "bg-orange text-paper border-orange shadow-sm" }
+    ? { label: "Coordinated", pillClasses: "bg-terracotta text-white-0 border-terracotta shadow-sm" }
     : summary.has_funding_disclosure
-    ? { label: "Funded", pillClasses: "bg-orange/10 text-orange border-orange/20" }
+    ? { label: "Funded", pillClasses: "bg-terracotta/10 text-terracotta border-terracotta/20" }
     : sourceTypeConfig[summary.source_type];
 
   return (
@@ -60,8 +60,10 @@ function CollapsedPill({
       )}
       aria-label={`Source: ${config.label}${summary.primary_affiliation ? `, ${summary.primary_affiliation}` : ""}. Click to expand.`}
     >
-      {summary.has_coordination_flag && (
+      {summary.has_coordination_flag ? (
         <Warning size={14} weight="fill" />
+      ) : (
+        <span className="w-1.5 h-1.5 rounded-full bg-current opacity-70" />
       )}
       <span className="font-medium">{config.label}</span>
       {summary.primary_affiliation && (
@@ -85,9 +87,9 @@ function ExpandedSummary({
 }) {
   const summary = useProvenance(post);
   const config = summary.has_coordination_flag 
-    ? { label: "Coordinated", pillClasses: "bg-orange text-paper border-orange shadow-sm" }
+    ? { label: "Coordinated", pillClasses: "bg-terracotta text-white-0 border-terracotta shadow-sm" }
     : summary.has_funding_disclosure
-    ? { label: "Funded", pillClasses: "bg-orange/10 text-orange border-orange/20" }
+    ? { label: "Funded", pillClasses: "bg-terracotta/10 text-terracotta border-terracotta/20" }
     : sourceTypeConfig[summary.source_type];
 
   return (

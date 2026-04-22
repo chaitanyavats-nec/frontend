@@ -54,6 +54,8 @@ export interface DbAffiliation {
   user_id: string; // (FK → profiles.id)
   organization_name: string;
   affiliation_type: string;
+  role: string | null;
+  public_statement: string | null;
   period_start: string | null;
   period_end: string | null;
   is_current: boolean;
@@ -126,6 +128,7 @@ export type PostWithAuthor = DbPost & {
     | "display_name"
     | "avatar_url"
     | "did"
+    | "bio"
     | "ladder_level"
     | "reputation_total"
   > & {

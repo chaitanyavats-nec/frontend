@@ -1,8 +1,10 @@
 "use client";
 
-import { ChatCircle, Flag, ShareNetwork } from "phosphor-react";
+import { useState } from "react";
+import { ChatCircle, Flag, ShareNetwork, ArrowsLeftRight, BookmarkSimple, Image as ImageIcon, Link as LinkIcon } from "phosphor-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ProvenanceTag } from "@/components/features/provenance/ProvenanceTag";
+import { Button } from "@/components/ui/button";
 import type { PostWithProvenance } from "@/types";
 
 interface PostDetailProps {
@@ -20,6 +22,9 @@ function getInitials(name?: string): string {
 }
 
 export function PostDetail({ post }: PostDetailProps) {
+  const [isReplying, setIsReplying] = useState(false);
+  const [replyText, setReplyText] = useState("");
+
   return (
     <article className="bg-surface rounded-lg border border-paper-dark p-5 sm:p-6" role="article" aria-label={`Post by ${post.author.display_name}`}>
       {/* Author Row — larger avatar */}
@@ -59,7 +64,7 @@ export function PostDetail({ post }: PostDetailProps) {
 
       {/* Full Content — no line clamp */}
       <div className="mb-4">
-        <p className="text-base text-ink leading-relaxed whitespace-pre-wrap">
+        <p className="text-lg font-editorial text-ink leading-relaxed whitespace-pre-wrap">
           {post.body}
         </p>
       </div>
@@ -125,27 +130,61 @@ export function PostDetail({ post }: PostDetailProps) {
       {/* Action Row */}
       <div className="flex items-center gap-2 pt-3 border-t border-paper-dark">
         <button
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-slate hover:text-ink hover:bg-paper-dark/50 transition-colors duration-150 text-xs font-medium"
-          aria-label={`${post.reply_count} replies. Click to reply.`}
+          onClick={() => setIsReplying(!isReplying)}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors duration-150 text-xs font-medium ${isReplying ? 'text-teal bg-teal/10' : 'text-slate hover:text-ink hover:bg-paper-dark/50'}`}
+          aria-label="Reply to this post"
         >
-          <ChatCircle size={18} />
-          <span>{post.reply_count} replies</span>
+          <ChatCircle size={18} weight={isReplying ? "fill" : "regular"} />
+          <span>Reply</span>
         </button>
         <button
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-slate hover:text-terracotta hover:bg-terracotta/10 transition-colors duration-150 text-xs font-medium"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-slate hover:text-teal hover:bg-teal/10 transition-colors duration-150 text-xs font-medium"
+          aria-label="Boost this post"
+        >
+          <ArrowsLeftRight size={18} />
+          <span>Boost</span>
+        </button>
+        <button
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-slate hover:text-violet hover:bg-violet/10 transition-colors duration-150 text-xs font-medium"
+          aria-label="Save this post"
+        >
+          <BookmarkSimple size={18} />
+          <span>Save</span>
+        </button>
+        <button
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-slate hover:text-terracotta hover:bg-terracotta/10 transition-colors duration-150 text-xs font-medium ml-auto"
           aria-label="Flag this post"
         >
           <Flag size={18} />
           <span>Flag</span>
         </button>
-        <button
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-slate hover:text-ink hover:bg-paper-dark/50 transition-colors duration-150 text-xs font-medium"
-          aria-label="Share this post"
-        >
-          <ShareNetwork size={18} />
-          <span>Share</span>
-        </button>
       </div>
+
+      {/* Inline Compose */}
+      {isReplying && (
+        <div className="mt-4 p-4 border border-paper-dark rounded-lg bg-surface relative">
+          <textarea
+            value={replyText}
+            onChange={(e) => setReplyText(e.target.value)}
+            placeholder="Write your reply..."
+            className="w-full bg-transparent border-none focus:ring-0 text-sm font-sans leading-relaxed text-ink placeholder:text-slate min-h-[100px] resize-none pb-10"
+            autoFocus
+          />
+          <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between pt-3 border-t border-paper-dark/50">
+            <div className="flex items-center gap-2">
+              <button className="text-slate hover:text-teal transition-colors">
+                <ImageIcon size={18} />
+              </button>
+              <button className="text-slate hover:text-teal transition-colors">
+                <LinkIcon size={18} />
+              </button>
+            </div>
+            <Button size="sm" disabled={!replyText.trim()} className="bg-teal text-white-0 px-4 h-8 rounded-md text-xs font-bold uppercase tracking-wider hover:bg-teal-dark">
+              Commit Reply
+            </Button>
+          </div>
+        </div>
+      )}
     </article>
   );
 }
