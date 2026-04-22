@@ -9,7 +9,7 @@ import { getPostById, getProvenanceSummary } from "@/lib/queries/posts";
 import { normalisePost } from "@/lib/normalise";
 import { USE_MOCK_DATA } from "@/lib/config";
 import { mockPosts } from "@/lib/mockData";
-import { PostWithProvenance, ProvenanceSummary } from "@/types";
+import { ProvenanceSummary } from "@/types";
 
 export function usePost(postId: string) {
   const { data, isLoading, error } = useQuery({

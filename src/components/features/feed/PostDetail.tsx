@@ -12,7 +12,6 @@ import {
   Copy,
   Image as ImageIcon,
   Link as LinkIcon,
-  ArrowLeft,
 } from "phosphor-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ProvenanceTag } from "@/components/features/provenance/ProvenanceTag";

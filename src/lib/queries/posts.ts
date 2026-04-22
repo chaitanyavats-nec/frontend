@@ -5,7 +5,7 @@
  */
 
 import { createClient } from "@/utils/supabase/client";
-import { PostWithProvenance, ProvenanceSummary } from "@/types";
+import { PostWithProvenance, ProvenanceSummary, RawPostSelect } from "@/types";
 import { normalisePost } from "../normalise";
 
 const supabase = createClient();
@@ -50,10 +50,12 @@ export async function getFeedPosts(options: {
   const { data, error } = await query;
   if (error) throw error;
 
-  return (data || []).map((raw) => {
+  const rawData = data as unknown as RawPostSelect[];
+
+  return (rawData || []).map((raw) => {
     // Filter to current affiliations only for author object
     if (raw.author?.affiliations) {
-      raw.author.affiliations = raw.author.affiliations.filter((a: any) => a.is_current);
+      raw.author.affiliations = raw.author.affiliations.filter((a) => a.is_current);
     }
     return normalisePost(raw);
   });
@@ -74,15 +76,17 @@ export async function getPostById(id: string): Promise<PostWithProvenance | null
     throw error;
   }
 
+  const raw = data as unknown as RawPostSelect;
+
   // Filter affiliations
-  if (data.author?.affiliations) {
-    data.author.affiliations = data.author.affiliations.filter((a: any) => a.is_current);
+  if (raw.author?.affiliations) {
+    raw.author.affiliations = raw.author.affiliations.filter((a) => a.is_current);
   }
 
   // Check if post survived challenge (moderation_flags with status = 'upheld')
   // Note: survivability might be better as a derived field in normalise, 
   // but we'll stick to the query logic requested.
-  return normalisePost(data);
+  return normalisePost(raw);
 }
 
 export async function getUserPosts(

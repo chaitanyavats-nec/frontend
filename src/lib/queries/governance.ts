@@ -5,9 +5,13 @@
  */
 
 import { createClient } from "@/utils/supabase/client";
-import { DbGovernanceProposal } from "@/types";
+import { type DbGovernanceProposal } from "@/types";
 
 const supabase = createClient();
+
+type ProposalWithProposer = DbGovernanceProposal & {
+  proposer: { display_name: string; did: string } | null;
+};
 
 export async function getOpenProposals() {
   const { data, error } = await supabase
@@ -23,7 +27,7 @@ export async function getOpenProposals() {
   if (error) throw error;
   
   // Mapping to ensure proposer data is accessible
-  return (data || []).map(p => ({
+  return ((data as unknown as ProposalWithProposer[]) || []).map((p) => ({
     ...p,
     proposer_display_name: p.proposer?.display_name,
     proposer_did: p.proposer?.did,

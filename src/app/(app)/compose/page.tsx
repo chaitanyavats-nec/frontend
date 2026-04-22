@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { ProvenanceTag } from "@/components/features/provenance/ProvenanceTag";
 import { ArrowLeft, Link as LinkIcon, Image as ImageIcon, ChartBar, MapPin } from "phosphor-react";
 import { useRouter } from "next/navigation";
-import type { ProvenanceRecord } from "@/types";
+import type { PostWithProvenance } from "@/types";
 
 export default function ComposePage() {
   const router = useRouter();
@@ -18,27 +18,51 @@ export default function ComposePage() {
   const [body, setBody] = useState("");
   const [topicId, setTopicId] = useState("");
   const [citationUrl, setCitationUrl] = useState("");
-  const [provenanceType, setProvenanceType] = useState<any>("original");
+  const [provenanceType, setProvenanceType] = useState<"original" | "derived" | "republished" | "institutional">("original");
 
   // Construct a preview post object for the provenance tag
-  const previewPost: any = {
+  const previewPost: PostWithProvenance = {
     id: "preview",
-    content: body,
+    body: body,
     source_type: provenanceType,
     author: {
-      display_name: (user as any)?.user_metadata?.display_name || user?.email?.split("@")[0] || "You",
-      did: (user as any)?.user_metadata?.did || (user?.id ? `did:agora:${user.id}` : "did:agora:preview"),
-      avatar_url: (user as any)?.user_metadata?.avatar_url,
+      id: user?.id || "preview",
+      display_name: (user as { user_metadata?: { display_name?: string } } | null)?.user_metadata?.display_name || user?.email?.split("@")[0] || "You",
+      did: (user as { user_metadata?: { did?: string } } | null)?.user_metadata?.did || (user?.id ? `did:agora:${user.id}` : "did:agora:preview"),
+      avatar_url: (user as { user_metadata?: { avatar_url?: string } } | null)?.user_metadata?.avatar_url,
       ladder_level: "new",
       reputation_total: 0,
+      affiliations: [],
+      bio: null,
     },
     author_affiliations: [],
     media_urls: [],
     topic_tags: topicId ? [topicId] : [],
     created_at: new Date().toISOString(),
+    citations: [],
+    provenance_updates: [],
     _provenance_verified: false,
     _content_permanent: false,
     _funding_verified: false,
+    // Add missing DbPost fields
+    author_id: user?.id || "preview",
+    ipfs_cid: null,
+    content_signature: null,
+    origin_url: null,
+    origin_label: null,
+    provenance_tx_hash: null,
+    funding_type: "independent",
+    funder_name: null,
+    funding_staked: false,
+    funding_tx_hash: null,
+    coordination_flagged: false,
+    coordination_confidence: null,
+    coordination_survived: false,
+    reply_count: 0,
+    is_published: false,
+    trust_score: 0,
+    context_completeness: 0,
+    has_disputed_framing: false,
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

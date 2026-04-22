@@ -12,7 +12,7 @@ const did = (suffix: string) => `did:agora:z6Mk${suffix}`;
 const cid = (suffix: string) => `Qm${suffix.padEnd(44, "abcdef1234567890")}`;
 
 // ─── User Profiles ──────────────────────────────────────────
-export const mockProfiles: any[] = [
+export const mockProfiles: UserProfile[] = [
   {
     id: "mock-user-chaitanya",
     did: did("R7vX2pQnKz8WfH3jL9mYcTbNsA4gE6dU"),
@@ -300,7 +300,7 @@ const provenanceDerived2: ProvenanceRecord = {
 };
 
 // ─── Posts ───────────────────────────────────────────────────
-export const mockPosts: any[] = [
+export const mockPosts: Post[] = [
   {
     id: cid("Post01Content"),
     authorDid: mockProfiles[0].did,
@@ -569,7 +569,7 @@ export const mockTopics: Topic[] = [
 ];
 
 // ─── Governance Proposals ───────────────────────────────────
-export const mockProposals: any[] = [
+export const mockProposals: GovernanceProposal[] = [
   {
     id: "prop-2025-0042",
     proposerDid: mockProfiles[0].did,
@@ -601,7 +601,7 @@ export const mockProposals: any[] = [
 ];
 
 // ─── Moderation Cases ───────────────────────────────────────
-export const mockModerationCases: any[] = [
+export const mockModerationCases: ModerationCase[] = [
   {
     id: "case-2025-0891",
     flaggedPost: mockPosts[7], // The coordinated post

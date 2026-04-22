@@ -2,6 +2,7 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
+import { DbPost } from "@/types";
 
 interface SubmitProvenanceUpdateParams {
   postId: string;
@@ -48,14 +49,14 @@ export async function submitProvenanceUpdate(params: SubmitProvenanceUpdateParam
   // 2. Perform server-side trust score / post effects if the update is instantly accepted
   if (status === "accepted") {
     // We fetch the current post to adjust it
-    const { data: post, error: fetchError } = await (supabase as any)
+    const { data: post, error: fetchError } = await supabase
       .from("posts")
       .select("trust_score, context_completeness")
       .eq("id", postId)
       .single();
 
     if (!fetchError && post) {
-      const updates: any = {};
+      const updates: Partial<DbPost> = {};
       
       if (updateType === "added_context") {
         updates.context_completeness = Math.min((post.context_completeness || 100) + 5, 100);
@@ -63,7 +64,7 @@ export async function submitProvenanceUpdate(params: SubmitProvenanceUpdateParam
         updates.trust_score = Math.max((post.trust_score || 100) - 5, 0); // Small downward adjustment
       }
 
-      await (supabase as any).from("posts").update(updates).eq("id", postId);
+      await supabase.from("posts").update(updates).eq("id", postId);
     }
 
     // Adjusting author score or contributor score would go here

@@ -10,7 +10,7 @@ import { USE_MOCK_DATA } from "@/lib/config";
 import { getFeedPosts } from "@/lib/queries/posts";
 import { normalisePost } from "@/lib/normalise";
 import { mockPosts } from "@/lib/mockData";
-import { PostWithProvenance, FeedMode } from "@/types";
+import { FeedMode } from "@/types";
 
 export function useFeed(mode: FeedMode, topicTags?: string[]) {
   const { data, isLoading, error } = useQuery({

@@ -5,10 +5,14 @@
  */
 
 import { createClient } from "@/utils/supabase/client";
-import { UserWithReputation, DbAffiliation } from "@/types";
+import { UserWithReputation, DbAffiliation, RawProfileSelect } from "@/types";
 import { normaliseProfile } from "../normalise";
 
 const supabase = createClient();
+
+type FollowRow = {
+  profiles: Record<string, unknown>; // RawProfileSelect doesn't perfectly match the join structure here
+};
 
 export async function getUserProfile(userId: string): Promise<UserWithReputation | null> {
   const decodedId = decodeURIComponent(userId);
@@ -28,7 +32,7 @@ export async function getUserProfile(userId: string): Promise<UserWithReputation
   const internalId = data.id;
 
   // Fetch affiliations separately for stability during migration
-  let affiliations: any[] = [];
+  let affiliations: DbAffiliation[] = [];
   try {
     const { data: affData } = await supabase
       .from("affiliations")
@@ -36,7 +40,7 @@ export async function getUserProfile(userId: string): Promise<UserWithReputation
       .eq("user_id", internalId)
       .eq("is_current", true);
     affiliations = affData || [];
-  } catch (e) {
+  } catch {
     console.warn("Affiliations table not found or query failed, skipping for now.");
   }
 
@@ -47,9 +51,6 @@ export async function getUserProfile(userId: string): Promise<UserWithReputation
     .eq("author_id", internalId);
 
   if (countError) throw countError;
-
-  // Filter current affiliations
-  const currentAffiliations = (data.affiliations || []).filter((a: any) => a.is_current);
 
   // Get followers count
   const { count: followersCount } = await supabase
@@ -65,11 +66,11 @@ export async function getUserProfile(userId: string): Promise<UserWithReputation
 
   return normaliseProfile({
     ...data,
-    affiliations: currentAffiliations,
-    post_count: postCount || 0,
-    follower_count: followersCount || 0,
-    following_count: followingCount || 0,
-  });
+    affiliations: affiliations,
+    post_count: [{ count: postCount || 0 }],
+    follower_count: [{ count: followersCount || 0 }],
+    following_count: [{ count: followingCount || 0 }],
+  } as unknown as RawProfileSelect); // Cast as unknown as RawProfileSelect
 }
 
 export async function getAffiliationsByUser(userId: string): Promise<DbAffiliation[]> {
@@ -105,7 +106,10 @@ export async function getFollowers(userId: string): Promise<UserWithReputation[]
     .eq("following_id", profile.id);
 
   if (error) throw error;
-  return (data || []).map((row: any) => normaliseProfile(row.profiles));
+  return (data || []).map((row: unknown) => {
+    const r = row as FollowRow;
+    return normaliseProfile(r.profiles as RawProfileSelect);
+  });
 }
 
 export async function getFollowing(userId: string): Promise<UserWithReputation[]> {
@@ -129,5 +133,8 @@ export async function getFollowing(userId: string): Promise<UserWithReputation[]
     .eq("follower_id", profile.id);
 
   if (error) throw error;
-  return (data || []).map((row: any) => normaliseProfile(row.profiles));
+  return (data || []).map((row: unknown) => {
+    const r = row as FollowRow;
+    return normaliseProfile(r.profiles as RawProfileSelect);
+  });
 }

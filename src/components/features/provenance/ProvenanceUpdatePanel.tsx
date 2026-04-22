@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { X, Check } from "phosphor-react";
+import { X } from "phosphor-react";
 import { submitProvenanceUpdate } from "@/app/actions/provenanceUpdates";
 
 interface ProvenanceUpdatePanelProps {

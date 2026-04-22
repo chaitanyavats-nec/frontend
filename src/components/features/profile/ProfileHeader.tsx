@@ -45,9 +45,10 @@ export function ProfileHeader({ profile }: ProfileHeaderProps) {
       } else {
         await follow();
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      alert(error?.message || "Failed to toggle follow status");
+      const message = error instanceof Error ? error.message : "Failed to toggle follow status";
+      alert(message);
     }
   };
 

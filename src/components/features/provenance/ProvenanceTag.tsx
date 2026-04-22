@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Warning, Eye, Link as LinkIcon } from "phosphor-react";
 import { cn } from "@/lib/utils";
 import { useProvenance } from "@/hooks/useProvenance";
-import type { PostWithProvenance, ProvenanceRecord, TransmissionNode, AffiliationSummary } from "@/types";
+import type { PostWithProvenance } from "@/types";
 
 interface ProvenanceTagProps {
   post: PostWithProvenance;
@@ -241,64 +241,6 @@ function ExpandedSummary({
   );
 }
 
-// ─── STATE 3: Full Chain View ───────────────────────────────
-function TransmissionNodeCard({ node }: { node: TransmissionNode }) {
-  const typeColors: Record<string, string> = {
-    original: "bg-teal/10 text-teal",
-    derived: "bg-teal/10 text-teal",
-    republished: "bg-teal/10 text-teal",
-    institutional: "bg-violet/10 text-violet",
-    unverified: "bg-orange/10 text-orange border-orange/20 border",
-  };
-
-  const relationshipColors: Record<string, string> = {
-    supports: "text-teal",
-    contradicts: "text-orange",
-    contextualises: "text-violet",
-    quotes: "text-ink",
-  };
-
-  return (
-    <div className="relative pl-8">
-      {/* Timeline dot and line */}
-      <div className="absolute left-3 top-0 bottom-0 w-px bg-paper-dark" />
-      <div className="absolute left-[9px] top-4 w-2.5 h-2.5 rounded-full bg-teal border-2 border-paper" />
-
-      <div className="pb-6">
-        <div className="bg-surface border border-paper-dark rounded-lg p-4 shadow-sm">
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <span className={cn("px-2 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider", typeColors[node.sourceType])}>
-              {node.sourceType}
-            </span>
-            <span className={cn("font-medium text-xs font-sans", relationshipColors[node.relationship])}>
-              {node.relationship}
-            </span>
-          </div>
-          <p className="font-sans font-medium text-sm text-ink mt-2">{node.sourceLabel}</p>
-          <div className="flex items-center gap-2 mt-2">
-            <a
-              href={node.sourceUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-mono text-xs text-teal hover:text-teal-dark underline truncate max-w-[300px]"
-            >
-              {node.sourceUrl}
-            </a>
-          </div>
-          <time className="font-mono text-xs text-slate mt-2 block">
-            {new Date(node.timestamp).toLocaleDateString("en-GB", {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-          </time>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function AffiliationCard({ affiliation }: { affiliation: DbAffiliation }) {
   return (

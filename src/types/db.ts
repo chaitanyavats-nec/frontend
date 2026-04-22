@@ -184,3 +184,19 @@ export interface ProvenanceSummary {
   is_on_chain: boolean;
   is_ipfs_stored: boolean;
 }
+
+// ─── Supabase Raw Join types (for normalization layer) ────────
+
+export type RawPostSelect = DbPost & {
+  author: (DbProfile & { affiliations: DbAffiliation[] }) | null;
+  citations: DbCitation[];
+  provenance_updates: (DbProvenanceUpdate & { user: DbProfile })[];
+  moderation_flags?: DbModerationFlag[];
+};
+
+export type RawProfileSelect = DbProfile & {
+  affiliations: DbAffiliation[];
+  post_count?: [{ count: number }];
+  follower_count?: [{ count: number }];
+  following_count?: [{ count: number }];
+};

@@ -1,7 +1,6 @@
 "use client";
 
 import { useSearchParams, useParams, useRouter } from "next/navigation";
-import Link from "next/link";
 import { ArrowLeft, Users, UserPlus } from "phosphor-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FollowList } from "@/components/features/profile/FollowList";

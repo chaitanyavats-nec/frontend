@@ -8,11 +8,10 @@ import {
   Textarea, 
   SettingAction 
 } from "@/components/features/settings/SettingsComponents";
-import { Copy, Plus, UserCircle, Image as ImageIcon } from "phosphor-react";
+import { Copy, UserCircle, Image as ImageIcon } from "phosphor-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import { cn } from "@/lib/utils";
-import type { DbAffiliation } from "@/types";
 
 export default function AccountSettingsPage() {
   const { user } = useAuth();

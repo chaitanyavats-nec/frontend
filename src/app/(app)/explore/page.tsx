@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { MagnifyingGlass } from "phosphor-react";
 import { FeedCard } from "@/components/features/feed/FeedCard";
-import { useMockData } from "@/hooks/useMockData";
 import { cn } from "@/lib/utils";
 
 const EXPLORE_TABS = [
