@@ -62,7 +62,7 @@ function CollapsedPill({
         onClick();
       }}
       className={cn(
-        "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border font-mono text-xs transition-all duration-150 hover:opacity-80",
+        "inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border font-mono text-[10px] sm:text-xs transition-all duration-150 hover:opacity-80",
         config.pillClasses
       )}
       aria-label={`Source: ${config.label}${summary.primary_affiliation ? `, ${summary.primary_affiliation}` : ""}. Click to expand.`}
@@ -107,8 +107,8 @@ function ExpandedSummary({
       transition={{ duration: 0.2, ease: "easeOut" }}
       className="overflow-hidden"
     >
-      <div className="border-l-2 border-teal bg-surface p-4 mt-3 rounded-r-lg shadow-md border-y border-r border-paper-dark">
-        <div className="space-y-3">
+      <div className="border border-[var(--border-subtle)] bg-neutral-50/50 dark:bg-neutral-800/30 p-3 mt-2 rounded-md">
+        <div className="space-y-2.5">
           {/* Origin Type */}
           <div className="flex items-center gap-2">
             <span className="font-mono text-xs text-slate uppercase tracking-wider">Origin</span>
@@ -116,10 +116,16 @@ function ExpandedSummary({
               {config.label}
             </span>
             {summary.is_on_chain && (
-              <span className="ml-auto font-mono text-[10px] text-teal font-bold uppercase tracking-widest border border-teal/20 bg-teal/5 lg:px-2 py-0.5 rounded">On-Chain Trusted</span>
+              <span className="ml-auto font-mono text-[9px] sm:text-[10px] text-teal font-bold uppercase tracking-wider border border-teal/20 bg-teal/5 px-1.5 sm:px-2 py-0.5 rounded truncate max-w-[80px] sm:max-w-none">
+                <span className="sm:hidden">On-Chain</span>
+                <span className="hidden sm:inline">On-Chain Trusted</span>
+              </span>
             )}
             {summary.is_ipfs_stored && (
-              <span className="font-mono text-[10px] text-slate font-bold uppercase tracking-widest border border-paper-dark bg-paper-dark/10 px-2 py-0.5 rounded">IPFS Permalink</span>
+              <span className="font-mono text-[9px] sm:text-[10px] text-slate font-bold uppercase tracking-wider border border-paper-dark bg-paper-dark/10 px-1.5 sm:px-2 py-0.5 rounded truncate max-w-[60px] sm:max-w-none">
+                <span className="sm:hidden">IPFS</span>
+                <span className="hidden sm:inline">IPFS Permalink</span>
+              </span>
             )}
           </div>
 
@@ -153,12 +159,12 @@ function ExpandedSummary({
                   <span
                     key={aff.id}
                     className={cn(
-                      "inline-flex items-center gap-1.5 px-2 py-1 rounded-md font-mono text-[11px] font-medium border transition-colors",
+                      "inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md font-mono text-[10px] font-medium border transition-colors",
                       aff.is_staked
-                        ? "bg-teal/10 text-teal-dark border-teal/20"
+                        ? "bg-teal/5 text-teal/80 border-teal/20"
                         : aff.is_challenged
-                          ? "bg-violet/10 text-violet border-violet/20"
-                          : "bg-orange/10 text-orange border-orange/20"
+                          ? "bg-violet/5 text-violet/80 border-violet/20"
+                          : "bg-orange/5 text-orange/80 border-orange/20"
                     )}
                   >
                     {aff.organization_name}
@@ -171,7 +177,7 @@ function ExpandedSummary({
 
           {/* Funding Flag */}
           {summary.has_funding_disclosure && (
-            <div className="flex items-start gap-2 bg-paper-dark/20 p-2.5 rounded-md border border-paper-dark">
+            <div className="flex items-start gap-2 bg-paper-dark/10 p-2 rounded-md border border-paper-dark/50">
               <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-orange shrink-0 mt-0.5">Funded</span>
               <span className="font-sans text-sm text-ink font-medium">
                 {post.funder_name || "Undisclosed"}
@@ -207,12 +213,12 @@ function ExpandedSummary({
               </div>
               <div className="space-y-1.5 mb-2">
                 {post.provenance_updates.slice(0, 2).map((update) => (
-                  <div key={update.id} className="text-xs font-sans p-2 rounded bg-paper-dark/20 border border-paper-dark/50">
-                    <span className="font-semibold text-ink mr-2">{update.user?.display_name || "Unknown"}</span>
-                    <span className={cn("px-1 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest bg-white-0 border shadow-sm mr-2", update.status === 'pending' ? 'text-gold border-gold/30' : 'text-slate border-paper-dark')}>
-                      {update.status === 'pending' ? 'Under Review' : updateTypeConfig[update.update_type].label}
+                  <div key={update.id} className="text-[11px] font-sans p-2 rounded bg-paper-dark/10 border border-paper-dark/30">
+                    <span className="font-semibold text-ink mr-1">{update.user?.display_name || "Unknown"}</span>
+                    <span className={cn("px-1 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest bg-white/50 border shadow-sm mr-2", update.status === 'pending' ? 'text-gold border-gold/30' : 'text-slate border-paper-dark')}>
+                      {update.status === 'pending' ? 'Review' : updateTypeConfig[update.update_type].label}
                     </span>
-                    <span className="text-slate line-clamp-1 mt-1">{update.body}</span>
+                    <p className="text-slate line-clamp-1 mt-0.5">{update.body}</p>
                   </div>
                 ))}
               </div>

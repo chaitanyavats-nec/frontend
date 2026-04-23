@@ -23,6 +23,13 @@ const POST_ENRICHED_SELECT = `
   provenance_updates(
     *,
     user:profiles(*)
+  ),
+  quoted_post:posts!quoted_post_id(
+    *,
+    author:profiles(
+      *,
+      affiliations(*)
+    )
   )
 `;
 
@@ -94,6 +101,18 @@ export async function getUserPosts(
   options: { limit?: number; offset?: number }
 ): Promise<PostWithProvenance[]> {
   return getFeedPosts({ ...options, authorId: userId });
+}
+
+export async function getRepliesByPostId(postId: string): Promise<PostWithProvenance[]> {
+  const { data, error } = await supabase
+    .from("posts")
+    .select(POST_ENRICHED_SELECT)
+    .eq("parent_id", postId)
+    .order("created_at", { ascending: true });
+
+  if (error) throw error;
+  const rawData = data as unknown as RawPostSelect[];
+  return (rawData || []).map(normalisePost);
 }
 
 /**

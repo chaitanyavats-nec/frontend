@@ -56,7 +56,7 @@ const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLI
       <input
         type={type}
         className={cn(
-          "flex h-11 w-full rounded-sm border border-neutral-300 dark:border-neutral-700 bg-paper-raised px-4 py-2 text-sm ring-offset-paper-page file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-neutral-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/20 focus-visible:border-cyan-500 disabled:cursor-not-allowed disabled:opacity-50 transition-all text-neutral-900 dark:text-neutral-50",
+          "flex h-11 w-full rounded-sm border border-[var(--border-subtle)] bg-paper-raised px-4 py-2 text-sm ring-offset-paper-page file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-neutral-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/20 focus-visible:border-cyan-500 disabled:cursor-not-allowed disabled:opacity-50 transition-all text-neutral-900 dark:text-neutral-50",
           className
         )}
         ref={ref}
@@ -75,7 +75,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, React.TextareaHTMLAttribu
     return (
       <textarea
         className={cn(
-          "flex min-h-[100px] w-full rounded-sm border border-neutral-300 dark:border-neutral-700 bg-paper-raised px-4 py-3 text-sm ring-offset-paper-page placeholder:text-neutral-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/20 focus-visible:border-cyan-500 disabled:cursor-not-allowed disabled:opacity-50 transition-all text-neutral-900 dark:text-neutral-50",
+          "flex min-h-[100px] w-full rounded-sm border border-[var(--border-subtle)] bg-paper-raised px-4 py-3 text-sm ring-offset-paper-page placeholder:text-neutral-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/20 focus-visible:border-cyan-500 disabled:cursor-not-allowed disabled:opacity-50 transition-all text-neutral-900 dark:text-neutral-50",
           className
         )}
         ref={ref}

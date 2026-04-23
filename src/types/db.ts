@@ -28,6 +28,8 @@ export interface DbProfile {
 export interface DbPost {
   id: string;
   author_id: string; // (FK → profiles.id)
+  parent_id: string | null;
+  root_id: string | null;
   body: string;
   media_urls: string[] | null;
   ipfs_cid: string | null;
@@ -45,6 +47,18 @@ export interface DbPost {
   coordination_survived: boolean;
   reply_count: number;
   topic_tags: string[] | null;
+  poll_data: { 
+    question: string;
+    options: string[];
+    votes: number[];
+  } | null;
+  location_data: {
+    name: string;
+    lat?: number;
+    lng?: number;
+  } | null;
+  type: "post" | "comment";
+  quoted_post_id: string | null;
   is_published: boolean;
   trust_score: number;
   context_completeness: number;
@@ -122,6 +136,16 @@ export interface DbGovernanceProposal {
   created_at: string;
 }
 
+export interface DbGovernanceVote {
+  id: string;
+  proposal_id: string;
+  user_id: string;
+  vote_type: "for" | "against" | "abstain";
+  reputation_level: "new" | "established" | "trusted" | "steward";
+  weight: number;
+  created_at: string;
+}
+
 // ─── Enriched Application Types ──────────────────────────────
 
 export type PostWithAuthor = DbPost & {
@@ -149,6 +173,7 @@ export type PostWithProvenance = PostWithAuthor & {
   provenance_updates: (DbProvenanceUpdate & {
     user: Pick<DbProfile, "id" | "display_name" | "avatar_url" | "did">
   })[];
+  quoted_post?: PostWithAuthor;
 };
 
 export interface DbProvenanceUpdate {
@@ -192,6 +217,7 @@ export type RawPostSelect = DbPost & {
   citations: DbCitation[];
   provenance_updates: (DbProvenanceUpdate & { user: DbProfile })[];
   moderation_flags?: DbModerationFlag[];
+  quoted_post?: (DbPost & { author: DbProfile & { affiliations: DbAffiliation[] } }) | null;
 };
 
 export type RawProfileSelect = DbProfile & {
@@ -199,4 +225,8 @@ export type RawProfileSelect = DbProfile & {
   post_count?: [{ count: number }];
   follower_count?: [{ count: number }];
   following_count?: [{ count: number }];
+};
+
+export type GovernanceProposalWithAuthor = DbGovernanceProposal & {
+  proposer: Pick<DbProfile, "id" | "display_name" | "avatar_url" | "did">;
 };

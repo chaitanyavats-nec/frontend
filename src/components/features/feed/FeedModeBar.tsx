@@ -35,7 +35,7 @@ export function FeedModeBar({
   return (
     <div className="mb-6">
       {/* Mode Tabs - Presswork Style */}
-      <div className="flex border-b border-neutral-200 dark:border-neutral-800 mb-6" role="tablist" aria-label="Feed mode">
+      <div className="flex border-b border-[var(--border-subtle)] mb-6" role="tablist" aria-label="Feed mode">
         {visibleOptions.map((option) => (
           <button
             key={option.value}
@@ -43,10 +43,10 @@ export function FeedModeBar({
             role="tab"
             aria-selected={mode === option.value}
             className={cn(
-              "px-5 py-2.5 font-mono text-[10px] font-medium uppercase tracking-widest transition-all duration-140 -mb-[1px] border-b-2 whitespace-nowrap",
+              "px-5 py-2.5 text-[10px] font-medium uppercase tracking-widest transition-all duration-140 -mb-[1px] border-b-2 whitespace-nowrap",
               mode === option.value
-                ? "text-neutral-900 dark:text-neutral-50 border-neutral-800 dark:border-neutral-200"
-                : "text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 border-transparent hover:border-neutral-200 dark:hover:border-neutral-700"
+                ? "text-[var(--text-primary)] border-cyan-500"
+                : "text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] border-transparent hover:border-[var(--border-default)]"
             )}
           >
             {option.label}
@@ -60,10 +60,10 @@ export function FeedModeBar({
           <button
             onClick={() => onTopicSelect?.("")}
             className={cn(
-              "px-3 py-1.5 rounded-full font-mono text-[10px] font-medium whitespace-nowrap transition-all duration-140 border shrink-0 uppercase tracking-tighter",
+              "px-3 py-1.5 rounded-full text-[10px] font-medium whitespace-nowrap transition-all duration-140 border shrink-0 uppercase tracking-tighter",
               !selectedTopic
-                ? "bg-cyan-50 dark:bg-cyan-900/20 text-cyan-800 dark:text-cyan-200 border-cyan-400"
-                : "bg-transparent text-neutral-500 border-neutral-300 dark:border-neutral-700 hover:border-cyan-400 hover:text-cyan-600"
+                ? "bg-cyan-500/10 text-cyan-400 border-cyan-500/30"
+                : "bg-transparent text-[var(--text-tertiary)] border-[var(--border-default)] hover:border-cyan-500/30 hover:text-cyan-400"
             )}
           >
             All Topics
@@ -73,10 +73,10 @@ export function FeedModeBar({
               key={topic.slug}
               onClick={() => onTopicSelect?.(topic.slug)}
               className={cn(
-                "px-3 py-1.5 rounded-full font-mono text-[10px] font-medium whitespace-nowrap transition-all duration-140 border shrink-0 uppercase tracking-tighter",
+                "px-3 py-1.5 rounded-full text-[10px] font-medium whitespace-nowrap transition-all duration-140 border shrink-0 uppercase tracking-tighter",
                 selectedTopic === topic.slug
-                  ? "bg-cyan-50 dark:bg-cyan-900/20 text-cyan-800 dark:text-cyan-200 border-cyan-400"
-                  : "bg-transparent text-neutral-500 border-neutral-300 dark:border-neutral-700 hover:border-cyan-400 hover:text-cyan-600"
+                  ? "bg-cyan-500/10 text-cyan-400 border-cyan-500/30"
+                  : "bg-transparent text-[var(--text-tertiary)] border-[var(--border-default)] hover:border-cyan-500/30 hover:text-cyan-400"
               )}
             >
               #{topic.displayName}

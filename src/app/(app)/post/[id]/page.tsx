@@ -5,7 +5,6 @@ import Link from "next/link";
 import { ArrowLeft } from "phosphor-react";
 import { PostDetail } from "@/components/features/feed/PostDetail";
 import { FeedCard } from "@/components/features/feed/FeedCard";
-import { AuthorSidebarCard } from "@/components/features/feed/AuthorSidebarCard";
 
 import { usePost } from "@/hooks/usePost";
 import { useFeed } from "@/hooks/useFeed";
@@ -13,15 +12,14 @@ import { useFeed } from "@/hooks/useFeed";
 export default function PostDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const { post, loading: isPostLoading, error } = usePost(params.id as string);
-  const { posts: allPosts, loading: isFeedLoading } = useFeed("chronological");
+  const { post, replies, loading: isPostLoading, error } = usePost(params.id as string);
 
   if (isPostLoading) {
     return (
-      <div className="max-w-[680px] mx-auto py-20">
+      <div className="max-w-[720px] mx-auto py-20 px-4">
         <div className="space-y-4 animate-pulse">
           <div className="h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-16" />
-          <div className="bg-paper-raised rounded-md border border-neutral-200 dark:border-neutral-700 p-6 space-y-4">
+          <div className="bg-paper-raised rounded-md border border-[var(--border-subtle)] p-6 space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full bg-neutral-200 dark:bg-neutral-700" />
               <div className="space-y-2">
@@ -42,8 +40,8 @@ export default function PostDetailPage() {
 
   if (error || !post) {
     return (
-      <div className="max-w-[680px] mx-auto py-12 text-center">
-        <div className="bg-paper-raised border border-neutral-200 dark:border-neutral-700 rounded-md p-8">
+      <div className="max-w-[720px] mx-auto py-12 text-center px-4">
+        <div className="bg-paper-raised border border-[var(--border-subtle)] rounded-md p-8">
           <p className="font-sans text-sm text-neutral-500 mb-4">This post could not be found.</p>
           <Link
             href="/home"
@@ -57,11 +55,8 @@ export default function PostDetailPage() {
     );
   }
 
-  // Mock replies: use other posts as mock replies
-  const mockReplies = allPosts.filter((p) => p.id !== post.id).slice(0, 3);
-
   return (
-    <div className="max-w-6xl mx-auto pb-20 px-0 sm:px-0">
+    <div className="max-w-6xl mx-auto pb-20 px-4">
       {/* Back navigation */}
       <button
         onClick={() => router.back()}
@@ -71,38 +66,30 @@ export default function PostDetailPage() {
         Back
       </button>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 items-start" style={{ display: "flex", flexDirection: "column" }}>
-        {/* Main Column */}
-        <div className="hidden lg:block sticky top-24">
-          <AuthorSidebarCard
-            post={post}
-            topicPosts={allPosts.filter(p => !post.topic_tags || (p.topic_tags && p.topic_tags.some(tag => post.topic_tags!.includes(tag))) && p.id !== post.id).slice(0, 3)}
-          />
-        </div>
-        <div className="space-y-8 min-w-0">
-          {/* Post Detail */}
-          <PostDetail post={post} />
-
-          {/* Reply Thread */}
-          {(isFeedLoading || mockReplies.length > 0) && (
-            <div>
-              <h3 className="eyebrow mb-4">
-                Replies
-              </h3>
-              <div className="space-y-3">
-                {isFeedLoading ? (
-                  [1, 2].map(i => <div key={i} className="h-32 bg-paper-raised rounded-md animate-pulse border border-neutral-200 dark:border-neutral-700" />)
-                ) : (
-                  mockReplies.map((reply) => (
-                    <FeedCard key={reply.id} post={reply} showProvenance={false} isReply />
-                  ))
-                )}
+      <div className="max-w-[720px] mx-auto space-y-8 min-w-0">
+        {/* Post Detail */}
+        <PostDetail post={post} />
+ 
+        {/* Reply Thread */}
+        <div className="space-y-6">
+          <h3 className="eyebrow flex items-center gap-2">
+            Replies <span className="text-[10px] bg-paper-sunken px-1.5 py-0.5 rounded border border-neutral-100 dark:border-neutral-800">{replies.length}</span>
+          </h3>
+          
+          <div className="space-y-4">
+            {replies.length === 0 ? (
+              <div className="py-8 text-center border border-dashed border-neutral-200 dark:border-neutral-800 rounded-md">
+                <p className="text-[12px] font-mono text-neutral-400 uppercase tracking-widest">No replies yet. Witness the conversation.</p>
               </div>
-            </div>
-          )}
+            ) : (
+              replies.map((reply) => (
+                <div key={reply.id} className="space-y-4">
+                  <FeedCard post={reply} isReply />
+                </div>
+              ))
+            )}
+          </div>
         </div>
-
-        {/* Right Sidebar */}
       </div>
     </div>
   );

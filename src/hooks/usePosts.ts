@@ -15,7 +15,7 @@ export function usePosts() {
     queryKey: ["posts"],
     queryFn: async () => {
       if (USE_MOCK_DATA) {
-        return mockPosts.map(normalisePost);
+        return mockPosts.map((p) => normalisePost(p as any));
       }
 
       const { data, error } = await supabase
@@ -32,7 +32,7 @@ export function usePosts() {
   });
 
   const createPostMutation = useMutation({
-    mutationFn: async ({ body, topicId, provenanceType, citationUrl }: Record<string, string | null>) => {
+    mutationFn: async ({ body, topicId, provenanceType, citationUrl, mediaUrls, pollData, locationData, parentId, rootId, type, quotedPostId }: Record<string, any>) => {
       if (USE_MOCK_DATA) {
         console.log("Mock post created:", { body, topicId, provenanceType, citationUrl });
         return { id: "mock-" + Date.now() };
@@ -72,15 +72,26 @@ export function usePosts() {
         topic_id: validTopicId,
         provenance_type: provenanceType,
         citation_url: citationUrl,
+        media_urls: mediaUrls || [],
+        poll_data: pollData || null,
+        location_data: locationData || null,
+        parent_id: parentId || null,
+        root_id: rootId || null,
+        type: type || (parentId ? "comment" : "post"),
+        quoted_post_id: quotedPostId || null,
       }).select().single();
 
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
       queryClient.invalidateQueries({ queryKey: ["feed"] });
-      router.push("/home");
+      
+      // Only redirect if NOT a reply
+      if (!variables.parentId) {
+        router.push("/home");
+      }
     },
   });
 

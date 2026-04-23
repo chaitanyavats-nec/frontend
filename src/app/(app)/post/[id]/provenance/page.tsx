@@ -29,7 +29,7 @@ export default function ProvenancePage() {
   if (error || !post) {
     return (
       <div className="max-w-[680px] mx-auto py-12 text-center">
-        <div className="bg-paper-raised border border-neutral-200 dark:border-neutral-700 rounded-md p-8">
+        <div className="bg-paper-raised border border-[var(--border-subtle)] rounded-md p-8">
           <p className="font-sans text-sm text-neutral-500 mb-4">Post not found.</p>
           <Link
             href="/home"
@@ -55,7 +55,7 @@ export default function ProvenancePage() {
       </button>
 
       {/* Post preview */}
-      <div className="mb-8 p-4 bg-paper-raised rounded-md border border-neutral-200 dark:border-neutral-700">
+      <div className="mb-8 p-4 bg-paper-raised rounded-md border border-[var(--border-subtle)]">
         <p className="font-sans text-sm text-neutral-600 dark:text-neutral-300 line-clamp-3 leading-relaxed">
           {post.body}
         </p>
@@ -73,7 +73,7 @@ export default function ProvenancePage() {
 
       {/* Community Provenance Updates */}
       {post.provenance_updates && post.provenance_updates.length > 0 && (
-        <div className="mt-10 pt-8 border-t border-neutral-200 dark:border-neutral-700">
+        <div className="mt-10 pt-8 border-t border-[var(--border-subtle)]">
           <h2 className="eyebrow mb-6">Community provenance updates</h2>
           <div className="space-y-3">
             {post.provenance_updates.map((update) => (
@@ -83,7 +83,7 @@ export default function ProvenancePage() {
                   "p-4 rounded-md border transition-colors",
                   update.status === 'accepted' 
                     ? "bg-paper-raised border-cyan-200 dark:border-cyan-800/50 shadow-sm" 
-                    : "bg-paper-raised border-neutral-200 dark:border-neutral-700"
+                    : "bg-paper-raised border-[var(--border-subtle)]"
                 )}
               >
                 {/* Header */}
@@ -138,8 +138,8 @@ export default function ProvenancePage() {
       )}
 
       {/* Proportionality Toggle */}
-      <div className="mt-10 pt-8 border-t border-neutral-200 dark:border-neutral-700">
-        <label className="flex items-start gap-4 cursor-pointer p-4 bg-paper-raised rounded-md hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors border border-neutral-200 dark:border-neutral-700">
+      <div className="mt-10 pt-8 border-t border-[var(--border-subtle)]">
+        <label className="flex items-start gap-4 cursor-pointer p-4 bg-paper-raised rounded-md hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors border border-[var(--border-subtle)]">
           <div className="relative inline-block w-10 mt-1 align-middle select-none transition duration-200 ease-in shrink-0">
             <input
               type="checkbox"
@@ -160,7 +160,7 @@ export default function ProvenancePage() {
               Compare topic coverage volume against the historical baseline to detect manufactured amplification.
             </span>
             {showProportionality && (
-              <div className="mt-4 p-3 bg-neutral-100 dark:bg-neutral-800 rounded-md border border-neutral-200 dark:border-neutral-700">
+              <div className="mt-4 p-3 bg-neutral-100 dark:bg-neutral-800 rounded-md border border-[var(--border-subtle)]">
                 <div className="flex items-center justify-between font-mono text-[10px] text-neutral-500 dark:text-neutral-400">
                   <span>Current Volume: 1.2M</span>
                   <span>Baseline: 400k</span>

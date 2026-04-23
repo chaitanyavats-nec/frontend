@@ -5,27 +5,34 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium ring-offset-surface transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-[12px] font-mono font-medium tracking-wide ring-offset-background transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-40 uppercase",
   {
     variants: {
       variant: {
-        default: "bg-teal text-paper hover:bg-teal-dark",
-        destructive: "bg-orange text-paper hover:bg-orange/90",
+        default:
+          "bg-cyan-600 text-white hover:bg-cyan-500 active:bg-cyan-700",
+        destructive:
+          "bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 hover:border-red-500/30",
         outline:
-          "border border-paper-dark bg-surface hover:bg-paper-dark/50 hover:text-ink",
-        secondary: "bg-paper-dark/50 text-ink hover:bg-paper-dark/80",
-        ghost: "hover:bg-paper-dark/50 hover:text-ink",
-        link: "text-teal underline-offset-4 hover:underline",
-        teal: "border border-teal text-teal hover:bg-teal hover:text-paper",
+          "border border-[var(--border-default)] bg-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] hover:bg-[var(--bg-surface)]",
+        secondary:
+          "bg-[var(--bg-surface)] text-[var(--text-secondary)] border border-[var(--border-subtle)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-raised)]",
+        ghost:
+          "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]",
+        link:
+          "text-cyan-500 underline-offset-4 hover:underline hover:text-cyan-400",
+        teal:
+          "border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 hover:border-cyan-500/50",
         orange:
-          "border border-orange text-orange hover:bg-orange hover:text-white-0",
-        violet: "border border-violet text-violet hover:bg-violet hover:text-white-0",
+          "border border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10 hover:border-yellow-500/50",
+        violet:
+          "border border-magenta-500/30 text-magenta-400 hover:bg-magenta-500/10 hover:border-magenta-500/50",
       },
       size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-8 rounded-lg px-3",
-        lg: "h-11 rounded-lg px-8",
-        icon: "h-10 w-10",
+        default: "h-9 px-4 py-2",
+        sm: "h-7 rounded-md px-3 text-[11px]",
+        lg: "h-11 rounded-md px-8",
+        icon: "h-9 w-9",
       },
     },
     defaultVariants: {

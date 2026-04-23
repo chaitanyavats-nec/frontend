@@ -2,15 +2,23 @@
 
 import Link from "next/link";
 import { Scales, BookOpen } from "phosphor-react";
-import { useMockData } from "@/hooks/useMockData";
+import { useGovernance } from "@/hooks/useGovernance";
 import { GovernanceProposalCard } from "@/components/features/governance/GovernanceProposal";
 import { Button } from "@/components/ui/button";
 
 export default function GovernanceHubPage() {
-  const { proposals } = useMockData();
+  const { proposals, isProposalsLoading } = useGovernance();
 
-  const openProposals = proposals.filter((p) => p.status === "open");
-  const pastProposals = proposals.filter((p) => p.status !== "open");
+  if (isProposalsLoading) {
+    return (
+      <div className="max-w-3xl mx-auto space-y-10 py-12 text-center">
+        <p className="font-sans text-sm text-slate animate-pulse italic">Synchronizing with registry...</p>
+      </div>
+    );
+  }
+
+  const openProposals = (proposals || []).filter((p) => p.status === "open");
+  const pastProposals = (proposals || []).filter((p) => p.status !== "open");
 
   return (
     <div className="max-w-3xl mx-auto space-y-10">
@@ -34,9 +42,11 @@ export default function GovernanceHubPage() {
               <BookOpen size={16} /> Constitution
             </Button>
           </Link>
-          <Button>
-            New Proposal
-          </Button>
+          <Link href="/governance/new" passHref>
+            <Button className="bg-ink hover:bg-ink-light">
+              New Proposal
+            </Button>
+          </Link>
         </div>
       </div>
 

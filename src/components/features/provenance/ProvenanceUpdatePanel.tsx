@@ -65,14 +65,14 @@ export function ProvenanceUpdatePanel({ postId, onClose, onSuccess }: Provenance
 
   return (
     <div className="mt-4 border border-paper-dark rounded-lg overflow-hidden bg-surface animate-in fade-in slide-in-from-top-2 duration-200">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-paper-dark bg-paper/30">
-        <h3 className="font-editorial text-base font-semibold text-ink">Contribute Context</h3>
-        <button onClick={onClose} className="p-1 text-slate hover:text-ink transition-colors rounded-md hover:bg-paper-dark/50">
-          <X size={16} />
+      <div className="flex items-center justify-between px-3 py-2 border-b border-paper-dark bg-paper/30">
+        <h3 className="font-editorial text-[15px] font-semibold text-ink">Contribute Context</h3>
+        <button onClick={onClose} className="p-1.5 text-slate hover:text-ink transition-colors rounded-md hover:bg-paper-dark/50">
+          <X size={14} />
         </button>
       </div>
 
-      <div className="p-4 space-y-5">
+      <div className="p-3.5 space-y-4">
         {/* Type Selection */}
         <div className="space-y-2">
           <label className="font-mono text-[11px] uppercase tracking-wider text-neutral-500 dark:text-neutral-400 font-semibold block">Update Type</label>
@@ -81,16 +81,16 @@ export function ProvenanceUpdatePanel({ postId, onClose, onSuccess }: Provenance
               <button
                 key={type.id}
                 onClick={() => setSelectedType(type.id)}
-                className={`text-left p-3.5 rounded-md border transition-all ${
+                className={`text-left p-2.5 rounded-md border transition-all ${
                   selectedType === type.id
-                    ? "border-cyan-500 bg-cyan-50/50 dark:bg-cyan-900/20 ring-1 ring-cyan-500/20 shadow-sm"
-                    : "border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600 bg-transparent"
+                    ? "border-cyan-500 bg-cyan-50/50 dark:bg-cyan-900/10 ring-1 ring-cyan-500/20 shadow-sm"
+                    : "border-[var(--border-subtle)] hover:border-neutral-300 dark:hover:border-neutral-600 bg-transparent"
                 }`}
               >
-                <div className={`font-sans text-[14px] font-bold mb-1 ${selectedType === type.id ? "text-cyan-700 dark:text-cyan-400" : "text-neutral-900 dark:text-neutral-50"}`}>
+                <div className={`font-sans text-[13px] font-bold mb-0.5 ${selectedType === type.id ? "text-cyan-700 dark:text-cyan-400" : "text-neutral-900 dark:text-neutral-50"}`}>
                   {type.label}
                 </div>
-                <div className="font-sans text-[13px] text-neutral-600 dark:text-neutral-400">{type.desc}</div>
+                <div className="font-sans text-[12px] text-neutral-600 dark:text-neutral-400 leading-snug">{type.desc}</div>
               </button>
             ))}
           </div>
@@ -110,7 +110,7 @@ export function ProvenanceUpdatePanel({ postId, onClose, onSuccess }: Provenance
             value={body}
             onChange={(e) => setBody(e.target.value)}
             placeholder={`Write your ${selectedType === "misleading_framing" ? "challenge" : "annotation"}...`}
-            className="w-full bg-paper-raised border border-neutral-200 dark:border-neutral-700 rounded-md p-3.5 focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500 text-[14px] font-sans leading-relaxed text-neutral-900 dark:text-neutral-50 placeholder:text-neutral-400 min-h-[120px] resize-y"
+            className="w-full bg-paper-raised border border-[var(--border-subtle)] rounded-md p-3 focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500 text-[14px] font-sans leading-relaxed text-neutral-900 dark:text-neutral-50 placeholder:text-neutral-400 min-h-[90px] resize-y"
           />
         </div>
 
@@ -124,29 +124,29 @@ export function ProvenanceUpdatePanel({ postId, onClose, onSuccess }: Provenance
               <span className="text-[9px] bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 px-1.5 py-0.5 rounded-sm">Optional</span>
             )}
           </label>
-          <div className="space-y-3.5 p-4 border border-neutral-200 dark:border-neutral-700 rounded-md bg-paper-raised">
+          <div className="space-y-2.5 p-3 border border-[var(--border-subtle)] rounded-md bg-paper-raised">
             <div>
-              <label className="text-[12px] font-sans text-neutral-500 dark:text-neutral-400 block mb-1.5 text-center sm:text-left">Provide a link to a supporting source:</label>
+              <label className="text-[11px] font-sans text-neutral-400 block mb-1">Source URL:</label>
               <input
                 type="text"
                 value={evidenceUrl}
                 onChange={e => setEvidenceUrl(e.target.value)}
-                placeholder="e.g., https://example.com/source"
-                className="w-full bg-surface border border-neutral-200 dark:border-neutral-700 rounded-md px-3 py-2.5 text-[14px] font-sans focus:outline-none focus:ring-1 focus:ring-cyan-500 placeholder:text-neutral-400"
+                placeholder="https://example.com/source"
+                className="w-full bg-surface border border-[var(--border-subtle)] rounded-md px-2.5 py-1.5 text-[13px] font-sans focus:outline-none focus:ring-1 focus:ring-cyan-500 placeholder:text-neutral-400"
               />
             </div>
             <div className="flex items-center gap-3">
-              <div className="flex-1 border-t border-neutral-200 dark:border-neutral-700"></div>
-              <div className="text-center text-[10px] text-neutral-400 font-mono font-semibold uppercase tracking-wider">OR</div>
-              <div className="flex-1 border-t border-neutral-200 dark:border-neutral-700"></div>
+              <div className="flex-1 border-t border-[var(--border-subtle)]"></div>
+              <div className="text-[9px] text-neutral-400 font-mono font-semibold uppercase tracking-wider">OR</div>
+              <div className="flex-1 border-t border-[var(--border-subtle)]"></div>
             </div>
             <div>
-              <label className="text-[12px] font-sans text-neutral-500 dark:text-neutral-400 block mb-1.5 text-center sm:text-left">Paste relevant excerpt:</label>
+              <label className="text-[11px] font-sans text-neutral-400 block mb-1">Evidence Excerpt:</label>
               <textarea
                 value={evidenceText}
                 onChange={e => setEvidenceText(e.target.value)}
                 placeholder="Quote the relevant text directly..."
-                className="w-full bg-surface border border-neutral-200 dark:border-neutral-700 rounded-md px-3 py-2.5 text-[14px] font-sans focus:outline-none focus:ring-1 focus:ring-cyan-500 min-h-[80px] placeholder:text-neutral-400"
+                className="w-full bg-surface border border-[var(--border-subtle)] rounded-md px-2.5 py-1.5 text-[13px] font-sans focus:outline-none focus:ring-1 focus:ring-cyan-500 min-h-[60px] placeholder:text-neutral-400"
               />
             </div>
           </div>
@@ -175,10 +175,10 @@ export function ProvenanceUpdatePanel({ postId, onClose, onSuccess }: Provenance
         )}
 
         {/* Submit Actions */}
-        <div className="flex items-center justify-between pt-4 border-t border-paper-dark">
+        <div className="flex items-center justify-between pt-3 border-t border-paper-dark">
           <button
             onClick={() => setIsPreview(!isPreview)}
-            className="text-xs font-semibold text-slate hover:text-ink transition-colors"
+            className="text-[11px] font-semibold text-slate hover:text-ink transition-colors"
           >
             {isPreview ? "Hide Preview" : "Show Preview"}
           </button>

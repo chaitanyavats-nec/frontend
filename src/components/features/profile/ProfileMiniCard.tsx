@@ -80,7 +80,7 @@ export function ProfileMiniCard({ profile }: ProfileMiniCardProps) {
           className={cn(
             "rounded-md px-3 h-8 font-mono font-bold uppercase tracking-wider text-[10px] transition-all shrink-0",
             isFollowing 
-              ? "bg-transparent border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:text-red-500 hover:border-red-500/30" 
+              ? "bg-transparent border border-[var(--border-subtle)] text-neutral-600 dark:text-neutral-400 hover:text-red-500 hover:border-red-500/30" 
               : "bg-neutral-900 dark:bg-neutral-100 text-neutral-50 dark:text-neutral-900 hover:bg-cyan-600 dark:hover:bg-cyan-500"
           )}
         >

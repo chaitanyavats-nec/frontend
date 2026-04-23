@@ -6,8 +6,9 @@ import { usePosts } from "@/hooks/usePosts";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { ProvenanceTag } from "@/components/features/provenance/ProvenanceTag";
-import { ArrowLeft, Link as LinkIcon, Image as ImageIcon, ChartBar, MapPin } from "phosphor-react";
+import { ArrowLeft, Link as LinkIcon, Image as ImageIcon, ChartBar, MapPin, Plus, Trash, X } from "phosphor-react";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 import type { PostWithProvenance } from "@/types";
 
 export default function ComposePage() {
@@ -19,6 +20,12 @@ export default function ComposePage() {
   const [topicId, setTopicId] = useState("");
   const [citationUrl, setCitationUrl] = useState("");
   const [provenanceType, setProvenanceType] = useState<"original" | "derived" | "republished" | "institutional">("original");
+  const [mediaUrls, setMediaUrls] = useState<string[]>([]);
+  const [locationName, setLocationName] = useState("");
+  const [pollQuestion, setPollQuestion] = useState("");
+  const [pollOptions, setPollOptions] = useState<string[]>(["", ""]);
+  const [activeTab, setActiveTab] = useState<"media" | "poll" | "location" | null>(null);
+  const [tempMediaUrl, setTempMediaUrl] = useState("");
 
   // Construct a preview post object for the provenance tag
   const previewPost: PostWithProvenance = {
@@ -36,9 +43,11 @@ export default function ComposePage() {
       bio: null,
     },
     author_affiliations: [],
-    media_urls: [],
+    media_urls: mediaUrls,
     topic_tags: topicId ? [topicId] : [],
     created_at: new Date().toISOString(),
+    poll_data: pollQuestion ? { question: pollQuestion, options: pollOptions.filter(o => o.trim() !== ""), votes: pollOptions.map(() => 0) } : null,
+    location_data: locationName ? { name: locationName } : null,
     citations: [],
     provenance_updates: [],
     _provenance_verified: false,
@@ -63,6 +72,39 @@ export default function ComposePage() {
     trust_score: 0,
     context_completeness: 0,
     has_disputed_framing: false,
+    parent_id: null,
+    root_id: null,
+    type: 'post' as const,
+    quoted_post_id: null,
+  };
+
+  const addMediaUrl = () => {
+    if (tempMediaUrl && tempMediaUrl.trim() !== "") {
+      setMediaUrls([...mediaUrls, tempMediaUrl.trim()]);
+      setTempMediaUrl("");
+    }
+  };
+
+  const removeMediaUrl = (index: number) => {
+    setMediaUrls(mediaUrls.filter((_, i) => i !== index));
+  };
+
+  const updatePollOption = (index: number, value: string) => {
+    const newOptions = [...pollOptions];
+    newOptions[index] = value;
+    setPollOptions(newOptions);
+  };
+
+  const addPollOption = () => {
+    if (pollOptions.length < 4) {
+      setPollOptions([...pollOptions, ""]);
+    }
+  };
+
+  const removePollOption = (index: number) => {
+    if (pollOptions.length > 2) {
+      setPollOptions(pollOptions.filter((_, i) => i !== index));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -73,6 +115,9 @@ export default function ComposePage() {
         topicId,
         provenanceType,
         citationUrl: citationUrl || null,
+        mediaUrls: mediaUrls.length > 0 ? mediaUrls : null,
+        pollData: pollQuestion ? { question: pollQuestion, options: pollOptions.filter(o => o.trim() !== ""), votes: pollOptions.filter(o => o.trim() !== "").map(() => 0) } : null,
+        locationData: locationName ? { name: locationName } : null,
       });
     } catch (err) {
       console.error(err);
@@ -106,30 +151,150 @@ export default function ComposePage() {
             className="w-full bg-transparent border-none focus:ring-0 text-lg font-sans leading-relaxed text-neutral-800 dark:text-neutral-200 placeholder:text-neutral-300 dark:placeholder:text-neutral-700 min-h-[250px] resize-none"
           />
 
-          <div className="flex flex-col gap-4 border-y border-neutral-200 dark:border-neutral-800 py-4">
+          <div className="flex flex-col gap-4 border-y border-[var(--border-subtle)] py-4">
             {/* Rich Media Action Bar */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-1 -mb-1 hide-scrollbar">
-              <button
-                type="button"
-                className="flex items-center gap-2 px-3 py-2 rounded-sm text-neutral-500 hover:text-cyan-600 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 transition-all text-xs font-bold uppercase tracking-wider font-mono shrink-0"
-              >
-                <ImageIcon size={18} />
-                <span>Media</span>
-              </button>
-              <button
-                type="button"
-                className="flex items-center gap-2 px-3 py-2 rounded-sm text-neutral-500 hover:text-cyan-600 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 transition-all text-xs font-bold uppercase tracking-wider font-mono shrink-0"
-              >
-                <ChartBar size={18} />
-                <span>Poll</span>
-              </button>
-              <button
-                type="button"
-                className="flex items-center gap-2 px-3 py-2 rounded-sm text-neutral-500 hover:text-cyan-600 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 transition-all text-xs font-bold uppercase tracking-wider font-mono shrink-0"
-              >
-                <MapPin size={18} />
-                <span>Location</span>
-              </button>
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 -mb-1 hide-scrollbar">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab(activeTab === "media" ? null : "media")}
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-2 rounded-sm transition-all text-xs font-bold uppercase tracking-wider font-mono shrink-0",
+                    activeTab === "media" 
+                      ? "text-cyan-400 bg-cyan-500/10 border border-cyan-500/30" 
+                      : "text-[var(--text-tertiary)] hover:text-cyan-400 hover:bg-cyan-500/10"
+                  )}
+                >
+                  <ImageIcon size={18} />
+                  <span>Media</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab(activeTab === "poll" ? null : "poll")}
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-2 rounded-sm transition-all text-xs font-bold uppercase tracking-wider font-mono shrink-0",
+                    activeTab === "poll" 
+                      ? "text-cyan-400 bg-cyan-500/10 border border-cyan-500/30" 
+                      : "text-[var(--text-tertiary)] hover:text-cyan-400 hover:bg-cyan-500/10"
+                  )}
+                >
+                  <ChartBar size={18} />
+                  <span>Poll</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab(activeTab === "location" ? null : "location")}
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-2 rounded-sm transition-all text-xs font-bold uppercase tracking-wider font-mono shrink-0",
+                    activeTab === "location" 
+                      ? "text-cyan-400 bg-cyan-500/10 border border-cyan-500/30" 
+                      : "text-[var(--text-tertiary)] hover:text-cyan-400 hover:bg-cyan-500/10"
+                  )}
+                >
+                  <MapPin size={18} />
+                  <span>Location</span>
+                </button>
+              </div>
+
+              {/* Media Tab Content */}
+              {activeTab === "media" && (
+                <div className="bg-paper-raised p-4 rounded-sm border border-[var(--border-subtle)] space-y-4">
+                  <div className="flex gap-2">
+                    <input
+                      type="url"
+                      value={tempMediaUrl}
+                      onChange={(e) => setTempMediaUrl(e.target.value)}
+                      placeholder="Enter Image URL..."
+                      className="flex-1 bg-transparent border-b border-[var(--border-subtle)] focus:border-cyan-500 py-1 text-sm focus:outline-none"
+                      onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addMediaUrl())}
+                    />
+                    <button
+                      type="button"
+                      onClick={addMediaUrl}
+                      className="p-1 text-cyan-600 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 rounded"
+                    >
+                      <Plus size={20} />
+                    </button>
+                  </div>
+                  {mediaUrls.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {mediaUrls.map((url, i) => (
+                        <div key={i} className="relative group w-20 h-20 border border-[var(--border-subtle)] rounded overflow-hidden">
+                          <img src={url} alt="" className="w-full h-full object-cover" />
+                          <button
+                            type="button"
+                            onClick={() => removeMediaUrl(i)}
+                            className="absolute top-0 right-0 p-1 bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X size={12} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Poll Tab Content */}
+              {activeTab === "poll" && (
+                <div className="bg-paper-raised p-4 rounded-sm border border-[var(--border-subtle)] space-y-4">
+                  <input
+                    type="text"
+                    value={pollQuestion}
+                    onChange={(e) => setPollQuestion(e.target.value)}
+                    placeholder="Poll Question (Implicit if empty)"
+                    className="w-full bg-transparent border-b border-[var(--border-subtle)] focus:border-cyan-500 py-1 text-sm focus:outline-none font-bold"
+                  />
+                  <div className="space-y-2">
+                    {pollOptions.map((opt, i) => (
+                      <div key={i} className="flex gap-2">
+                        <input
+                          type="text"
+                          value={opt}
+                          onChange={(e) => updatePollOption(i, e.target.value)}
+                          placeholder={`Option ${i + 1}`}
+                          className="flex-1 bg-transparent border border-[var(--border-subtle)] rounded-sm px-3 py-1.5 text-sm focus:border-cyan-500 focus:outline-none"
+                        />
+                        {pollOptions.length > 2 && (
+                          <button
+                            type="button"
+                            onClick={() => removePollOption(i)}
+                            className="p-1.5 text-neutral-400 hover:text-magenta-600"
+                          >
+                            <Trash size={16} />
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  {pollOptions.length < 4 && (
+                    <button
+                      type="button"
+                      onClick={addPollOption}
+                      className="text-[10px] font-mono font-bold uppercase tracking-widest text-cyan-600 hover:underline"
+                    >
+                      + Add Option
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* Location Tab Content */}
+              {activeTab === "location" && (
+                <div className="bg-paper-raised p-4 rounded-sm border border-[var(--border-subtle)]">
+                  <div className="flex items-center gap-2">
+                    <MapPin size={18} className="text-cyan-600" />
+                    <input
+                      type="text"
+                      value={locationName}
+                      onChange={(e) => setLocationName(e.target.value)}
+                      placeholder="Enter location name..."
+                      className="flex-1 bg-transparent border-none focus:ring-0 text-sm py-1"
+                      autoFocus
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="flex-1 flex items-center gap-3 group">
@@ -154,7 +319,7 @@ export default function ComposePage() {
             <select
               value={topicId}
               onChange={(e) => setTopicId(e.target.value)}
-              className="w-full bg-paper-raised border border-neutral-300 dark:border-neutral-700 rounded-sm px-4 py-3 text-sm font-sans focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all appearance-none cursor-pointer text-neutral-900 dark:text-neutral-50"
+              className="w-full bg-paper-raised border border-[var(--border-subtle)] rounded-sm px-4 py-3 text-sm font-sans focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all appearance-none cursor-pointer text-neutral-900 dark:text-neutral-50"
             >
               <option value="">No Specific Topic (Optional)</option>
               {topics?.map((t) => (
@@ -173,7 +338,7 @@ export default function ComposePage() {
               required
               value={provenanceType}
               onChange={(e) => setProvenanceType(e.target.value as "original" | "derived" | "republished" | "institutional")}
-              className="w-full bg-paper-raised border border-neutral-300 dark:border-neutral-700 rounded-sm px-4 py-3 text-sm font-sans focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all appearance-none cursor-pointer text-neutral-900 dark:text-neutral-50"
+              className="w-full bg-paper-raised border border-[var(--border-subtle)] rounded-sm px-4 py-3 text-sm font-sans focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all appearance-none cursor-pointer text-neutral-900 dark:text-neutral-50"
             >
               <option value="original">Original Contribution</option>
               <option value="institutional">Institutional / Official</option>
@@ -184,8 +349,8 @@ export default function ComposePage() {
         </div>
 
         {/* Live Preview section */}
-        <div className="bg-paper-raised border border-neutral-200 dark:border-neutral-800 p-8 rounded-md space-y-6 shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between border-b border-dotted border-neutral-200 dark:border-neutral-800 pb-2">
+        <div className="bg-paper-raised border border-[var(--border-subtle)] p-8 rounded-md space-y-6 shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between border-b border-dotted border-[var(--border-subtle)] pb-2">
             <span className="sublabel">Live Provenance Preview</span>
             <div className="relative w-4 h-4">
               <div className="absolute top-0 left-0.5 w-2.5 h-2.5 bg-cyan-300/60 rounded-full" />
@@ -199,7 +364,7 @@ export default function ComposePage() {
               expanded={true}
             />
           </div>
-          <div className="bg-neutral-50 dark:bg-neutral-900/50 rounded-sm p-3 border border-dashed border-neutral-200 dark:border-neutral-800">
+          <div className="bg-neutral-50 dark:bg-neutral-900/50 rounded-sm p-3 border border-dashed border-[var(--border-subtle)]">
             <p className="text-[10px] font-mono text-neutral-400 leading-relaxed">
               SIGNATURE PROCESS: YOUR VERIFIED LOCAL EXPERTISE AND PROFESSIONAL AFFILIATIONS WILL BE AUTOMATICALLY ATTACHED TO THIS POST&apos;S PROVENANCE CHAIN UPON PUBLICATION.
             </p>

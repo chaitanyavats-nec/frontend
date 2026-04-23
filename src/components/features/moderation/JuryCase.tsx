@@ -40,25 +40,25 @@ export function JuryCase({ modCase, isDetailedView = false }: JuryCaseProps) {
   return (
     <div className="bg-paper border border-paper-dark rounded-md overflow-hidden">
       {/* Header */}
-      <div className="bg-paper-dark/30 p-4 border-b border-paper-dark flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-        <div className="flex items-center gap-2">
-          <ShieldCheck size={20} className="text-ink" />
-          <span className="font-mono text-xs text-slate-light">
+      <div className="bg-paper-dark/30 p-3 border-b border-paper-dark flex flex-col sm:flex-row gap-2.5 items-start sm:items-center justify-between">
+        <div className="flex items-center gap-1.5">
+          <ShieldCheck size={18} className="text-ink" />
+          <span className="font-mono text-[10px] sm:text-xs text-slate-light">
             Case {modCase.id.slice(0, 16)}…
           </span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <span
             className={cn(
-              "px-2 py-0.5 rounded text-xs font-mono capitalize",
+              "px-1.5 py-0.5 rounded text-[10px] sm:text-xs font-mono capitalize",
               FLAG_COLORS[modCase.flagType] || "bg-slate text-paper"
             )}
           >
-            {modCase.flagType.replace("-", " ")}
+             {modCase.flagType.replace("-", " ")}
           </span>
           <span
             className={cn(
-              "px-2 py-0.5 rounded text-xs font-mono uppercase border",
+              "px-1.5 py-0.5 rounded text-[10px] sm:text-xs font-mono uppercase border",
               modCase.phase === "commit"
                 ? "bg-sage-light text-sage-dark border-sage-light"
                 : modCase.phase === "reveal"
@@ -66,29 +66,29 @@ export function JuryCase({ modCase, isDetailedView = false }: JuryCaseProps) {
                 : "bg-paper-dark text-slate border-paper-dark"
             )}
           >
-            Phase: {modCase.phase}
+            {modCase.phase}
           </span>
         </div>
       </div>
 
-      <div className="p-4 sm:p-6 space-y-6">
+      <div className="p-3.5 sm:p-4 space-y-4">
         {/* Timeline context */}
-        <div className="flex flex-col sm:flex-row gap-4 font-mono text-xs text-slate bg-paper-dark/10 p-3 rounded-md">
+        <div className="flex flex-col sm:flex-row gap-3 font-mono text-[10px] sm:text-[11px] text-slate bg-paper-dark/10 p-2.5 rounded-md">
           <div className="flex-1">
-            <strong className="text-ink block mb-1">Commit Deadline</strong>
+            <strong className="text-ink block mb-0.5">Commit Deadline</strong>
             {new Date(modCase.commitDeadline).toLocaleString("en-GB")}
           </div>
           <div className="flex-1">
-            <strong className="text-ink block mb-1">Reveal Deadline</strong>
+            <strong className="text-ink block mb-0.5">Reveal Deadline</strong>
             {new Date(modCase.revealDeadline).toLocaleString("en-GB")}
           </div>
         </div>
 
         {/* Flag Note / Evidence */}
         <div>
-          <h3 className="font-mono text-sm text-ink mb-2">Flagger Note</h3>
-          <p className="font-editorial text-sm text-slate bg-terracotta/5 p-3 rounded flex gap-2">
-            <WarningCircle className="text-terracotta shrink-0 mt-0.5" size={16} />
+          <h3 className="font-mono text-[11px] uppercase tracking-wider font-bold text-ink mb-1.5">Flagger Note</h3>
+          <p className="font-editorial text-[14px] text-slate bg-terracotta/5 p-2.5 rounded border border-terracotta/10 flex gap-2">
+            <WarningCircle className="text-terracotta shrink-0 mt-0.5" size={15} />
             {modCase.flaggerNote || "No note provided."}
           </p>
 
@@ -108,7 +108,7 @@ export function JuryCase({ modCase, isDetailedView = false }: JuryCaseProps) {
 
         {/* Content Under Review */}
         <div>
-          <h3 className="font-mono text-sm text-ink mb-2">Content Under Review</h3>
+          <h3 className="font-mono text-[11px] uppercase tracking-wider font-bold text-ink mb-1.5">Content Under Review</h3>
           <div className="border border-terracotta/30 rounded-md overflow-hidden">
             {/* Reuse FeedCard but force provenance display to see context */}
             <FeedCard post={modCase.flaggedPost} showProvenance={true} />
@@ -117,34 +117,34 @@ export function JuryCase({ modCase, isDetailedView = false }: JuryCaseProps) {
 
         {/* Action Area based on Phase */}
         {isDetailedView && (
-          <div className="pt-4 border-t border-paper-dark">
+          <div className="pt-3 border-t border-paper-dark">
             {modCase.phase === "commit" && !hasCommitted && (
-              <div className="space-y-4">
-                <p className="font-editorial text-sm text-slate">
-                  Review the evidence and cast your vote. During the commit phase, your vote is cryptographically hashed and hidden from other jurors to prevent consensus bias.
+              <div className="space-y-3">
+                <p className="font-editorial text-[13px] text-slate leading-relaxed">
+                  Review the evidence and cast your vote. During the commit phase, your vote is cryptographically hashed and hidden from other jurors to prevent bias.
                 </p>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setVote("uphold")}
                     className={cn(
-                      "flex-1 py-2 rounded-md font-mono text-sm transition-colors border",
+                      "flex-1 py-1.5 rounded-md font-mono text-[11px] font-bold uppercase tracking-wider transition-all border",
                       vote === "uphold"
                         ? "bg-terracotta text-paper border-terracotta"
                         : "bg-paper text-slate border-paper-dark hover:border-terracotta/50"
                     )}
                   >
-                    Uphold Flag (Remove)
+                    Uphold
                   </button>
                   <button
                     onClick={() => setVote("dismiss")}
                     className={cn(
-                      "flex-1 py-2 rounded-md font-mono text-sm transition-colors border",
+                      "flex-1 py-1.5 rounded-md font-mono text-[11px] font-bold uppercase tracking-wider transition-all border",
                       vote === "dismiss"
                         ? "bg-sage text-paper border-sage"
                         : "bg-paper text-slate border-paper-dark hover:border-sage/50"
                     )}
                   >
-                    Dismiss Flag (Keep)
+                    Dismiss
                   </button>
                 </div>
                 <Button

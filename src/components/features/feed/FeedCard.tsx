@@ -12,10 +12,14 @@ import {
   ShareNetwork,
   Flag,
   DotsThree,
-  ShieldCheck,
-  Link as LinkIcon,
   Copy,
+  MapPin,
+  CheckCircle,
+  ShieldCheck,
+  Quotes,
+  LinkSimple as LinkIcon,
 } from 'phosphor-react';
+import { QuotedPost } from './QuotedPost';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useInteractions } from '@/hooks/useInteractions';
@@ -85,20 +89,20 @@ export function FeedCard({ post, isReply = false }: FeedCardProps) {
       className={cn(
         'group transition-all duration-150 overflow-hidden cursor-pointer',
         isReply
-          ? 'border-l-2 border-cyan-400/20 pl-3 py-3 pr-4 hover:bg-cyan-50/50 dark:hover:bg-cyan-900/10'
-          : 'bg-paper-raised rounded-md border border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600 hover:shadow-sm'
+          ? 'border-l-2 border-cyan-500/20 pl-3 py-3 pr-4 hover:bg-cyan-500/5'
+          : 'bg-paper-raised rounded-md border border-[var(--border-subtle)] hover:border-[var(--border-default)] hover:shadow-sm'
       )}
     >
       {/* Top accent bar */}
       {!isReply && (
-        <div className="h-[2px] flex w-full opacity-60 group-hover:opacity-100 transition-opacity">
+        <div className="h-px flex w-full opacity-60 group-hover:opacity-100 transition-opacity">
           <div className="flex-1 bg-cyan-400" />
           <div className="flex-1 bg-magenta-400" />
           <div className="flex-1 bg-yellow-400" />
         </div>
       )}
 
-      <div className={cn("p-3.5 sm:p-5", isReply && "p-0")}>
+      <div className={cn("p-3 sm:p-4", isReply && "p-0")}>
         <div className="flex items-start gap-3 sm:gap-4">
           {/* ── Author Avatar ── */}
           <div className="shrink-0 pt-0.5">
@@ -107,11 +111,11 @@ export function FeedCard({ post, isReply = false }: FeedCardProps) {
                 "border-2 border-surface shadow-sm hover:opacity-90 transition-opacity",
                 isReply ? "h-8 w-8" : "h-10 w-10"
               )}>
-                {post.author.avatar_url && (
+                {post.author?.avatar_url && (
                   <AvatarImage src={post.author.avatar_url} alt={post.author.display_name} />
                 )}
                 <AvatarFallback className={cn("font-bold bg-paper-dark/10", isReply ? "text-[11px]" : "text-[13px]")}>
-                  {getInitials(post.author.display_name)}
+                  {getInitials(post.author?.display_name || "??")}
                 </AvatarFallback>
               </Avatar>
             </Link>
@@ -119,34 +123,30 @@ export function FeedCard({ post, isReply = false }: FeedCardProps) {
 
           <div className="flex-1 min-w-0">
             {/* ── Header Row ── */}
-            <div className="flex items-center justify-between gap-2 mb-1.5">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2 min-w-0 w-full overflow-hidden text-[10px] sm:text-[14px]">
-                <div className="flex items-center gap-1.5 shrink-0">
-                  <Link
-                    href={`/profile/${post.author.did}`}
-                    onClick={e => e.stopPropagation()}
-                    className="font-sans font-bold text-[14px] text-neutral-900 dark:text-neutral-50 hover:text-cyan-600 transition-colors truncate max-w-[160px] sm:max-w-none"
-                  >
-                    {post.author.display_name}
-                  </Link>
-                  {post.coordination_survived && (
-                    <ShieldCheck size={14} className="text-teal shrink-0" weight="fill" />
-                  )}
-                </div>
-                <span className="hidden sm:inline text-neutral-300 dark:text-neutral-700 shrink-0">·</span>
+            <div className="flex items-center justify-between gap-2 mb-1">
+              <div className="flex items-center gap-2 min-w-0 flex-1">
+                <Link
+                  href={`/profile/${post.author.did}`}
+                  onClick={e => e.stopPropagation()}
+                  className="font-sans font-bold text-[14px] text-neutral-900 dark:text-neutral-50 hover:text-cyan-600 transition-colors truncate shrink-0"
+                >
+                  {post.author?.display_name || "Unknown Author"}
+                </Link>
+                {post.coordination_survived && (
+                  <ShieldCheck size={14} className="text-teal shrink-0" weight="fill" />
+                )}
+                <span className="text-neutral-300 dark:text-neutral-700 shrink-0">·</span>
                 <div className="flex items-center gap-1.5 min-w-0">
-                  <span className="font-mono text-[10px] text-neutral-400 truncate shrink min-w-0">
+                  <span className="hidden sm:inline font-mono text-[10px] text-neutral-400 truncate shrink min-w-0">
                     {post.author.did || 'did:agora:unknown'}
                   </span>
-                  <span className="text-neutral-300 dark:text-neutral-700 shrink-0">·</span>
+                  <span className="hidden sm:inline text-neutral-300 dark:text-neutral-700 shrink-0">·</span>
                   <time className="text-[10px] font-mono text-neutral-400 shrink-0">
                     {getRelativeTime(post.created_at)}
                   </time>
                 </div>
               </div>
 
-              {/* ── Options Menu ── */}
-              {!isReply && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button
@@ -185,45 +185,72 @@ export function FeedCard({ post, isReply = false }: FeedCardProps) {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              )}
             </div>
 
+            {/* ── Location Badge ── */}
+            {post.location_data?.name && (
+              <div className="flex items-center gap-1 mb-1.5 text-cyan-600 dark:text-cyan-400">
+                <MapPin size={12} weight="fill" />
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider">{post.location_data.name}</span>
+              </div>
+            )}
+
             {/* ── Content Body ── */}
-            <div className="mb-3">
+            <div className="mb-2.5">
               <div
                 className={cn(
                   'text-neutral-800 dark:text-neutral-200 whitespace-pre-wrap leading-relaxed break-words overflow-hidden font-sans',
-                  isReply ? 'text-[13px] line-clamp-4' : 'text-[15px] line-clamp-6'
+                  isReply ? 'text-[13px] line-clamp-4' : 'text-[14px] sm:text-[15px] line-clamp-6'
                 )}
               >
                 {post.body}
               </div>
             </div>
 
-            {/* ── Visual Media ── */}
-            {post.media_urls && post.media_urls.length > 0 && (
-              <div
-                className={cn(
-                  'relative rounded-md overflow-hidden mb-3 border border-neutral-200 dark:border-neutral-700 bg-paper-dark/20',
-                  post.media_urls.length > 1 ? 'grid grid-cols-2 gap-0.5' : 'block'
+            {/* ── Quoted Post ── */}
+            {post.quoted_post && (
+              <div onClick={(e) => { e.stopPropagation(); router.push(`/post/${post.quoted_post?.id}`); }}>
+                <QuotedPost post={post.quoted_post} />
+              </div>
+            )}
+
+            {/* ── Poll UI ── */}
+            {post.poll_data && (
+              <div className="mb-4 bg-paper-sunken border border-neutral-200 dark:border-neutral-800 rounded-md p-4 space-y-3">
+                {post.poll_data.question && (
+                  <h4 className="text-[13px] font-sans font-bold text-ink mb-2">{post.poll_data.question}</h4>
                 )}
-              >
-                {post.media_urls.map((url: string, idx: number) => (
-                  <div
-                    key={idx}
-                    className={cn(
-                      'relative',
-                      post.media_urls!.length === 1 ? 'aspect-[16/9]' : 'aspect-square'
-                    )}
-                  >
-                    <Image
-                      src={url}
-                      alt={`Media ${idx + 1}`}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-                    />
-                  </div>
-                ))}
+                <div className="space-y-2">
+                  {post.poll_data.options.map((opt, i) => {
+                    const votes = post.poll_data!.votes?.[i] || 0;
+                    const totalVotes = post.poll_data!.votes?.reduce((a, b) => a + b, 0) || 1;
+                    const percentage = Math.round((votes / totalVotes) * 100);
+                    
+                    return (
+                      <button
+                        key={i}
+                        onClick={(e) => { e.stopPropagation(); withAuth(() => {}); }}
+                        className="w-full relative group"
+                      >
+                        <div className="w-full h-9 bg-paper border border-[var(--border-subtle)] rounded-md px-3 flex items-center justify-between relative overflow-hidden transition-all hover:border-cyan-500/50">
+                          {/* Progress build-up (simulated) */}
+                          <div 
+                            className="absolute inset-y-0 left-0 bg-cyan-100/30 dark:bg-cyan-900/10 transition-all duration-500" 
+                            style={{ width: `${percentage}%` }}
+                          />
+                          <span className="relative z-10 text-[12px] font-sans text-ink">{opt}</span>
+                          <span className="relative z-10 text-[11px] font-mono text-slate">{percentage}%</span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="flex items-center justify-between mt-2 pt-2 border-t border-neutral-100 dark:border-neutral-800">
+                  <span className="text-[10px] font-mono text-slate uppercase tracking-wider">
+                    {post.poll_data.votes?.reduce((a, b) => a + b, 0) || 0} Votes · Final Results
+                  </span>
+                  <CheckCircle size={14} className="text-teal" />
+                </div>
               </div>
             )}
 
@@ -249,33 +276,41 @@ export function FeedCard({ post, isReply = false }: FeedCardProps) {
             )}
 
             {/* ── Action Footer ── */}
-            <div className="flex items-center justify-between pt-2.5 border-t border-dotted border-neutral-200 dark:border-neutral-800">
-              <span className="text-[10px] font-mono text-neutral-400 truncate max-w-[100px] sm:max-w-[160px]">
+            <div className="flex items-center justify-between pt-2 border-t border-[var(--border-subtle)]">
+              <span className="text-[10px] font-mono text-neutral-400 truncate max-w-[80px] sm:max-w-[160px]">
                 {post.origin_label || 'agora.io'}
               </span>
-
+ 
               <div className="flex items-center gap-0.5">
                 <button
                   onClick={(e) => { e.stopPropagation(); withAuth(() => {}); }}
-                  className="flex items-center gap-1 px-2 py-1.5 rounded-md font-mono text-[10px] text-neutral-400 hover:text-cyan-600 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 transition-all"
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-md text-[11px] text-[var(--text-tertiary)] hover:text-cyan-400 hover:bg-cyan-500/10 transition-all"
                   aria-label={`${post.reply_count || 0} replies`}
                 >
                   <ChatCircle size={15} />
                   <span>{post.reply_count || 0}</span>
                 </button>
-
+ 
                 <button
                   onClick={(e) => { e.stopPropagation(); withAuth(toggleLike); }}
                   className={cn(
-                    "flex items-center gap-1 px-2 py-1.5 rounded-md font-mono text-[10px] transition-all",
+                    "flex items-center gap-1 px-2.5 py-1.5 rounded-md text-[11px] transition-all",
                     userHasLiked
-                      ? "text-magenta-600 dark:text-magenta-400 bg-magenta-50 dark:bg-magenta-900/20"
-                      : "text-neutral-400 hover:text-magenta-600 hover:bg-magenta-50 dark:hover:bg-magenta-900/20"
+                      ? "text-magenta-400 bg-magenta-500/10"
+                      : "text-[var(--text-tertiary)] hover:text-magenta-400 hover:bg-magenta-500/10"
                   )}
                   aria-label={`${likeCount} boosts`}
                 >
                   <ArrowUpRight size={15} weight={userHasLiked ? "bold" : "regular"} />
                   <span>{likeCount}</span>
+                </button>
+
+                <button
+                  onClick={(e) => { e.stopPropagation(); withAuth(() => { router.push(`/post/${post.id}?quote=true`); }); }}
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-md text-[11px] text-[var(--text-tertiary)] hover:text-cyan-400 hover:bg-cyan-500/10 transition-all"
+                  aria-label="Quote post"
+                >
+                  <Quotes size={15} />
                 </button>
               </div>
             </div>

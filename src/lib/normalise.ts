@@ -39,15 +39,15 @@ export function normalisePost(raw: RawPostSelect): PostWithProvenance {
   if (!author && (raw as LegacyPost).authorDid) {
     const flat = raw as LegacyPost;
     author = {
-      id: flat.authorId || flat.authorDid,
-      display_name: flat.authorDisplayName,
-      did: flat.authorDid,
+      id: flat.authorId || flat.authorDid || "unknown",
+      display_name: flat.authorDisplayName || "Unknown User",
+      did: flat.authorDid || null,
       avatar_url: flat.authorAvatarUrl || null,
       ladder_level: (flat.reputationScore?.ladderLevel as "new" | "established" | "trusted" | "steward") || "new",
       reputation_total: flat.reputationScore?.total || 0,
       affiliations: [], // Fixed types for mock data legacy compatibility
       bio: null,
-    };
+    } as any;
   }
 
   // Handle topic tags alignment
@@ -55,7 +55,7 @@ export function normalisePost(raw: RawPostSelect): PostWithProvenance {
 
   return {
     ...raw,
-    author,
+    author: author as any,
     topic_tags,
     // Surfacing affiliations as requested
     author_affiliations: author?.affiliations || [],
@@ -64,6 +64,7 @@ export function normalisePost(raw: RawPostSelect): PostWithProvenance {
     _provenance_verified: raw.provenance_tx_hash ? true : ((raw as LegacyPost).provenance ? true : false),
     _content_permanent: raw.ipfs_cid ? true : false,
     _funding_verified: raw.funding_tx_hash ? true : false,
+    quoted_post: raw.quoted_post ? normalisePost(raw.quoted_post as RawPostSelect) : undefined,
   };
 }
 

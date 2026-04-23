@@ -4,11 +4,72 @@ import { useState } from "react";
 import { Note, Scales, Users, WarningCircle } from "phosphor-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import type { GovernanceProposal } from "@/types";
+import { useGovernance } from "@/hooks/useGovernance";
+import type { GovernanceProposalWithAuthor, DbGovernanceVote } from "@/types";
 
 interface GovernanceProposalProps {
-  proposal: GovernanceProposal;
+  proposal: GovernanceProposalWithAuthor;
   isDetailedView?: boolean;
+}
+
+function TallyBreakdown({ votes }: { votes: DbGovernanceVote[] }) {
+  if (!votes || votes.length === 0) return null;
+
+  const tiers = ["steward", "trusted", "established", "new"];
+  const totalWeight = votes.reduce((acc, v) => acc + v.weight, 0);
+
+  const breakdown = tiers.map(tier => {
+    const tierVotes = votes.filter(v => v.reputation_level === tier);
+    const weight = tierVotes.reduce((acc, v) => acc + v.weight, 0);
+    const count = tierVotes.length;
+    const percent = totalWeight > 0 ? (weight / totalWeight) * 100 : 0;
+    
+    return { tier, weight, count, percent };
+  });
+
+  return (
+    <div className="space-y-4 pt-6 border-t border-paper-dark mt-6">
+      <div className="flex items-center justify-between">
+        <h3 className="font-sans font-bold text-sm text-ink uppercase tracking-wider">Weightage Revelation</h3>
+        <span className="text-[10px] font-mono text-slate bg-paper-dark/10 px-2 py-0.5 rounded uppercase font-bold">Verifiable Analysis</span>
+      </div>
+      <div className="space-y-3">
+        {breakdown.map(({ tier, weight, count, percent }) => (
+          <div key={tier} className="space-y-1.5">
+            <div className="flex justify-between items-end text-[10px] font-mono uppercase tracking-widest px-0.5">
+              <span className={cn(
+                "font-bold",
+                tier === 'steward' && "text-ink",
+                tier === 'trusted' && "text-slate-dark",
+                tier === 'established' && "text-slate",
+                tier === 'new' && "text-slate-light"
+              )}>
+                {tier}s <span className="font-medium opacity-60">({count} votes)</span>
+              </span>
+              <span className="font-bold">{Math.round(percent)}%</span>
+            </div>
+            <div className="h-1.5 w-full bg-paper-dark/30 rounded-full overflow-hidden">
+              <div 
+                className={cn(
+                  "h-full transition-all duration-1000 ease-out",
+                  tier === 'steward' && "bg-ink",
+                  tier === 'trusted' && "bg-slate-dark",
+                  tier === 'established' && "bg-slate",
+                  tier === 'new' && "bg-slate-light"
+                )}
+                style={{ width: `${percent}%` }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="bg-paper-dark/10 p-3 rounded-md border border-dashed border-paper-dark">
+        <p className="text-[10px] font-mono text-slate uppercase leading-relaxed text-center tracking-wider">
+          POW WEIGHTAGE REVEALS THE DISTRIBUTION OF REPUTATION STAKED IN THIS DECISION.
+        </p>
+      </div>
+    </div>
+  );
 }
 
 const STATUS_COLORS = {
@@ -22,10 +83,13 @@ export function GovernanceProposalCard({
   proposal,
   isDetailedView = false,
 }: GovernanceProposalProps) {
-  const [hasVoted, setHasVoted] = useState(false);
-  const [vote, setVote] = useState<"for" | "against" | "abstain" | null>(null);
+  const { useProposal, castVote, isVoting } = useGovernance();
+  const { data: detailedData } = useProposal(isDetailedView ? proposal.id : "");
+  
+  const [localVoted, setLocalVoted] = useState(false);
+  const [localVote, setLocalVote] = useState<"for" | "against" | "abstain" | null>(null);
 
-  const totalVotes = proposal.votesFor + proposal.votesAgainst + proposal.votesAbstain;
+  const totalVotes = (proposal.votes_for || 0) + (proposal.votes_against || 0) + (proposal.votes_abstain || 0);
   
   // Calculate percentages rounded to 1 decimal place
   const getPercent = (count: number) => {
@@ -33,11 +97,17 @@ export function GovernanceProposalCard({
     return Math.round((count / totalVotes) * 1000) / 10;
   };
 
-  const handleVote = (selectedVote: "for" | "against" | "abstain") => {
-    setVote(selectedVote);
-    setHasVoted(true);
-    // In a real app, this would trigger an on-chain transaction
+  const handleVote = async (selectedVote: "for" | "against" | "abstain") => {
+    try {
+      await castVote({ proposalId: proposal.id, voteType: selectedVote });
+      setLocalVote(selectedVote);
+      setLocalVoted(true);
+    } catch (err) {
+      console.error("Failed to cast vote:", err);
+    }
   };
+
+  const isClosed = proposal.status !== "open" || new Date(proposal.deadline) < new Date();
 
   return (
     <div className="bg-surface border border-paper-dark rounded-lg overflow-hidden flex flex-col h-full">
@@ -50,7 +120,7 @@ export function GovernanceProposalCard({
             <Note size={20} className="text-ink" />
           )}
           <span className="font-mono text-xs text-slate font-medium">
-            Prop {proposal.id.split("-")[2]}
+            Prop {proposal.id.split("-")[0].toUpperCase()}
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -79,8 +149,8 @@ export function GovernanceProposalCard({
           </h2>
           <div className="flex items-center gap-2 text-xs text-slate">
             <span>Proposed by</span>
-            <span className="font-mono truncate max-w-[150px]">
-              {proposal.proposerDid.slice(0, 16)}…
+            <span className="font-mono truncate max-w-[200px]">
+              {proposal.proposer?.did || "did:agora:unknown"}
             </span>
           </div>
         </div>
@@ -136,43 +206,44 @@ export function GovernanceProposalCard({
           <div className="h-2.5 w-full bg-paper-dark/50 rounded-full overflow-hidden flex">
             <div
               className="h-full bg-sage transition-all duration-500 ease-out"
-              style={{ width: `${getPercent(proposal.votesFor)}%` }}
-              title={`For: ${getPercent(proposal.votesFor)}%`}
+              style={{ width: `${getPercent(proposal.votes_for || 0)}%` }}
+              title={`For: ${getPercent(proposal.votes_for || 0)}%`}
             />
             <div
               className="h-full bg-terracotta transition-all duration-500 ease-out"
-              style={{ width: `${getPercent(proposal.votesAgainst)}%` }}
-              title={`Against: ${getPercent(proposal.votesAgainst)}%`}
+              style={{ width: `${getPercent(proposal.votes_against || 0)}%` }}
+              title={`Against: ${getPercent(proposal.votes_against || 0)}%`}
             />
             <div
               className="h-full bg-slate-light transition-all duration-500 ease-out"
-              style={{ width: `${getPercent(proposal.votesAbstain)}%` }}
-              title={`Abstain: ${getPercent(proposal.votesAbstain)}%`}
+              style={{ width: `${getPercent(proposal.votes_abstain || 0)}%` }}
+              title={`Abstain: ${getPercent(proposal.votes_abstain || 0)}%`}
             />
           </div>
           
           <div className="flex justify-between mt-2 text-[10px] sm:text-xs font-medium">
-            <span className="text-sage w-1/3 text-left">For ({getPercent(proposal.votesFor)}%)</span>
-            <span className="text-slate w-1/3 text-center">Abstain ({getPercent(proposal.votesAbstain)}%)</span>
-            <span className="text-terracotta w-1/3 text-right">Against ({getPercent(proposal.votesAgainst)}%)</span>
+            <span className="text-sage w-1/3 text-left">For ({getPercent(proposal.votes_for || 0)}%)</span>
+            <span className="text-slate w-1/3 text-center">Abstain ({getPercent(proposal.votes_abstain || 0)}%)</span>
+            <span className="text-terracotta w-1/3 text-right">Against ({getPercent(proposal.votes_against || 0)}%)</span>
           </div>
         </div>
 
         {/* Action Area */}
-        {isDetailedView && proposal.status === "open" && (
+        {isDetailedView && proposal.status === "open" && !isClosed && (
           <div className="pt-6 border-t border-paper-dark mt-6">
             <h3 className="font-medium text-sm text-ink mb-4">Cast Your Vote</h3>
-            {hasVoted ? (
+            {localVoted ? (
               <div className="bg-sage/10 border border-sage/20 p-4 rounded-lg text-center">
                 <p className="font-semibold text-sm text-sage mb-1">Vote Recorded</p>
                 <p className="text-sm text-slate">
-                  You voted <strong className="capitalize text-ink">{vote}</strong>. Your transaction has been confirmed on-chain.
+                  You voted <strong className="capitalize text-ink">{localVote}</strong>. Your transaction has been confirmed on-chain.
                 </p>
               </div>
             ) : (
               <div className="flex flex-col sm:flex-row gap-3">
                 <Button
                   onClick={() => handleVote("for")}
+                  disabled={isVoting}
                   variant="outline"
                   className="flex-1 border-sage text-sage hover:bg-sage hover:text-white-0"
                 >
@@ -180,6 +251,7 @@ export function GovernanceProposalCard({
                 </Button>
                 <Button
                   onClick={() => handleVote("against")}
+                  disabled={isVoting}
                   variant="outline"
                   className="flex-1 border-terracotta text-terracotta hover:bg-terracotta hover:text-white-0"
                 >
@@ -187,6 +259,7 @@ export function GovernanceProposalCard({
                 </Button>
                 <Button
                   onClick={() => handleVote("abstain")}
+                  disabled={isVoting}
                   variant="outline"
                   className="flex-1 border-slate text-slate hover:bg-slate hover:text-white-0"
                 >
@@ -198,6 +271,11 @@ export function GovernanceProposalCard({
               Voting weight is determined by reputation score and active stake.
             </p>
           </div>
+        )}
+
+        {/* Reveal Weightage (Only if it's the detailed view AND the voting is closed) */}
+        {isDetailedView && isClosed && detailedData?.votes && (
+          <TallyBreakdown votes={detailedData.votes} />
         )}
       </div>
     </div>

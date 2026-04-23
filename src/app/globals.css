@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=IBM+Plex+Sans:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -80,9 +80,9 @@
     --border-default: var(--n-300);
     --border-strong: var(--n-600);
 
-    /* Fonts */
+    /* Fonts — single UI font + display font */
     --font-serif: 'Playfair Display', Georgia, serif;
-    --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+    --font-sans: 'IBM Plex Mono', 'Courier New', monospace;
     --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
 
     /* Radius */
@@ -101,22 +101,33 @@
   }
 
   .dark {
-    --bg-page: var(--n-900);
-    --bg-surface: var(--n-800);
-    --bg-raised: var(--n-700);
-    --bg-sunken: #000000;
+    --n-50: #E5E3DF;
+    --n-100: #C5C3BF;
+    --n-200: rgba(255, 255, 255, 0.10);
+    --n-300: rgba(255, 255, 255, 0.16);
+    --n-400: #7A7874;
+    --n-500: #5C5A56;
+    --n-600: #3E3C39;
+    --n-700: rgba(255, 255, 255, 0.06);
+    --n-800: rgba(255, 255, 255, 0.03);
+    --n-900: #0C0C0B;
 
-    --text-primary: var(--n-50);
-    --text-secondary: var(--n-300);
-    --text-tertiary: var(--n-500);
-    --text-disabled: var(--n-600);
+    --bg-page: #0C0C0B;
+    --bg-surface: #141312;
+    --bg-raised: #1A1918;
+    --bg-sunken: #080807;
 
-    --border-subtle: #252423;
-    --border-default: var(--n-700);
-    --border-strong: var(--n-400);
+    --text-primary: #E5E3DF;
+    --text-secondary: #9A9892;
+    --text-tertiary: #5C5A56;
+    --text-disabled: #3E3C39;
 
-    --color-paper: 26 25 24;
-    --color-ink: 247 246 244;
+    --border-subtle: rgba(255, 255, 255, 0.06);
+    --border-default: rgba(255, 255, 255, 0.10);
+    --border-strong: rgba(255, 255, 255, 0.20);
+
+    --color-paper: 12 12 11;
+    --color-ink: 229 227 223;
   }
 
   *,
@@ -135,9 +146,11 @@
   body {
     background: var(--bg-page);
     color: var(--text-primary);
-    font-family: var(--font-sans);
-    font-size: 14px;
-    line-height: 1.6;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.65;
+    letter-spacing: 0.01em;
     min-height: 100vh;
     overflow-x: hidden;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
@@ -145,11 +158,16 @@
 
   h1,
   h2,
-  h3,
-  h4,
-  .font-serif {
+  .font-serif,
+  .font-editorial {
     font-family: var(--font-serif);
     @apply tracking-tight font-semibold;
+  }
+
+  h3,
+  h4 {
+    font-family: var(--font-mono);
+    @apply tracking-tight font-medium;
   }
 
   .font-mono {
