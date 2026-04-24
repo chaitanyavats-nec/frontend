@@ -13,44 +13,23 @@ const POSTS_PER_PAGE = 5;
 const FEED_MODE_KEY = "agora-feed-mode";
 const FEED_TOPIC_KEY = "agora-feed-topic";
 
+import { useFeedModeStore } from "@/stores/useFeedModeStore";
+
 export default function HomePage() {
   const { user } = useAuth();
   const { data: topics } = useTopics();
-  const [mode, setMode] = useState<FeedMode>("chronological");
+  const { mode, setMode, selectedTopic, setSelectedTopic } = useFeedModeStore();
   
-  const [selectedTopic, setSelectedTopic] = useState<string>("");
   const { posts, loading: isPostsLoading } = useFeed(mode, mode === "topics" ? [selectedTopic] : []);
   const [visibleCount, setVisibleCount] = useState(POSTS_PER_PAGE);
 
-  // Load feed config from localStorage (never sent to server)
-  useEffect(() => {
-    const savedMode = localStorage.getItem(FEED_MODE_KEY) as FeedMode | null;
-    const savedTopic = localStorage.getItem(FEED_TOPIC_KEY);
-    
-    // Default to following if logged in and no saved mode
-    if (user && !savedMode) {
-      setMode("following");
-    } else if (savedMode) {
-      // Validate saved mode (guest can't see following)
-      if (savedMode === "following" && !user) {
-        setMode("chronological");
-      } else {
-        setMode(savedMode);
-      }
-    }
-    
-    if (savedTopic) setSelectedTopic(savedTopic);
-  }, [user]);
-
   const handleModeChange = (newMode: FeedMode) => {
     setMode(newMode);
-    localStorage.setItem(FEED_MODE_KEY, newMode);
     setVisibleCount(POSTS_PER_PAGE);
   };
 
   const handleTopicSelect = (slug: string) => {
     setSelectedTopic(slug);
-    localStorage.setItem(FEED_TOPIC_KEY, slug);
     setVisibleCount(POSTS_PER_PAGE);
   };
 
@@ -78,15 +57,17 @@ export default function HomePage() {
         <h1 className="font-editorial font-bold text-4xl tracking-tight text-ink hidden lg:block">Feed</h1>
       </div>
 
-      {/* Feed Mode Bar */}
-      <FeedModeBar
-        mode={mode}
-        onModeChange={handleModeChange}
-        topics={topics || []}
-        selectedTopic={selectedTopic}
-        onTopicSelect={handleTopicSelect}
-        showFollowing={!!user}
-      />
+      {/* Feed Mode Bar - Hidden on mobile, handled by Nav Dropdown */}
+      <div className="hidden lg:block">
+        <FeedModeBar
+          mode={mode}
+          onModeChange={handleModeChange}
+          topics={topics || []}
+          selectedTopic={selectedTopic}
+          onTopicSelect={handleTopicSelect}
+          showFollowing={!!user}
+        />
+      </div>
 
       {/* Feed Cards */}
       <div className="space-y-4">

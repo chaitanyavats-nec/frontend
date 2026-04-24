@@ -1,5 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
-@import url('https://api.fontshare.com/v2/css?f[]=sentient@300,301,400,401,500,501,600,601,700,701,1,2&display=swap');
+@import url('https://api.fontshare.com/v2/css?f[]=sentient@300,301,400,401,500,501,600,601,700,701,1,2&f[]=satoshi@300,301,400,401,500,501,700,701,900,901&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -83,8 +82,8 @@
 
     /* Fonts — single UI font + display font */
     --font-serif: 'Sentient', Georgia, serif;
-    --font-sans: 'IBM Plex Mono', 'Courier New', monospace;
-    --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+    --font-sans: 'Satoshi', sans-serif;
+    --font-mono: 'Satoshi', sans-serif;
 
     /* Radius */
     --r-xs: 2px;

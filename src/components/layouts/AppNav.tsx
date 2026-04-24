@@ -11,11 +11,24 @@ import {
   Gear,
   NotePencil,
   ChartBar,
-  SignIn
+  SignIn,
+  MagnifyingGlass,
+  CaretDown,
+  List
 } from "phosphor-react";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu";
+import { useFeedModeStore } from "@/stores/useFeedModeStore";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { useAuthModalStore } from "@/stores/useAuthModalStore";
+import { useTopics } from "@/hooks/useTopics";
 
 interface NavItem {
   label: string;
@@ -36,13 +49,15 @@ const mobileNavItems: NavItem[] = [
   { label: "Home", href: "/home", icon: House },
   { label: "Explore", href: "/explore", icon: Compass },
   { label: "Compose", href: "/compose", icon: NotePencil },
-  { label: "Civics", href: "/civics", icon: Fingerprint, badge: 3 },
+  { label: "Governance", href: "/civics", icon: ChartBar, badge: 1 },
   { label: "Settings", href: "/settings/account", icon: Gear },
 ];
 
 export function AppNav() {
   const pathname = usePathname();
   const { user } = useAuth();
+  const { mode, setMode, selectedTopic, setSelectedTopic } = useFeedModeStore();
+  const { data: topics } = useTopics();
   const { open: openAuthModal } = useAuthModalStore();
 
   const isActive = (href: string) => {
@@ -54,11 +69,63 @@ export function AppNav() {
     <>
       {/* Mobile Top Bar */}
       <div className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-neutral-50/95 dark:bg-neutral-900/95 backdrop-blur-md z-40 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between px-4">
-        <h1 className="font-serif text-2xl font-bold text-neutral-900 dark:text-neutral-50 tracking-tight">AGORA</h1>
-        <div className="flex items-center gap-4">
+        {/* Left: Profile Icon */}
+        <Link href={user ? "/profile/me" : "/welcome"} className="shrink-0">
+          <UserCircle size={26} className="text-neutral-400 dark:text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-50" weight={pathname === "/profile/me" ? "fill" : "regular"} />
+        </Link>
+
+        {/* Feed Mode Dropdown (only on home) */}
+        <div className="flex-1 flex justify-start ml-4">
+          {pathname === "/home" ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-1.5 py-1.5 transition-all outline-none border-none">
+                <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-cyan-600 dark:text-cyan-400">
+                  {mode === "chronological" ? "Global" : mode === "topics" ? (selectedTopic || "Topics") : mode}
+                </span>
+                <CaretDown size={10} weight="bold" className="text-cyan-500/70 dark:text-cyan-400/50" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56 max-h-[70vh] overflow-y-auto">
+                <DropdownMenuLabel className="text-[10px] font-mono font-bold uppercase tracking-widest text-neutral-400">Feed View</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setMode("chronological")} className="font-mono text-[11px] uppercase tracking-wider">Global</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setMode("curated")} className="font-mono text-[11px] uppercase tracking-wider">Curated</DropdownMenuItem>
+                {user && (
+                  <DropdownMenuItem onClick={() => setMode("following")} className="font-mono text-[11px] uppercase tracking-wider">Following</DropdownMenuItem>
+                )}
+                
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel className="text-[10px] font-mono font-bold uppercase tracking-widest text-neutral-400">Topics</DropdownMenuLabel>
+                <DropdownMenuItem onClick={() => { setMode("topics"); setSelectedTopic(""); }} className="font-mono text-[11px] uppercase tracking-wider">All Topics</DropdownMenuItem>
+                {topics?.map(topic => (
+                  <DropdownMenuItem 
+                    key={topic.id} 
+                    onClick={() => { setMode("topics"); setSelectedTopic(topic.slug); }}
+                    className={cn(
+                      "font-mono text-[11px] uppercase tracking-wider",
+                      selectedTopic === topic.slug && mode === "topics" ? "text-cyan-500" : ""
+                    )}
+                  >
+                    #{topic.displayName}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+             <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-neutral-400 ml-4">
+               {pathname.split('/').pop()?.replace('-', ' ') || 'Agora'}
+             </span>
+          )}
+        </div>
+
+        {/* Right: Actions */}
+        <div className="flex items-center gap-3">
+          <button className="text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-50 transition-colors">
+            <MagnifyingGlass size={20} />
+          </button>
+          
           <div className="relative text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-50 cursor-pointer transition-colors">
-            <Bell size={22} />
-            <span className="absolute -top-1 -right-1 bg-yellow-400 text-neutral-900 text-[9px] font-medium rounded-full h-4 min-w-[16px] flex items-center justify-center px-1 border border-neutral-200 dark:border-neutral-900">
+            <Bell size={20} />
+            <span className="absolute -top-1 -right-1 bg-yellow-400 text-neutral-900 text-[8px] font-bold rounded-full h-3.5 min-w-[14px] flex items-center justify-center border border-neutral-900">
               3
             </span>
           </div>
