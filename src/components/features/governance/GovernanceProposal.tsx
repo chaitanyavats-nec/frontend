@@ -114,7 +114,7 @@ export function GovernanceProposalCard({
       {/* Header */}
       <div className="bg-paper-dark/30 p-4 border-b border-paper-dark flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
         <div className="flex items-center gap-2">
-          {proposal.type === "constitutional" ? (
+          {proposal.proposal_type === "constitutional" ? (
             <Scales size={20} className="text-gold" />
           ) : (
             <Note size={20} className="text-ink" />
@@ -124,7 +124,7 @@ export function GovernanceProposalCard({
           </span>
         </div>
         <div className="flex items-center gap-2">
-          {proposal.constitutionalConflict && (
+          {proposal.constitutional_conflict && (
             <div className="flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-gold/10 text-gold border border-gold/20">
               <WarningCircle size={14} />
               <span>Constitutional</span>
@@ -133,7 +133,7 @@ export function GovernanceProposalCard({
           <span
             className={cn(
               "px-2.5 py-1 rounded-md text-[11px] font-bold uppercase tracking-wider border",
-              STATUS_COLORS[proposal.status]
+              STATUS_COLORS[proposal.status as keyof typeof STATUS_COLORS] || STATUS_COLORS.invalid
             )}
           >
             {proposal.status}
