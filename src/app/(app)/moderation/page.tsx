@@ -2,15 +2,23 @@
 
 import Link from "next/link";
 import { ShieldCheck } from "phosphor-react";
-import { useMockData } from "@/hooks/useMockData";
+import { useModeration } from "@/hooks/useModeration";
 import { JuryCase } from "@/components/features/moderation/JuryCase";
 
 export default function ModerationHubPage() {
-  const { moderationCases } = useMockData();
+  const { moderationCases, isCasesLoading } = useModeration();
+
+  if (isCasesLoading) {
+    return (
+      <div className="max-w-3xl mx-auto py-24 text-center">
+        <p className="font-mono text-xs text-slate animate-pulse uppercase tracking-widest">Loading Jury Log...</p>
+      </div>
+    );
+  }
 
   // Split cases for demonstration
-  const activeCases = moderationCases.filter((c) => c.phase !== "outcome");
-  const pastCases = moderationCases.filter((c) => c.phase === "outcome");
+  const activeCases = moderationCases.filter((c: any) => c.phase !== "outcome");
+  const pastCases = moderationCases.filter((c: any) => c.phase === "outcome");
 
   return (
     <div className="max-w-3xl mx-auto space-y-10">

@@ -3,19 +3,28 @@
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "phosphor-react";
-import { useMockData } from "@/hooks/useMockData";
+import { useModeration } from "@/hooks/useModeration";
 import { JuryCase } from "@/components/features/moderation/JuryCase";
 
 export default function ModerationCaseDetailPage() {
   const params = useParams();
-  const { moderationCases } = useMockData();
-  
-  const modCase = moderationCases.find((c) => c.id === params.id);
+  const { useJuryCase } = useModeration();
+  const { data: modCase, isLoading, error } = useJuryCase(params.id as string);
 
-  if (!modCase) {
+  if (isLoading) {
+    return (
+      <div className="py-24 text-center">
+        <p className="font-mono text-xs text-slate animate-pulse uppercase tracking-widest">Verifying evidence...</p>
+      </div>
+    );
+  }
+
+  if (error || !modCase) {
     return (
       <div className="py-12 text-center">
-        <p className="font-editorial text-base text-slate">Case not found.</p>
+        <p className="font-editorial text-base text-slate">
+          {error ? "Error loading case." : "Case not found."}
+        </p>
         <Link
           href="/moderation"
           className="inline-flex items-center gap-1 font-mono text-xs text-sage hover:text-sage-dark mt-4"

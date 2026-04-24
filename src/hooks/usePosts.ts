@@ -2,8 +2,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { normalisePost } from "@/lib/normalise";
-import { USE_MOCK_DATA } from "@/lib/config";
-import { mockPosts } from "@/lib/mockData";
 
 export function usePosts() {
   const supabase = createClient();
@@ -14,9 +12,6 @@ export function usePosts() {
   const { data: posts, isLoading: isPostsLoading } = useQuery({
     queryKey: ["posts"],
     queryFn: async () => {
-      if (USE_MOCK_DATA) {
-        return mockPosts.map((p) => normalisePost(p as any));
-      }
 
       const { data, error } = await supabase
         .from("posts")
@@ -33,10 +28,6 @@ export function usePosts() {
 
   const createPostMutation = useMutation({
     mutationFn: async ({ body, topicId, provenanceType, citationUrl, mediaUrls, pollData, locationData, parentId, rootId, type, quotedPostId }: Record<string, any>) => {
-      if (USE_MOCK_DATA) {
-        console.log("Mock post created:", { body, topicId, provenanceType, citationUrl });
-        return { id: "mock-" + Date.now() };
-      }
 
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Authenticated user required");

@@ -73,7 +73,7 @@ export function normalisePost(raw: RawPostSelect): PostWithProvenance {
  */
 export function normaliseProfile(raw: RawProfileSelect): UserWithReputation {
   // Handle legacy mock data format (camelCase)
-  const display_name = raw.display_name || (raw as LegacyProfile).displayName;
+  const display_name = raw.display_name || (raw as LegacyProfile).displayName || "Unknown User";
   const avatar_url = raw.avatar_url || (raw as LegacyProfile).avatarUrl || null;
   const created_at = raw.created_at || (raw as LegacyProfile).joinedAt || new Date().toISOString();
   

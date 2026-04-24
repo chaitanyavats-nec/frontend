@@ -11,7 +11,7 @@ import { normaliseProfile } from "../normalise";
 const supabase = createClient();
 
 type FollowRow = {
-  profiles: Record<string, unknown>; // RawProfileSelect doesn't perfectly match the join structure here
+  profiles: RawProfileSelect;
 };
 
 export async function getUserProfile(userId: string): Promise<UserWithReputation | null> {
@@ -44,13 +44,11 @@ export async function getUserProfile(userId: string): Promise<UserWithReputation
     console.warn("Affiliations table not found or query failed, skipping for now.");
   }
 
-  // Get post count separately (Supabase v2 count doesn't easily join here without RPC or multiple queries)
-  const { count: postCount, error: countError } = await supabase
+  // Get post count separately
+  const { count: postCount } = await supabase
     .from("posts")
     .select("*", { count: "exact", head: true })
     .eq("author_id", internalId);
-
-  if (countError) throw countError;
 
   // Get followers count
   const { count: followersCount } = await supabase
@@ -64,13 +62,15 @@ export async function getUserProfile(userId: string): Promise<UserWithReputation
     .select("*", { count: "exact", head: true })
     .eq("follower_id", internalId);
 
-  return normaliseProfile({
+  const rawProfile: RawProfileSelect = {
     ...data,
-    affiliations: affiliations,
+    affiliations,
     post_count: [{ count: postCount || 0 }],
     follower_count: [{ count: followersCount || 0 }],
     following_count: [{ count: followingCount || 0 }],
-  } as unknown as RawProfileSelect); // Cast as unknown as RawProfileSelect
+  };
+
+  return normaliseProfile(rawProfile);
 }
 
 export async function getAffiliationsByUser(userId: string): Promise<DbAffiliation[]> {
@@ -106,9 +106,8 @@ export async function getFollowers(userId: string): Promise<UserWithReputation[]
     .eq("following_id", profile.id);
 
   if (error) throw error;
-  return (data || []).map((row: unknown) => {
-    const r = row as FollowRow;
-    return normaliseProfile(r.profiles as RawProfileSelect);
+  return (data as unknown as FollowRow[] || []).map((row) => {
+    return normaliseProfile(row.profiles);
   });
 }
 
@@ -133,8 +132,7 @@ export async function getFollowing(userId: string): Promise<UserWithReputation[]
     .eq("follower_id", profile.id);
 
   if (error) throw error;
-  return (data || []).map((row: unknown) => {
-    const r = row as FollowRow;
-    return normaliseProfile(r.profiles as RawProfileSelect);
+  return (data as unknown as FollowRow[] || []).map((row) => {
+    return normaliseProfile(row.profiles);
   });
 }
