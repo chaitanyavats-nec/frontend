@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
+@import url('https://api.fontshare.com/v2/css?f[]=sentient@300,301,400,401,500,501,600,601,700,701,1,2&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -81,7 +82,7 @@
     --border-strong: var(--n-600);
 
     /* Fonts — single UI font + display font */
-    --font-serif: 'Playfair Display', Georgia, serif;
+    --font-serif: 'Sentient', Georgia, serif;
     --font-sans: 'IBM Plex Mono', 'Courier New', monospace;
     --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
 
@@ -226,21 +227,31 @@
     outline-offset: 2px;
   }
 
-  /* Scrollbar styling */
+  /* Scrollbar styling - Modern, subtle, and integrated */
   ::-webkit-scrollbar {
-    width: 6px;
+    width: 10px;
+    height: 10px;
   }
 
   ::-webkit-scrollbar-track {
-    background: var(--bg-page);
+    background: transparent;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: rgb(var(--cy-200));
-    border-radius: 8px;
+    background-color: var(--n-300);
+    border-radius: 20px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+    transition: background-color 0.2s ease;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: rgb(var(--cy-500));
+    background-color: var(--n-500);
+  }
+
+  /* Firefox support */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--n-300) transparent;
   }
 }

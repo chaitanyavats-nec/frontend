@@ -28,13 +28,13 @@ export default function ExplorePage() {
       {/* Search Header - Sticky */}
       <div className="sticky top-0 z-30 bg-paper/90 backdrop-blur-md -mx-4 px-4 pt-4 pb-2 border-b border-paper-dark/10">
         <div className="relative group mb-4">
-          <MagnifyingGlass 
-            size={20} 
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate transition-colors group-focus-within:text-teal" 
+          <MagnifyingGlass
+            size={20}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate transition-colors group-focus-within:text-teal"
           />
-          <input 
-            type="text" 
-            placeholder="Search Agora topics, tags, or people" 
+          <input
+            type="text"
+            placeholder="Search Agora topics, tags, or people"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-surface border-2 border-paper-dark/30 rounded-full py-2.5 pl-12 pr-4 text-[15px] font-sans focus:border-teal/40 focus:bg-white outline-none transition-all shadow-sm placeholder:text-slate/50"
@@ -63,17 +63,6 @@ export default function ExplorePage() {
       {/* Explore Content */}
       <div className="py-6 space-y-4">
         {/* Featured Section placeholder */}
-        {activeTab === "For you" && (
-           <div className="mb-8 p-6 rounded-2xl bg-gradient-to-br from-teal/10 to-sage/10 border border-teal/20 relative overflow-hidden group cursor-pointer">
-              <div className="relative z-10">
-                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-teal mb-2 block">Featured Topic</span>
-                <h2 className="text-2xl font-editorial font-bold text-ink mb-2">The Future of Platform Cooperatives</h2>
-                <p className="text-sm text-slate line-clamp-2 max-w-md">How the next generation of digital infrastructure is being built by the communities that use it, not just for-profit corporations.</p>
-              </div>
-              <div className="absolute top-0 right-0 w-32 h-32 bg-teal/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-110" />
-           </div>
-        )}
-
         {/* Dynamic Feed based on tab */}
         {loading ? (
           <div className="space-y-4">
