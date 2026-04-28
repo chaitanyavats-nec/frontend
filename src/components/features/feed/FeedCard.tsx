@@ -20,6 +20,7 @@ import {
   LinkSimple as LinkIcon,
 } from 'phosphor-react';
 import { QuotedPost } from './QuotedPost';
+import { MediaGrid } from './MediaGrid';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useInteractions } from '@/hooks/useInteractions';
@@ -187,16 +188,10 @@ export function FeedCard({ post, isReply = false }: FeedCardProps) {
                 </DropdownMenu>
             </div>
 
-            {/* ── Location Badge ── */}
-            {post.location_data?.name && (
-              <div className="flex items-center gap-1 mb-1.5 text-cyan-600 dark:text-cyan-400">
-                <MapPin size={12} weight="fill" />
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider">{post.location_data.name}</span>
-              </div>
-            )}
+
 
             {/* ── Content Body ── */}
-            <div className="mb-2.5">
+            <div className="mb-3">
               <div
                 className={cn(
                   'text-neutral-800 dark:text-neutral-200 whitespace-pre-wrap leading-relaxed break-words overflow-hidden font-sans',
@@ -205,20 +200,35 @@ export function FeedCard({ post, isReply = false }: FeedCardProps) {
               >
                 {post.body}
               </div>
+              
+              {/* ── Inline Location ── */}
+              {post.location_data?.name && (
+                <div className="flex items-center gap-1 mt-2 mb-1">
+                  <div className="flex items-center gap-1.5 text-cyan-600 dark:text-cyan-400 opacity-80 hover:opacity-100 transition-opacity">
+                    <MapPin size={12} weight="bold" />
+                    <span className="text-[11px] font-sans font-medium">{post.location_data.name}</span>
+                  </div>
+                </div>
+              )}
             </div>
 
+            {/* ── Media Content ── */}
+            {post.media_urls && post.media_urls.length > 0 && (
+              <MediaGrid urls={post.media_urls} />
+            )}
+
             {/* ── Quoted Post ── */}
-            {post.quoted_post && (
-              <div onClick={(e) => { e.stopPropagation(); router.push(`/post/${post.quoted_post?.id}`); }}>
+            {post.quoted_post && post.quoted_post.id && (
+              <div onClick={(e) => { e.stopPropagation(); router.push(`/post/${post.quoted_post.id}`); }}>
                 <QuotedPost post={post.quoted_post} />
               </div>
             )}
 
             {/* ── Poll UI ── */}
-            {post.poll_data && (
-              <div className="mb-4 bg-paper-sunken border border-neutral-200 dark:border-neutral-800 rounded-md p-4 space-y-3">
+            {post.poll_data && post.poll_data.options && post.poll_data.options.length > 0 && (
+              <div className="mt-4 bg-neutral-50 dark:bg-neutral-900/40 border border-neutral-100 dark:border-neutral-800 rounded-xl p-4 space-y-3 shadow-inner">
                 {post.poll_data.question && (
-                  <h4 className="text-[13px] font-sans font-bold text-ink mb-2">{post.poll_data.question}</h4>
+                  <h4 className="text-[13px] font-sans font-bold text-neutral-800 dark:text-neutral-200 mb-2">{post.poll_data.question}</h4>
                 )}
                 <div className="space-y-2">
                   {post.poll_data.options.map((opt, i) => {
@@ -232,24 +242,27 @@ export function FeedCard({ post, isReply = false }: FeedCardProps) {
                         onClick={(e) => { e.stopPropagation(); withAuth(() => {}); }}
                         className="w-full relative group"
                       >
-                        <div className="w-full h-9 bg-paper border border-[var(--border-subtle)] rounded-md px-3 flex items-center justify-between relative overflow-hidden transition-all hover:border-cyan-500/50">
-                          {/* Progress build-up (simulated) */}
+                        <div className="w-full h-9 bg-white dark:bg-neutral-900/80 border border-neutral-200 dark:border-neutral-800 rounded-lg px-3 flex items-center justify-between relative overflow-hidden transition-all hover:border-cyan-500/50">
+                          {/* Progress bar */}
                           <div 
-                            className="absolute inset-y-0 left-0 bg-cyan-100/30 dark:bg-cyan-900/10 transition-all duration-500" 
+                            className="absolute inset-y-0 left-0 bg-cyan-500/10 dark:bg-cyan-500/15 transition-all duration-700 ease-out" 
                             style={{ width: `${percentage}%` }}
                           />
-                          <span className="relative z-10 text-[12px] font-sans text-ink">{opt}</span>
-                          <span className="relative z-10 text-[11px] font-mono text-slate">{percentage}%</span>
+                          <span className="relative z-10 text-[12px] font-sans font-medium text-neutral-700 dark:text-neutral-300">{opt}</span>
+                          <span className="relative z-10 text-[11px] font-mono text-neutral-500 font-bold">{percentage}%</span>
                         </div>
                       </button>
                     );
                   })}
                 </div>
-                <div className="flex items-center justify-between mt-2 pt-2 border-t border-neutral-100 dark:border-neutral-800">
-                  <span className="text-[10px] font-mono text-slate uppercase tracking-wider">
-                    {post.poll_data.votes?.reduce((a, b) => a + b, 0) || 0} Votes · Final Results
+                <div className="flex items-center justify-between mt-2 pt-2 border-t border-neutral-100/50 dark:border-neutral-800/50">
+                  <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-wider">
+                    {post.poll_data.votes?.reduce((a, b) => a + b, 0) || 0} Votes · Final
                   </span>
-                  <CheckCircle size={14} className="text-teal" />
+                  <div className="flex items-center gap-1 text-teal-600 dark:text-teal-400">
+                    <span className="text-[9px] font-mono font-bold uppercase">Verified Outcomes</span>
+                    <CheckCircle size={14} weight="fill" />
+                  </div>
                 </div>
               </div>
             )}

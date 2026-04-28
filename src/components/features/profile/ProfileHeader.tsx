@@ -8,6 +8,9 @@ import type { UserWithReputation } from "@/types";
 import { useFollows } from "@/hooks/useFollows";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { useState } from "react";
+import { AvatarEditor } from "./AvatarEditor";
+import { PencilSimple } from "phosphor-react";
 
 interface ProfileHeaderProps {
   profile: UserWithReputation;
@@ -37,6 +40,8 @@ const LADDER_COLORS = {
 export function ProfileHeader({ profile }: ProfileHeaderProps) {
   const { user } = useAuth();
   const { isFollowing, follow, unfollow, isFollowingLoading } = useFollows(profile.id);
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [currentAvatarUrl, setCurrentAvatarUrl] = useState(profile.avatar_url);
 
   const handleFollowToggle = async () => {
     try {
@@ -57,14 +62,36 @@ export function ProfileHeader({ profile }: ProfileHeaderProps) {
   return (
     <div className="bg-surface p-6 rounded-lg border border-paper-dark">
       <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-center">
-        <Avatar className="h-24 w-24 border-2 border-surface shadow-sm">
-          {profile.avatar_url && (
-            <AvatarImage src={profile.avatar_url} alt={profile.display_name} />
+        <div 
+          className={cn(
+            "relative group",
+            isOwnProfile && "cursor-pointer"
           )}
-          <AvatarFallback className="text-2xl font-semibold bg-paper-dark/10">
-            {getInitials(profile.display_name)}
-          </AvatarFallback>
-        </Avatar>
+          onClick={() => isOwnProfile && setIsEditorOpen(true)}
+        >
+          <Avatar className="h-24 w-24 border-2 border-surface shadow-sm">
+            {currentAvatarUrl && (
+              <AvatarImage src={currentAvatarUrl} alt={profile.display_name} className="object-cover" />
+            )}
+            <AvatarFallback className="text-2xl font-semibold bg-paper-dark/10">
+              {getInitials(profile.display_name)}
+            </AvatarFallback>
+          </Avatar>
+          
+          {isOwnProfile && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+              <PencilSimple size={24} className="text-white" weight="bold" />
+            </div>
+          )}
+        </div>
+
+        <AvatarEditor 
+          userId={profile.id}
+          isOpen={isEditorOpen}
+          onClose={() => setIsEditorOpen(false)}
+          onSuccess={(url) => setCurrentAvatarUrl(url)}
+          initialImage={currentAvatarUrl}
+        />
 
         <div className="flex-1 min-w-0">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
@@ -105,6 +132,17 @@ export function ProfileHeader({ profile }: ProfileHeaderProps) {
                 )}
               >
                 {isFollowingLoading ? "..." : isFollowing ? "Following" : "Follow"}
+              </Button>
+            )}
+
+            {isOwnProfile && (
+              <Button
+                asChild
+                className="rounded-full px-6 font-bold uppercase tracking-widest text-[10px] bg-paper-dark text-ink hover:bg-paper-darker border border-paper-dark shadow-sm transition-all active:scale-95"
+              >
+                <Link href="/settings/account">
+                  Edit Profile
+                </Link>
               </Button>
             )}
           </div>

@@ -53,10 +53,16 @@ export function normalisePost(raw: RawPostSelect): PostWithProvenance {
   // Handle topic tags alignment
   const topic_tags = raw.topic_tags || ((raw as LegacyPost).topicId ? [(raw as LegacyPost).topicId as string] : []);
 
+  // Normalise media: prefer media_urls, then legacy media objects, then empty array
+  const media_urls = raw.media_urls || (raw as any).media?.map((m: any) => typeof m === 'string' ? m : m.url) || [];
+
   return {
     ...raw,
     author: author as any,
     topic_tags,
+    media_urls,
+    poll_data: raw.poll_data || (raw as any).pollData || null,
+    location_data: raw.location_data || (raw as any).locationData || null,
     // Surfacing affiliations as requested
     author_affiliations: author?.affiliations || [],
     provenance_updates: raw.provenance_updates || [],

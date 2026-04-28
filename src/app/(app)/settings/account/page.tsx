@@ -12,6 +12,9 @@ import { Copy, UserCircle, Image as ImageIcon } from "phosphor-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/utils/supabase/client";
+import { updateProfile } from "@/lib/queries/users";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 export default function AccountSettingsPage() {
   const { user } = useAuth();
@@ -21,6 +24,40 @@ export default function AccountSettingsPage() {
     if (profile?.did) {
       navigator.clipboard.writeText(profile.did);
       alert("DID copied to clipboard");
+    }
+  };
+
+  const avatarInputRef = React.useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = React.useState(false);
+  const supabase = createClient();
+
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !user) return;
+
+    setIsUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}-${Math.random()}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data } = supabase.storage.from('avatars').getPublicUrl(fileName);
+      
+      await updateProfile(user.id, { avatar_url: data.publicUrl });
+      
+      alert("Avatar updated successfully! Please refresh to see changes globally.");
+      // Ideally we would invalidate the react-query cache here, but a reload works for now
+      window.location.reload();
+    } catch (error: unknown) {
+      console.error("Error uploading avatar:", error);
+      alert(error instanceof Error ? error.message : "Error uploading avatar");
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -71,11 +108,34 @@ export default function AccountSettingsPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="p-4 border border-dashed border-paper-dark rounded-xl flex flex-col items-center justify-center gap-3 bg-surface/50 hover:bg-surface transition-colors cursor-pointer group">
-            <div className="w-16 h-16 rounded-full bg-paper-dark/20 flex items-center justify-center text-slate group-hover:text-teal transition-colors">
-              <UserCircle size={32} />
-            </div>
-            <p className="text-xs font-medium text-slate">Change Avatar</p>
+          <input 
+            type="file" 
+            ref={avatarInputRef} 
+            className="hidden" 
+            accept="image/*" 
+            onChange={handleAvatarUpload} 
+            disabled={isUploading}
+          />
+          <div 
+            onClick={() => avatarInputRef.current?.click()}
+            className={cn(
+              "p-4 border border-dashed border-paper-dark rounded-xl flex flex-col items-center justify-center gap-3 transition-colors cursor-pointer group",
+              isUploading ? "bg-surface/30 opacity-50 cursor-not-allowed" : "bg-surface/50 hover:bg-surface"
+            )}
+          >
+            {profile.avatar_url ? (
+              <Avatar className="w-16 h-16 border-2 border-surface shadow-sm">
+                <AvatarImage src={profile.avatar_url} alt={profile.display_name} />
+                <AvatarFallback>{profile.display_name?.slice(0, 2).toUpperCase()}</AvatarFallback>
+              </Avatar>
+            ) : (
+              <div className="w-16 h-16 rounded-full bg-paper-dark/20 flex items-center justify-center text-slate group-hover:text-teal transition-colors">
+                <UserCircle size={32} />
+              </div>
+            )}
+            <p className="text-xs font-medium text-slate">
+              {isUploading ? "Uploading..." : "Change Avatar"}
+            </p>
           </div>
           <div className="p-4 border border-dashed border-paper-dark rounded-xl flex flex-col items-center justify-center gap-3 bg-surface/50 hover:bg-surface transition-colors cursor-pointer group">
             <div className="w-full h-16 rounded-lg bg-paper-dark/20 flex items-center justify-center text-slate group-hover:text-teal transition-colors">

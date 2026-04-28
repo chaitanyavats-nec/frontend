@@ -136,3 +136,12 @@ export async function getFollowing(userId: string): Promise<UserWithReputation[]
     return normaliseProfile(row.profiles);
   });
 }
+
+export async function updateProfile(userId: string, updates: Partial<{ display_name: string, bio: string, avatar_url: string }>): Promise<void> {
+  const { error } = await supabase
+    .from("profiles")
+    .update(updates)
+    .eq("id", userId);
+
+  if (error) throw error;
+}

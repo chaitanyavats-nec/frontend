@@ -4,6 +4,8 @@ import { PostWithAuthor } from "@/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { MediaGrid } from "./MediaGrid";
+import { MapPin } from "phosphor-react";
 
 interface QuotedPostProps {
   post: PostWithAuthor;
@@ -29,7 +31,7 @@ export function QuotedPost({ post }: QuotedPostProps) {
     return `${Math.floor(diffInDays / 30)}mo`;
   };
 
-  if (!post) return null;
+  if (!post || !post.id) return null;
 
   return (
     <div className="mt-2 mb-1 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-paper-sunken/30 overflow-hidden hover:bg-paper-sunken/50 transition-colors">
@@ -60,6 +62,23 @@ export function QuotedPost({ post }: QuotedPostProps) {
         <div className="text-[12px] text-neutral-800 dark:text-neutral-200 line-clamp-3 font-sans leading-normal">
           {post.body}
         </div>
+
+        {/* ── Location Badge ── */}
+        {post.location_data?.name && (
+          <div className="flex items-center gap-1 mt-1.5">
+            <div className="flex items-center gap-1 px-1 py-0.5 bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-100 dark:border-cyan-800 rounded-sm text-cyan-600 dark:text-cyan-400">
+              <MapPin size={8} weight="fill" />
+              <span className="text-[8px] font-mono font-bold uppercase tracking-wider">{post.location_data.name}</span>
+            </div>
+          </div>
+        )}
+
+        {/* ── Media ── */}
+        {post.media_urls && post.media_urls.length > 0 && (
+          <div className="mt-2">
+            <MediaGrid urls={post.media_urls} compact={true} />
+          </div>
+        )}
       </div>
     </div>
   );
