@@ -1,88 +1,89 @@
 "use client";
-
+ 
 import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Warning, Eye, Link as LinkIcon } from "phosphor-react";
+import { ArrowRight, Warning, Eye, Link as LinkIcon, FileText, Bank, HandCoin, ShareNetwork, Flag } from "phosphor-react";
+import { ReputationBadge } from "../profile/ReputationBadge";
 import { cn } from "@/lib/utils";
 import { useProvenance } from "@/hooks/useProvenance";
 import type { PostWithProvenance } from "@/types";
+import { PROVENANCE_CONFIG, getHealthColor } from "@/lib/provenance-config";
+
+const updateTypeConfig: Record<string, { label: string; classes: string }> = {
+  correction: { label: "Correction", classes: "bg-red-50 text-red-600 border-red-200" },
+  addition: { label: "Addition", classes: "bg-blue-50 text-blue-600 border-blue-200" },
+  dispute: { label: "Dispute", classes: "bg-orange-50 text-orange-600 border-orange-200" },
+  verification: { label: "Verified", classes: "bg-teal-50 text-teal-600 border-teal-200" },
+};
 
 interface ProvenanceTagProps {
   post: PostWithProvenance;
   expanded?: boolean;
   onExpand?: () => void;
+  showIcon?: boolean;
 }
 
-const sourceTypeConfig = {
-  original: {
-    label: "Original",
-    pillClasses: "bg-sage/10 text-sage-dark border-sage/30",
-  },
-  derived: {
-    label: "Derived",
-    pillClasses: "bg-sage/10 text-sage-dark border-sage/30",
-  },
-  republished: {
-    label: "Republished",
-    pillClasses: "bg-sage/10 text-sage-dark border-sage/30",
-  },
-  institutional: {
-    label: "Institutional",
-    pillClasses: "bg-gold/10 text-gold-dark border-gold/30",
-  },
-} as const;
-
-export const updateTypeConfig = {
-  added_context: { label: "Added Context", classes: "bg-teal/10 text-teal-dark border-teal/20" },
-  incomplete_provenance: { label: "Incomplete Provenance", classes: "bg-orange/10 text-orange border-orange/20" },
-  misleading_framing: { label: "Misleading Framing", classes: "bg-terracotta/10 text-terracotta border-terracotta/20" },
-  undisclosed_funding: { label: "Undisclosed Funding", classes: "bg-terracotta/10 text-terracotta border-terracotta/20" },
-} as const;
 
 // ─── STATE 1: Collapsed Pill ────────────────────────────────
 function CollapsedPill({
   post,
   onClick,
+  showIcon = false,
 }: {
   post: PostWithProvenance;
   onClick: () => void;
+  showIcon?: boolean;
 }) {
   const summary = useProvenance(post);
-  const config = summary.has_coordination_flag 
-    ? { label: "Coordinated", pillClasses: "bg-terracotta text-white-0 border-terracotta shadow-sm" }
-    : summary.has_funding_disclosure
-    ? { label: "Funded", pillClasses: "bg-terracotta/10 text-terracotta border-terracotta/20" }
-    : sourceTypeConfig[summary.source_type];
+  const type = (post.source_type || "original") as string;
+  const config = PROVENANCE_CONFIG[type] || PROVENANCE_CONFIG.original;
+  
+  const Icon = config.icon;
+
+  // Coordination flag logic for pill
+  const isCoordinated = summary.has_coordination_flag;
+  const showAmberBorder = type === "amplified" && isCoordinated;
+  
+  // Combination type logic
+  const isFunded = summary.has_funding_disclosure;
+  const showFundedBadge = type !== "funded" && isFunded;
+  const showInstitutionalBadge = type === "funded" && summary.affiliation_count > 0;
+  
+  const citationsCount = post.citations?.length || 0;
+  const hasAffiliations = post.author_affiliations?.length > 0;
+  const healthColor = getHealthColor(summary.health_score);
 
   return (
-    <button
-      onClick={(e) => {
-        e.stopPropagation();
-        onClick();
-      }}
-      className={cn(
-        "inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border font-mono text-[10px] sm:text-xs transition-all duration-150 hover:opacity-80",
-        config.pillClasses
+    <div className="flex items-center gap-1.5 flex-wrap">
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onClick();
+        }}
+        className={cn(
+          "inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border font-mono text-[9px] transition-all duration-150 hover:bg-opacity-20 shrink-0",
+          config.bgColor,
+          config.textColor,
+          "border-neutral-200 dark:border-neutral-800"
+        )}
+        aria-label={`Source: ${config.label}. Click to expand.`}
+      >
+        <span className="w-1.5 h-1.5 rounded-full bg-current opacity-60" />
+        <span className="font-bold uppercase tracking-widest">{config.label}</span>
+      </button>
+
+      {showFundedBadge && (
+        <span className="px-1.5 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-500 border border-neutral-200 dark:border-neutral-700 font-mono text-[8px] font-bold uppercase tracking-widest shrink-0">
+          Funded
+        </span>
       )}
-      aria-label={`Source: ${config.label}${summary.primary_affiliation ? `, ${summary.primary_affiliation}` : ""}. Click to expand.`}
-    >
-      {summary.has_coordination_flag ? (
-        <Warning size={14} weight="fill" />
-      ) : (
-        <span className="w-1.5 h-1.5 rounded-full bg-current opacity-70" />
+      {showInstitutionalBadge && (
+        <span className="px-1.5 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-500 border border-neutral-200 dark:border-neutral-700 font-mono text-[8px] font-bold uppercase tracking-widest shrink-0">
+          Institutional
+        </span>
       )}
-      <span className="font-medium">{config.label}</span>
-      {summary.primary_affiliation && (
-        <>
-          <span className="opacity-50">·</span>
-          <span className="max-w-[80px] sm:max-w-[120px] truncate">{summary.primary_affiliation}</span>
-        </>
-      )}
-      {summary.is_on_chain && (
-        <span className="ml-1 text-[10px]" title="On-chain Verified">✓</span>
-      )}
-    </button>
+    </div>
   );
 }
 
@@ -93,41 +94,59 @@ function ExpandedSummary({
   post: PostWithProvenance;
 }) {
   const summary = useProvenance(post);
-  const config = summary.has_coordination_flag 
-    ? { label: "Coordinated", pillClasses: "bg-terracotta text-white-0 border-terracotta shadow-sm" }
-    : summary.has_funding_disclosure
-    ? { label: "Funded", pillClasses: "bg-terracotta/10 text-terracotta border-terracotta/20" }
-    : sourceTypeConfig[summary.source_type];
+  const type = (post.source_type || "original") as string;
+  const config = PROVENANCE_CONFIG[type] || PROVENANCE_CONFIG.original;
+
+  const citationsCount = post.citations?.length || 0;
+  const hasAffiliations = post.author_affiliations?.length > 0;
+  const healthColor = getHealthColor(summary.health_score);
 
   return (
     <motion.div
-      initial={{ opacity: 0, height: 0 }}
-      animate={{ opacity: 1, height: "auto" }}
-      exit={{ opacity: 0, height: 0 }}
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
       transition={{ duration: 0.2, ease: "easeOut" }}
-      className="overflow-hidden"
+      className="mt-2"
     >
-      <div className="border border-[var(--border-subtle)] bg-neutral-50/50 dark:bg-neutral-800/30 p-3 mt-2 rounded-md">
-        <div className="space-y-2.5">
-          {/* Origin Type */}
-          <div className="flex items-center gap-2">
-            <span className="font-mono text-xs text-slate uppercase tracking-wider">Origin</span>
-            <span className={cn("inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-mono font-medium border", config.pillClasses)}>
-              {config.label}
-            </span>
-            {summary.is_on_chain && (
-              <span className="ml-auto font-mono text-[9px] sm:text-[10px] text-teal font-bold uppercase tracking-wider border border-teal/20 bg-teal/5 px-1.5 sm:px-2 py-0.5 rounded truncate max-w-[80px] sm:max-w-none">
-                <span className="sm:hidden">On-Chain</span>
-                <span className="hidden sm:inline">On-Chain Trusted</span>
-              </span>
-            )}
-            {summary.is_ipfs_stored && (
-              <span className="font-mono text-[9px] sm:text-[10px] text-slate font-bold uppercase tracking-wider border border-paper-dark bg-paper-dark/10 px-1.5 sm:px-2 py-0.5 rounded truncate max-w-[60px] sm:max-w-none">
-                <span className="sm:hidden">IPFS</span>
-                <span className="hidden sm:inline">IPFS Permalink</span>
-              </span>
-            )}
+      <div className="bg-neutral-50/80 dark:bg-neutral-900/40 p-4 rounded-xl border border-neutral-100 dark:border-neutral-800 shadow-sm">
+        <div className="grid grid-cols-2 gap-y-5 gap-x-8 mb-5 pb-5 border-b border-neutral-100 dark:border-neutral-800">
+          <div className="space-y-1">
+            <span className="text-[9px] font-mono font-bold uppercase tracking-[0.25em] text-neutral-400">Content Type</span>
+            <div className="text-[13px] font-sans font-bold text-neutral-800 dark:text-neutral-200">{config.label}</div>
           </div>
+          <div className="space-y-1">
+            <span className="text-[9px] font-mono font-bold uppercase tracking-[0.25em] text-neutral-400">Health Score</span>
+            <div className="flex items-center gap-2">
+               <div className="w-2 h-2 rounded-full" style={{ backgroundColor: healthColor }} />
+               <div className="text-[13px] font-mono font-bold" style={{ color: healthColor }}>{summary.health_score}%</div>
+            </div>
+          </div>
+          <div className="space-y-1">
+            <span className="text-[9px] font-mono font-bold uppercase tracking-[0.25em] text-neutral-400">Funding</span>
+            <div className="text-[13px] font-sans font-bold text-neutral-800 dark:text-neutral-200 truncate">
+              {post.funding_type === 'independent' ? "Independent" : (post.funder_name || "Funded")}
+            </div>
+          </div>
+          <div className="space-y-1">
+            <span className="text-[9px] font-mono font-bold uppercase tracking-[0.25em] text-neutral-400">Declaration</span>
+            <div className={cn("text-[13px] font-sans font-bold", hasAffiliations ? "text-teal-600" : "text-neutral-800 dark:text-neutral-200")}>
+              {hasAffiliations ? "Verified" : "None"}
+            </div>
+          </div>
+          <div className="col-span-2 space-y-1">
+            <span className="text-[9px] font-mono font-bold uppercase tracking-[0.25em] text-neutral-400">Citations</span>
+            <div className="text-[13px] font-sans font-bold text-neutral-800 dark:text-neutral-200">{citationsCount} Verified Sources</div>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          {/* Origin Section */}
+          <div className="flex items-center gap-4">
+             <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate opacity-50 min-w-[60px]">Origin</span>
+             <span className="text-[14px] font-sans font-bold text-ink">{config.label}</span>
+          </div>
+
 
           {/* Source Label */}
           {summary.origin_label && (
@@ -214,7 +233,17 @@ function ExpandedSummary({
               <div className="space-y-1.5 mb-2">
                 {post.provenance_updates.slice(0, 2).map((update) => (
                   <div key={update.id} className="text-[11px] font-sans p-2 rounded bg-paper-dark/10 border border-paper-dark/30">
-                    <span className="font-semibold text-ink mr-1">{update.user?.display_name || "Unknown"}</span>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-semibold text-ink">{update.user?.display_name || "Unknown"}</span>
+                      {update.user && (
+                        <ReputationBadge 
+                          level={update.user.ladder_level} 
+                          score={update.user.reputation_total} 
+                          size="sm" 
+                          showScore={false} 
+                        />
+                      )}
+                    </div>
                     <span className={cn("px-1 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest bg-white/50 border shadow-sm mr-2", update.status === 'pending' ? 'text-gold border-gold/30' : 'text-slate border-paper-dark')}>
                       {update.status === 'pending' ? 'Review' : updateTypeConfig[update.update_type].label}
                     </span>
@@ -236,10 +265,9 @@ function ExpandedSummary({
           <Link
             href={`/post/${post.id}/provenance`}
             onClick={(e) => e.stopPropagation()}
-            className="inline-flex items-center gap-1 font-sans text-xs font-semibold text-teal hover:text-teal-dark transition-colors duration-150 pt-1"
+            className="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 text-sm font-sans font-bold transition-colors mt-4 pt-2 border-t border-[var(--border-subtle)] w-full"
           >
-            View full chain history
-            <ArrowRight size={14} />
+            View full chain history <ArrowRight size={16} />
           </Link>
         </div>
       </div>

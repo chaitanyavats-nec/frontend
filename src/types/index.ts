@@ -63,7 +63,7 @@ export interface ProportionalityData {
 
 export interface ProvenanceRecord {
   postCid: string;
-  sourceType: "original" | "derived" | "republished" | "institutional";
+  sourceType: "original" | "derived" | "institutional" | "funded" | "amplified" | "republished";
   originUrl?: string;
   originLabel?: string;
   transmissionChain: TransmissionNode[];
@@ -100,7 +100,8 @@ export interface ReputationScore {
   contentLongevity: number;
   disputeParticipation: number;
   accountAgeWeight: number;
-  ladderLevel: "new" | "established" | "trusted" | "steward";
+  ladderLevel: "new" | "contributor" | "trusted" | "established" | "authority" | "elder";
+  voiceWeight?: number;
 }
 
 export interface UserProfile {

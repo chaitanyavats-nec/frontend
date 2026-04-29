@@ -21,7 +21,7 @@ export interface DbProfile {
   reputation_content_longevity: number;
   reputation_dispute_participation: number;
   reputation_account_age_weight: number;
-  ladder_level: "new" | "established" | "trusted" | "steward";
+  ladder_level: "new" | "contributor" | "trusted" | "established" | "authority" | "elder";
   created_at: string;
 }
 
@@ -34,7 +34,7 @@ export interface DbPost {
   media_urls: string[] | null;
   ipfs_cid: string | null;
   content_signature: string | null;
-  source_type: "original" | "derived" | "republished" | "institutional";
+  source_type: "original" | "derived" | "institutional" | "funded" | "amplified" | "republished";
   origin_url: string | null;
   origin_label: string | null;
   provenance_tx_hash: string | null;
@@ -116,6 +116,7 @@ export interface DbJuryCase {
   onchain_tx_hash: string | null;
   votes_upheld: number;
   votes_dismissed: number;
+  jury_participants: { user_id: string; vote: "upheld" | "dismissed" }[];
   created_at: string;
 }
 
@@ -141,7 +142,7 @@ export interface DbGovernanceVote {
   proposal_id: string;
   user_id: string;
   vote_type: "for" | "against" | "abstain";
-  reputation_level: "new" | "established" | "trusted" | "steward";
+  reputation_level: "new" | "contributor" | "trusted" | "established" | "authority" | "elder";
   weight: number;
   created_at: string;
 }
@@ -158,6 +159,10 @@ export type PostWithAuthor = DbPost & {
     | "bio"
     | "ladder_level"
     | "reputation_total"
+    | "reputation_moderation_accuracy"
+    | "reputation_content_longevity"
+    | "reputation_dispute_participation"
+    | "reputation_account_age_weight"
   > & {
     affiliations: DbAffiliation[];
   };
@@ -171,7 +176,7 @@ export type PostWithProvenance = PostWithAuthor & {
   citations: DbCitation[];
   author_affiliations: DbAffiliation[]; // Same as author.affiliations, surfaced as requested
   provenance_updates: (DbProvenanceUpdate & {
-    user: Pick<DbProfile, "id" | "display_name" | "avatar_url" | "did">
+    user: Pick<DbProfile, "id" | "display_name" | "avatar_url" | "did" | "ladder_level" | "reputation_total">
   })[];
   quoted_post?: PostWithAuthor;
 };
@@ -196,6 +201,7 @@ export type UserWithReputation = DbProfile & {
   // Blockchain readiness hints (derived)
   _identity_anchored: boolean;
   _reputation_on_chain: boolean;
+  voice_weight?: number;
 };
 
 export interface ProvenanceSummary {
@@ -208,6 +214,7 @@ export interface ProvenanceSummary {
   primary_affiliation: string | null;
   is_on_chain: boolean;
   is_ipfs_stored: boolean;
+  health_score: number;
 }
 
 // ─── Supabase Raw Join types (for normalization layer) ────────
@@ -225,6 +232,7 @@ export type RawProfileSelect = DbProfile & {
   post_count?: [{ count: number }];
   follower_count?: [{ count: number }];
   following_count?: [{ count: number }];
+  voice_weight?: number;
 };
 
 export type GovernanceProposalWithAuthor = DbGovernanceProposal & {

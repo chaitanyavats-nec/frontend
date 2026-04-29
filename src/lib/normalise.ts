@@ -43,7 +43,7 @@ export function normalisePost(raw: RawPostSelect): PostWithProvenance {
       display_name: flat.authorDisplayName || "Unknown User",
       did: flat.authorDid || null,
       avatar_url: flat.authorAvatarUrl || null,
-      ladder_level: (flat.reputationScore?.ladderLevel as "new" | "established" | "trusted" | "steward") || "new",
+      ladder_level: (flat.reputationScore?.ladderLevel as "new" | "contributor" | "trusted" | "established" | "authority" | "elder") || "new",
       reputation_total: flat.reputationScore?.total || 0,
       affiliations: [], // Fixed types for mock data legacy compatibility
       bio: null,
@@ -84,7 +84,7 @@ export function normaliseProfile(raw: RawProfileSelect): UserWithReputation {
   const created_at = raw.created_at || (raw as LegacyProfile).joinedAt || new Date().toISOString();
   
   // Mapping nested reputation score to flat fields if needed
-  const ladder_level = (raw.ladder_level as "new" | "established" | "trusted" | "steward") || (raw as LegacyProfile).reputationScore?.ladderLevel || "new";
+  const ladder_level = (raw.ladder_level as "new" | "contributor" | "trusted" | "established" | "authority" | "elder") || (raw as LegacyProfile).reputationScore?.ladderLevel || "new";
   const reputation_total = raw.reputation_total ?? ((raw as LegacyProfile).reputationScore?.total || 0);
 
   return {
@@ -100,5 +100,6 @@ export function normaliseProfile(raw: RawProfileSelect): UserWithReputation {
     // Derived blockchain readiness metadata
     _identity_anchored: raw.did !== null,
     _reputation_on_chain: raw.reputation_contract_address !== null,
+    voice_weight: raw.voice_weight,
   };
 }

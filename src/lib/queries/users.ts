@@ -18,15 +18,28 @@ export async function getUserProfile(userId: string): Promise<UserWithReputation
   const decodedId = decodeURIComponent(userId);
   const queryField = decodedId.startsWith("did:") ? "did" : "id";
 
-  const { data, error } = await supabase
-    .from("profiles")
+  let { data, error } = await supabase
+    .from("profile_with_voice")
     .select("*")
     .eq(queryField, decodedId)
     .single();
 
   if (error) {
-    if (error.code === "PGRST116" || error.code === "22P02") return null; // Not found or invalid UUID format
-    throw error;
+    if (error.code === "PGRST116" || error.code === "22P02") return null;
+    
+    // Fallback to raw profiles if view is missing or failing
+    console.warn("View 'profile_with_voice' query failed, falling back to profiles table.", error);
+    const { data: pData, error: pError } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq(queryField, decodedId)
+      .single();
+    
+    if (pError) {
+      if (pError.code === "PGRST116" || pError.code === "22P02") return null;
+      throw pError;
+    }
+    data = pData;
   }
 
   const internalId = data.id;

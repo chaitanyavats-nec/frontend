@@ -94,6 +94,7 @@ const config: Config = {
           surface: "var(--bg-surface)",
           raised: "var(--bg-raised)",
           sunken: "var(--bg-sunken)",
+          dark: "var(--n-200)",
         },
         // Legacy mappings
         teal: {

@@ -8,17 +8,28 @@ interface ReputationMeterProps {
 }
 
 const LADDER_REQUIREMENTS = {
-  new: "100 points to reach Established. Participate in disputes to level up.",
-  established: "500 points to reach Trusted. Maintain >80% moderation accuracy.",
-  trusted: "1000 points and active stewardship role required for Steward.",
-  steward: "Highest reputation level. Eligible for full Constitution committee.",
+  new: "Earn 10 points to become a Contributor. Continue participating to establish identity.",
+  contributor: "30 points to reach Trusted. Your voice weight begins to scale with activity.",
+  trusted: "50 points to reach Established. Eligible for advanced moderation features.",
+  established: "75 points to reach Authority. High-trust community member.",
+  authority: "90 points to reach Elder. Proven long-term commitment to Agora.",
+  elder: "Maximum reputation tier. Recognized community elder with peak voice weight.",
 };
 
 const LADDER_COLORS = {
   new: "bg-slate-light/20 text-slate",
-  established: "bg-sage/10 text-sage hover:bg-sage/20 border border-sage/20",
+  contributor: "bg-sage-light/20 text-sage",
   trusted: "bg-sage text-white-0",
-  steward: "bg-gold text-white-0",
+  established: "bg-gold text-white-0",
+  authority: "bg-gold-dark text-white-0",
+  elder: "bg-terracotta text-white-0",
+};
+
+const MAX_POINTS = {
+  moderationAccuracy: 25,
+  contentLongevity: 40,
+  disputeParticipation: 10,
+  accountAgeWeight: 25,
 };
 
 export function ReputationMeter({ score }: ReputationMeterProps) {
@@ -42,89 +53,96 @@ export function ReputationMeter({ score }: ReputationMeterProps) {
   };
 
   return (
-    <div className="bg-surface p-5 rounded-lg border border-paper-dark">
+    <div className="py-4 px-4 sm:px-6">
       {/* Header Row */}
-      <div className="flex items-start justify-between mb-6">
+      <div className="flex items-start justify-between mb-8">
         <div>
-          <h3 className="font-sans font-semibold text-xl text-ink mb-1 tracking-tight">Reputation</h3>
-          <p className="font-sans text-sm text-slate">
+          <h3 className="font-sans font-bold text-lg text-ink mb-1">Reputation</h3>
+          <p className="font-sans text-[11px] text-slate">
             Based on historical accuracy and constructive participation.
           </p>
         </div>
-        <div className="text-right">
-          <span className="font-sans font-bold text-3xl text-ink leading-none block mb-1.5 tracking-tight">
-            {total}
-          </span>
-          <span
-            className={cn(
-               "inline-block px-2 py-0.5 rounded-full text-xs font-medium capitalize",
-              LADDER_COLORS[ladderLevel]
-            )}
-          >
-            {ladderLevel}
-          </span>
+        <div className="text-right flex items-center gap-6 justify-end">
+          <div className="flex flex-col items-end">
+            <span className="font-sans font-bold text-4xl text-ink leading-none block mb-1">
+              {total}
+            </span>
+            <span className="text-[9px] font-bold text-slate uppercase tracking-widest">
+              Reputation
+            </span>
+          </div>
+          {score.voiceWeight !== undefined && (
+            <div className="flex flex-col items-end border-l border-paper-dark/30 pl-6">
+              <span className="font-sans font-bold text-4xl text-teal leading-none block mb-1">
+                {Math.round(score.voiceWeight)}
+              </span>
+              <span className="text-[9px] font-bold text-teal uppercase tracking-widest">
+                Voice Power
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Breakdown Bars */}
-      <div className="space-y-4 mb-5">
+      <div className="space-y-5 mb-8">
         <div>
-          <div className="flex justify-between font-medium text-xs text-slate mb-1.5">
+          <div className="flex justify-between font-medium text-[11px] text-ink mb-2">
             <span>Moderation Accuracy</span>
-            <span>{(moderationAccuracy * 100).toFixed(0)}%</span>
+            <span className="text-slate opacity-60">{moderationAccuracy} / {MAX_POINTS.moderationAccuracy}</span>
           </div>
-          <div className="h-2 w-full bg-paper-dark/50 rounded-full overflow-hidden">
+          <div className="h-1 w-full bg-paper-dark/30 rounded-full overflow-hidden">
             <div
-              className="h-full bg-sage transition-all duration-500 ease-out"
-              style={{ width: getWidth(moderationAccuracy) }}
+              className="h-full bg-ink transition-all duration-500 ease-out"
+              style={{ width: `${(moderationAccuracy / MAX_POINTS.moderationAccuracy) * 100}%` }}
             />
           </div>
         </div>
 
         <div>
-          <div className="flex justify-between font-medium text-xs text-slate mb-1.5">
+          <div className="flex justify-between font-medium text-[11px] text-ink mb-2">
             <span>Content Longevity</span>
-            <span>{(contentLongevity * 100).toFixed(0)}%</span>
+            <span className="text-slate opacity-60">{contentLongevity} / {MAX_POINTS.contentLongevity}</span>
           </div>
-          <div className="h-2 w-full bg-paper-dark/50 rounded-full overflow-hidden">
+          <div className="h-1 w-full bg-paper-dark/30 rounded-full overflow-hidden">
             <div
-              className="h-full bg-sage transition-all duration-500 ease-out"
-              style={{ width: getWidth(contentLongevity) }}
+              className="h-full bg-ink transition-all duration-500 ease-out"
+              style={{ width: `${(contentLongevity / MAX_POINTS.contentLongevity) * 100}%` }}
             />
           </div>
         </div>
 
         <div>
-          <div className="flex justify-between font-medium text-xs text-slate mb-1.5">
+          <div className="flex justify-between font-medium text-[11px] text-ink mb-2">
             <span>Dispute Participation</span>
-            <span>{(disputeParticipation * 100).toFixed(0)}%</span>
+            <span className="text-slate opacity-60">{disputeParticipation} / {MAX_POINTS.disputeParticipation}</span>
           </div>
-          <div className="h-2 w-full bg-paper-dark/50 rounded-full overflow-hidden">
+          <div className="h-1 w-full bg-paper-dark/30 rounded-full overflow-hidden">
             <div
-              className="h-full bg-sage transition-all duration-500 ease-out"
-              style={{ width: getWidth(disputeParticipation) }}
+              className="h-full bg-ink transition-all duration-500 ease-out"
+              style={{ width: `${(disputeParticipation / MAX_POINTS.disputeParticipation) * 100}%` }}
             />
           </div>
         </div>
 
         <div>
-          <div className="flex justify-between font-medium text-xs text-slate mb-1.5">
+          <div className="flex justify-between font-medium text-[11px] text-ink mb-2">
             <span>Account Age Weight</span>
-            <span>{(accountAgeWeight * 100).toFixed(0)}%</span>
+            <span className="text-slate opacity-60">{accountAgeWeight} / {MAX_POINTS.accountAgeWeight}</span>
           </div>
-          <div className="h-2 w-full bg-paper-dark/50 rounded-full overflow-hidden">
+          <div className="h-1 w-full bg-paper-dark/30 rounded-full overflow-hidden">
             <div
-              className="h-full bg-sage transition-all duration-500 ease-out"
-              style={{ width: getWidth(accountAgeWeight) }}
+              className="h-full bg-ink transition-all duration-500 ease-out"
+              style={{ width: `${(accountAgeWeight / MAX_POINTS.accountAgeWeight) * 100}%` }}
             />
           </div>
         </div>
       </div>
 
       {/* What's next */}
-      <div className="pt-4 border-t border-paper-dark">
-        <span className="font-medium text-xs text-slate block mb-1">What&apos;s next</span>
-        <p className="font-sans text-sm text-ink leading-relaxed">
+      <div className="pt-0">
+        <span className="font-bold text-[9px] text-slate uppercase tracking-widest block mb-1">What&apos;s next</span>
+        <p className="font-sans text-[11px] text-slate leading-relaxed">
           {LADDER_REQUIREMENTS[ladderLevel]}
         </p>
       </div>

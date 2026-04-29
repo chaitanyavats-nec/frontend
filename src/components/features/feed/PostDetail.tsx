@@ -17,15 +17,22 @@ import {
   MapPin,
   CheckCircle,
   Quotes,
+  Heart,
 } from "phosphor-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { ProvenanceTag } from "@/components/features/provenance/ProvenanceTag";
 import { ProvenanceUpdatePanel } from "@/components/features/provenance/ProvenanceUpdatePanel";
+import { ProvenanceDetailSection } from "@/components/features/provenance/ProvenanceDetailSection";
+import { PROVENANCE_CONFIG, getHealthColor } from "@/lib/provenance-config";
+import { useProvenance } from "@/hooks/useProvenance";
+import { ReputationBadge } from "../profile/ReputationBadge";
 import { Button } from "@/components/ui/button";
+import { useInteractions } from "@/hooks/useInteractions";
 import { usePosts } from "@/hooks/usePosts";
 import { useAuth } from "@/hooks/useAuth";
+import { useAuthModalStore } from "@/stores/useAuthModalStore";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -63,7 +70,13 @@ function getFormattedDate(dateString: string): string {
   });
 }
 
+
 export function PostDetail({ post }: PostDetailProps) {
+  const summary = useProvenance(post);
+  const type = (post.source_type || "original") as string;
+  const config = PROVENANCE_CONFIG[type] || PROVENANCE_CONFIG.original;
+  const healthColor = getHealthColor(summary.health_score);
+
   const [isReplying, setIsReplying] = useState(false);
   const [replyText, setReplyText] = useState("");
   const [showUpdatePanel, setShowUpdatePanel] = useState(false);
@@ -72,6 +85,16 @@ export function PostDetail({ post }: PostDetailProps) {
   const { user } = useAuth();
   const searchParams = useSearchParams();
   const isQuoteMode = searchParams.get("quote") === "true";
+  const { likeCount, userHasLiked, toggleLike } = useInteractions(post.id);
+  const { open: openAuthModal } = useAuthModalStore();
+
+  const withAuth = (action: () => void) => {
+    if (!user) {
+      openAuthModal();
+      return;
+    }
+    action();
+  };
 
   const handleReplySubmit = async () => {
     if (!replyText.trim()) return;
@@ -94,16 +117,18 @@ export function PostDetail({ post }: PostDetailProps) {
 
   return (
     <article
-      className="bg-paper-raised rounded-md border border-[var(--border-subtle)] overflow-hidden"
+      className="bg-paper-raised rounded-md border border-[var(--border-subtle)] overflow-hidden relative"
       role="article"
       aria-label={`Post by ${post.author.display_name}`}
     >
-      {/* Accent bar */}
-      <div className="h-px flex w-full">
-        <div className="flex-1 bg-cyan-400" />
-        <div className="flex-1 bg-magenta-400" />
-        <div className="flex-1 bg-yellow-400" />
-      </div>
+      {/* ── Provenance Health Bar (4px) ── */}
+      <div 
+        className="absolute top-0 left-0 right-0 h-[4px] transition-all duration-300"
+        style={{ 
+          backgroundColor: healthColor,
+          opacity: 0.9
+        }}
+      />
 
       <div className="p-4 sm:p-6">
         {/* ── Author Row ── */}
@@ -115,15 +140,16 @@ export function PostDetail({ post }: PostDetailProps) {
               )}
               <AvatarFallback className="text-[12px] font-bold bg-paper-dark/10">{getInitials(post.author.display_name)}</AvatarFallback>
             </Avatar>
- 
+
             <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2 min-w-0 overflow-hidden">
               <span className="font-sans font-bold text-[15px] sm:text-[17px] text-neutral-900 dark:text-neutral-50 truncate shrink-0">
                 {post.author.display_name}
               </span>
               <span className="hidden sm:inline text-neutral-300 dark:text-neutral-600 shrink-0">·</span>
               <div className="flex items-center gap-1.5 min-w-0">
-                <span className="font-mono text-[11px] text-neutral-400 truncate shrink min-w-0">
-                  {post.author.did || 'did:agora:unknown'}
+                <ProvenanceTag post={post} showIcon />
+                <span className="font-mono text-[11px] font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">
+                  {summary.health_score}
                 </span>
                 <span className="hidden sm:inline text-neutral-300 dark:text-neutral-600 shrink-0">·</span>
                 <time
@@ -138,11 +164,12 @@ export function PostDetail({ post }: PostDetailProps) {
 
           {/* ── Location Badge ── */}
           {post.location_data?.name && (
-            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-100 dark:border-cyan-800 rounded-sm text-cyan-700 dark:text-cyan-300 mr-2">
+            <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-100 dark:border-cyan-800 rounded-sm text-cyan-700 dark:text-cyan-300 mr-2">
               <MapPin size={14} weight="fill" />
               <span className="text-[10px] font-mono font-bold uppercase tracking-wider">{post.location_data.name}</span>
             </div>
           )}
+
 
           <div className="flex items-center gap-1">
             <button
@@ -170,7 +197,7 @@ export function PostDetail({ post }: PostDetailProps) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-52">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem className="gap-2.5 cursor-pointer">
+              <DropdownMenuItem onClick={() => withAuth(() => {})} className="gap-2.5 cursor-pointer">
                 <BookmarkSimple size={15} />
                 <span>Save post</span>
               </DropdownMenuItem>
@@ -178,7 +205,7 @@ export function PostDetail({ post }: PostDetailProps) {
                 <Copy size={15} />
                 <span>Copy link</span>
               </DropdownMenuItem>
-              <DropdownMenuItem className="gap-2.5 cursor-pointer">
+              <DropdownMenuItem onClick={() => withAuth(() => {})} className="gap-2.5 cursor-pointer">
                 <ShareNetwork size={15} />
                 <span>Share</span>
               </DropdownMenuItem>
@@ -191,7 +218,7 @@ export function PostDetail({ post }: PostDetailProps) {
                 </DropdownMenuItem>
               )}
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="gap-2.5 cursor-pointer text-red-500 focus:text-red-500">
+              <DropdownMenuItem onClick={() => withAuth(() => {})} className="gap-2.5 cursor-pointer text-red-500 focus:text-red-500">
                 <Flag size={15} />
                 <span>Flag post</span>
               </DropdownMenuItem>
@@ -221,18 +248,25 @@ export function PostDetail({ post }: PostDetailProps) {
                   </div>
                   
                   {/* Right: Reputation */}
-                  <div className="space-y-3">
-                    <h4 className="font-mono text-[10px] uppercase tracking-wider font-bold text-slate mb-2 opacity-70">Reputation</h4>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <h4 className="font-mono text-[10px] uppercase tracking-wider font-bold text-slate opacity-70">Reputation</h4>
+                      <ReputationBadge 
+                        level={post.author.ladder_level} 
+                        score={post.author.reputation_total} 
+                        size="sm"
+                      />
+                    </div>
                     <div className="space-y-2">
                       <div>
                         <div className="flex justify-between text-[9px] font-mono mb-1 text-slate uppercase">
                           <span>Accuracy</span>
-                          <span className="text-teal font-bold">85%</span>
+                          <span className="text-teal font-bold">{Math.round((post.author.reputation_moderation_accuracy / 25) * 100)}%</span>
                         </div>
                         <div className="h-1 w-full bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden">
                           <motion.div 
                             initial={{ width: 0 }}
-                            animate={{ width: "85%" }}
+                            animate={{ width: `${(post.author.reputation_moderation_accuracy / 25) * 100}%` }}
                             className="h-full bg-teal/70"
                           />
                         </div>
@@ -240,12 +274,12 @@ export function PostDetail({ post }: PostDetailProps) {
                       <div>
                         <div className="flex justify-between text-[9px] font-mono mb-1 text-slate uppercase">
                           <span>Longevity</span>
-                          <span className="text-teal font-bold">70%</span>
+                          <span className="text-teal font-bold">{Math.round((post.author.reputation_content_longevity / 40) * 100)}%</span>
                         </div>
                         <div className="h-1 w-full bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden">
                           <motion.div 
                             initial={{ width: 0 }}
-                            animate={{ width: "70%" }}
+                            animate={{ width: `${(post.author.reputation_content_longevity / 40) * 100}%` }}
                             className="h-full bg-teal/70"
                           />
                         </div>
@@ -253,12 +287,12 @@ export function PostDetail({ post }: PostDetailProps) {
                       <div>
                         <div className="flex justify-between text-[9px] font-mono mb-1 text-slate uppercase">
                           <span>Participation</span>
-                          <span className="text-teal font-bold">45%</span>
+                          <span className="text-teal font-bold">{Math.round((post.author.reputation_dispute_participation / 10) * 100)}%</span>
                         </div>
                         <div className="h-1 w-full bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden">
                           <motion.div 
                             initial={{ width: 0 }}
-                            animate={{ width: "45%" }}
+                            animate={{ width: `${(post.author.reputation_dispute_participation / 10) * 100}%` }}
                             className="h-full bg-teal/70"
                           />
                         </div>
@@ -366,9 +400,10 @@ export function PostDetail({ post }: PostDetailProps) {
         )}
 
         {/* ── Provenance ── */}
-        <div className="mb-4">
+        <ProvenanceDetailSection post={post} />
+        
+        <div className="mt-4">
           <div className="space-y-2">
-            <ProvenanceTag post={post} expanded={true} />
             {!showUpdatePanel && (
               <div className="flex justify-end">
                 <button
@@ -397,14 +432,21 @@ export function PostDetail({ post }: PostDetailProps) {
           </button>
 
           <button
-            className="flex items-center gap-1.5 px-3 py-2 rounded-md text-neutral-500 hover:text-cyan-600 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 transition-all duration-150 text-[12px] font-mono font-medium"
-            aria-label="Boost this post"
+            onClick={() => withAuth(toggleLike)}
+            className={cn(
+              "flex items-center gap-1.5 px-3 py-2 rounded-md transition-all duration-150 text-[12px] font-mono font-medium",
+              userHasLiked 
+                ? "text-magenta-600 bg-magenta-50 dark:bg-magenta-900/20" 
+                : "text-neutral-500 hover:text-magenta-600 hover:bg-magenta-50 dark:hover:bg-magenta-900/20"
+            )}
+            aria-label="Like this post"
           >
-            <ArrowsLeftRight size={16} />
-            <span>Boost</span>
+            <Heart size={16} weight={userHasLiked ? "fill" : "regular"} />
+            <span>{likeCount} Likes</span>
           </button>
 
           <button
+            onClick={() => withAuth(() => {})}
             className="flex items-center gap-1.5 px-3 py-2 rounded-md text-neutral-500 hover:text-magenta-600 hover:bg-magenta-50 dark:hover:bg-magenta-900/20 transition-all duration-150 text-[12px] font-mono font-medium"
             aria-label="Save this post"
           >
@@ -413,6 +455,7 @@ export function PostDetail({ post }: PostDetailProps) {
           </button>
 
           <button
+            onClick={() => withAuth(() => {})}
             className="flex items-center gap-1.5 px-3 py-2 rounded-md text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all duration-150 text-[12px] font-mono font-medium ml-auto"
             aria-label="Share this post"
           >

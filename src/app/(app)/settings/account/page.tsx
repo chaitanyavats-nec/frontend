@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
 import { updateProfile } from "@/lib/queries/users";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { ReputationHistory } from "@/components/features/profile/ReputationHistory";
 
 export default function AccountSettingsPage() {
   const { user } = useAuth();
@@ -197,6 +198,13 @@ export default function AccountSettingsPage() {
             onClick={() => {}} 
           />
         </div>
+      </SettingsSection>
+
+      <SettingsSection 
+        title="Reputation History" 
+        description="A timeline of events that have affected your reputation score. This log is only visible to you."
+      >
+        <ReputationHistory userId={user?.id || ""} />
       </SettingsSection>
 
       <div className="flex justify-end pt-4">

@@ -15,7 +15,7 @@ interface GovernanceProposalProps {
 function TallyBreakdown({ votes }: { votes: DbGovernanceVote[] }) {
   if (!votes || votes.length === 0) return null;
 
-  const tiers = ["steward", "trusted", "established", "new"];
+  const tiers = ["elder", "authority", "established", "trusted", "contributor", "new"];
   const totalWeight = votes.reduce((acc, v) => acc + v.weight, 0);
 
   const breakdown = tiers.map(tier => {
@@ -27,6 +27,15 @@ function TallyBreakdown({ votes }: { votes: DbGovernanceVote[] }) {
     return { tier, weight, count, percent };
   });
 
+  const TIER_COLORS: Record<string, string> = {
+    elder: "text-terracotta bg-terracotta",
+    authority: "text-gold-dark bg-gold-dark",
+    established: "text-gold bg-gold",
+    trusted: "text-sage bg-sage",
+    contributor: "text-sage-light bg-sage-light",
+    new: "text-slate bg-slate",
+  };
+
   return (
     <div className="space-y-4 pt-6 border-t border-paper-dark mt-6">
       <div className="flex items-center justify-between">
@@ -37,13 +46,7 @@ function TallyBreakdown({ votes }: { votes: DbGovernanceVote[] }) {
         {breakdown.map(({ tier, weight, count, percent }) => (
           <div key={tier} className="space-y-1.5">
             <div className="flex justify-between items-end text-[10px] font-mono uppercase tracking-widest px-0.5">
-              <span className={cn(
-                "font-bold",
-                tier === 'steward' && "text-ink",
-                tier === 'trusted' && "text-slate-dark",
-                tier === 'established' && "text-slate",
-                tier === 'new' && "text-slate-light"
-              )}>
+              <span className={cn("font-bold", TIER_COLORS[tier].split(' ')[0])}>
                 {tier}s <span className="font-medium opacity-60">({count} votes)</span>
               </span>
               <span className="font-bold">{Math.round(percent)}%</span>
@@ -52,10 +55,7 @@ function TallyBreakdown({ votes }: { votes: DbGovernanceVote[] }) {
               <div 
                 className={cn(
                   "h-full transition-all duration-1000 ease-out",
-                  tier === 'steward' && "bg-ink",
-                  tier === 'trusted' && "bg-slate-dark",
-                  tier === 'established' && "bg-slate",
-                  tier === 'new' && "bg-slate-light"
+                  TIER_COLORS[tier].split(' ')[1]
                 )}
                 style={{ width: `${percent}%` }}
               />

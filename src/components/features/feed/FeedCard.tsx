@@ -17,10 +17,12 @@ import {
   CheckCircle,
   ShieldCheck,
   Quotes,
+  Heart,
   LinkSimple as LinkIcon,
 } from 'phosphor-react';
 import { QuotedPost } from './QuotedPost';
 import { MediaGrid } from './MediaGrid';
+import { ReputationBadge } from '../profile/ReputationBadge';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useInteractions } from '@/hooks/useInteractions';
@@ -41,7 +43,15 @@ interface FeedCardProps {
   isReply?: boolean;
 }
 
+import { PROVENANCE_CONFIG, getHealthColor } from '@/lib/provenance-config';
+import { useProvenance } from '@/hooks/useProvenance';
+
 export function FeedCard({ post, isReply = false }: FeedCardProps) {
+  const summary = useProvenance(post);
+  const type = (post.source_type || "original") as string;
+  const config = PROVENANCE_CONFIG[type] || PROVENANCE_CONFIG.original;
+  const healthColor = getHealthColor(summary.health_score);
+
   const router = useRouter();
   const { user } = useAuth();
   const { open: openAuthModal } = useAuthModalStore();
@@ -88,19 +98,20 @@ export function FeedCard({ post, isReply = false }: FeedCardProps) {
     <article
       onClick={handleCardClick}
       className={cn(
-        'group transition-all duration-150 overflow-hidden cursor-pointer',
+        'group transition-all duration-150 overflow-hidden cursor-pointer relative',
         isReply
           ? 'border-l-2 border-cyan-500/20 pl-3 py-3 pr-4 hover:bg-cyan-500/5'
-          : 'bg-paper-raised rounded-md border border-[var(--border-subtle)] hover:border-[var(--border-default)] hover:shadow-sm'
+          : 'bg-paper-raised rounded-md border border-[var(--border-subtle)] hover:border-[var(--border-default)] hover:shadow-sm shadow-sm mb-3'
       )}
     >
-      {/* Top accent bar */}
+      {/* ── Provenance Health Bar (3px) ── */}
       {!isReply && (
-        <div className="h-px flex w-full opacity-60 group-hover:opacity-100 transition-opacity">
-          <div className="flex-1 bg-cyan-400" />
-          <div className="flex-1 bg-magenta-400" />
-          <div className="flex-1 bg-yellow-400" />
-        </div>
+        <div 
+          className="absolute top-0 left-0 right-0 h-[3px] sm:h-[4px] transition-all duration-300 z-10"
+          style={{ 
+            backgroundColor: healthColor,
+          }}
+        />
       )}
 
       <div className={cn("p-3 sm:p-4", isReply && "p-0")}>
@@ -124,7 +135,7 @@ export function FeedCard({ post, isReply = false }: FeedCardProps) {
 
           <div className="flex-1 min-w-0">
             {/* ── Header Row ── */}
-            <div className="flex items-center justify-between gap-2 mb-1">
+            <div className="flex items-center justify-between gap-2 mb-0.5">
               <div className="flex items-center gap-2 min-w-0 flex-1">
                 <Link
                   href={`/profile/${post.author.did}`}
@@ -133,19 +144,25 @@ export function FeedCard({ post, isReply = false }: FeedCardProps) {
                 >
                   {post.author?.display_name || "Unknown Author"}
                 </Link>
+
+                {/* NEW Badge */}
+                {new Date(post.created_at).getTime() > Date.now() - 24 * 60 * 60 * 1000 && (
+                  <span className="text-[10px] font-mono font-black text-cyan-600 dark:text-cyan-400 uppercase tracking-tighter px-1">NEW</span>
+                )}
+
+                <ReputationBadge 
+                  level={post.author.ladder_level} 
+                  score={post.author.reputation_total} 
+                  size="sm" 
+                  showScore={false} 
+                />
                 {post.coordination_survived && (
                   <ShieldCheck size={14} className="text-teal shrink-0" weight="fill" />
                 )}
                 <span className="text-neutral-300 dark:text-neutral-700 shrink-0">·</span>
-                <div className="flex items-center gap-1.5 min-w-0">
-                  <span className="hidden sm:inline font-mono text-[10px] text-neutral-400 truncate shrink min-w-0">
-                    {post.author.did || 'did:agora:unknown'}
-                  </span>
-                  <span className="hidden sm:inline text-neutral-300 dark:text-neutral-700 shrink-0">·</span>
-                  <time className="text-[10px] font-mono text-neutral-400 shrink-0">
-                    {getRelativeTime(post.created_at)}
-                  </time>
-                </div>
+                <time className="text-[10px] font-mono text-neutral-400 shrink-0">
+                  {getRelativeTime(post.created_at)}
+                </time>
               </div>
 
                 <DropdownMenu>
@@ -190,6 +207,7 @@ export function FeedCard({ post, isReply = false }: FeedCardProps) {
 
 
 
+
             {/* ── Content Body ── */}
             <div className="mb-3">
               <div
@@ -219,7 +237,7 @@ export function FeedCard({ post, isReply = false }: FeedCardProps) {
 
             {/* ── Quoted Post ── */}
             {post.quoted_post && post.quoted_post.id && (
-              <div onClick={(e) => { e.stopPropagation(); router.push(`/post/${post.quoted_post.id}`); }}>
+              <div onClick={(e) => { e.stopPropagation(); if (post.quoted_post?.id) router.push(`/post/${post.quoted_post.id}`); }}>
                 <QuotedPost post={post.quoted_post} />
               </div>
             )}
@@ -289,43 +307,47 @@ export function FeedCard({ post, isReply = false }: FeedCardProps) {
             )}
 
             {/* ── Action Footer ── */}
-            <div className="flex items-center justify-between pt-2 border-t border-[var(--border-subtle)]">
-              <span className="text-[10px] font-mono text-neutral-400 truncate max-w-[80px] sm:max-w-[160px]">
-                {post.origin_label || 'agora.io'}
-              </span>
- 
-              <div className="flex items-center gap-0.5">
+            <div className="flex items-center justify-between pt-3 mt-1">
+              <div className="flex items-center bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-full px-1 py-0.5 shadow-sm">
                 <button
                   onClick={(e) => { e.stopPropagation(); withAuth(() => {}); }}
-                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-md text-[11px] text-[var(--text-tertiary)] hover:text-cyan-400 hover:bg-cyan-500/10 transition-all"
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] text-[var(--text-tertiary)] hover:text-cyan-400 hover:bg-cyan-500/5 transition-all active:scale-95"
                   aria-label={`${post.reply_count || 0} replies`}
                 >
-                  <ChatCircle size={15} />
-                  <span>{post.reply_count || 0}</span>
+                  <ChatCircle size={14} />
+                  <span className="font-bold">{post.reply_count || 0}</span>
                 </button>
  
+                <div className="w-[1px] h-3 bg-neutral-200 dark:bg-neutral-800 mx-0.5" />
+
                 <button
                   onClick={(e) => { e.stopPropagation(); withAuth(toggleLike); }}
                   className={cn(
-                    "flex items-center gap-1 px-2.5 py-1.5 rounded-md text-[11px] transition-all",
+                    "flex items-center gap-1.5 px-2.5 py-1 rounded-full transition-all active:scale-95 text-[11px]",
                     userHasLiked
-                      ? "text-magenta-400 bg-magenta-500/10"
-                      : "text-[var(--text-tertiary)] hover:text-magenta-400 hover:bg-magenta-500/10"
+                      ? "text-magenta-500 bg-magenta-500/5"
+                      : "text-[var(--text-tertiary)] hover:text-magenta-500 hover:bg-magenta-500/5"
                   )}
-                  aria-label={`${likeCount} boosts`}
+                  aria-label={`${likeCount} likes`}
                 >
-                  <ArrowUpRight size={15} weight={userHasLiked ? "bold" : "regular"} />
-                  <span>{likeCount}</span>
+                  <Heart size={14} weight={userHasLiked ? "fill" : "regular"} />
+                  <span className="font-bold">{likeCount}</span>
                 </button>
+
+                <div className="w-[1px] h-3 bg-neutral-200 dark:bg-neutral-800 mx-0.5" />
 
                 <button
                   onClick={(e) => { e.stopPropagation(); withAuth(() => { router.push(`/post/${post.id}?quote=true`); }); }}
-                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-md text-[11px] text-[var(--text-tertiary)] hover:text-cyan-400 hover:bg-cyan-500/10 transition-all"
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] text-[var(--text-tertiary)] hover:text-cyan-400 hover:bg-cyan-500/5 transition-all active:scale-95"
                   aria-label="Quote post"
                 >
-                  <Quotes size={15} />
+                  <Quotes size={14} />
                 </button>
               </div>
+
+              <span className="text-[11px] font-sans text-neutral-400 opacity-60">
+                {post.origin_label || 'agora.io'}
+              </span>
             </div>
           </div>
         </div>

@@ -7,15 +7,15 @@
 @layer base {
   :root {
     /* ── NEUTRAL BASE (warm-neutral, barely tinted) ── */
-    --n-50: #F7F6F4;
-    --n-100: #EDECEA;
-    --n-200: #DDDCDA;
-    --n-300: #C8C7C4;
-    --n-400: #A9A8A5;
-    --n-500: #8A8986;
-    --n-600: #6B6A68;
-    --n-700: #4E4D4B;
-    --n-800: #323130;
+    --n-50: #FBFBFA;
+    --n-100: #F5F4F2;
+    --n-200: #EAE9E7;
+    --n-300: #DAD9D6;
+    --n-400: #BDBBB8;
+    --n-500: #9E9C99;
+    --n-600: #7F7D7A;
+    --n-700: #61605E;
+    --n-800: #424140;
     --n-900: #1A1918;
 
     /* ── CMY PRIMARY PLATES (Converted to RGB for Tailwind) ── */
@@ -66,19 +66,19 @@
     --in-50: 232 241 253;
 
     /* ── APPLIED TOKENS ── */
-    --bg-page: var(--n-50);
-    --bg-surface: var(--n-100);
+    --bg-page: #FFFFFF;
+    --bg-surface: var(--n-50);
     --bg-raised: #FFFFFF;
-    --bg-sunken: var(--n-200);
+    --bg-sunken: var(--n-100);
 
     --text-primary: var(--n-900);
     --text-secondary: var(--n-600);
-    --text-tertiary: var(--n-400);
-    --text-disabled: var(--n-300);
+    --text-tertiary: var(--n-500);
+    --text-disabled: var(--n-400);
 
-    --border-subtle: var(--n-200);
-    --border-default: var(--n-300);
-    --border-strong: var(--n-600);
+    --border-subtle: var(--n-100);
+    --border-default: var(--n-200);
+    --border-strong: var(--n-500);
 
     /* Fonts — single UI font + display font */
     --font-serif: 'Sentient', Georgia, serif;

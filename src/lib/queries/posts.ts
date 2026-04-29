@@ -129,5 +129,6 @@ export function getProvenanceSummary(post: PostWithProvenance): ProvenanceSummar
     primary_affiliation: post.author_affiliations?.[0]?.organization_name || null,
     is_on_chain: post.provenance_tx_hash !== null,
     is_ipfs_stored: post.ipfs_cid !== null,
+    health_score: post.trust_score || 0,
   };
 }

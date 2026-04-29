@@ -68,7 +68,7 @@ export function AppNav() {
   return (
     <>
       {/* Mobile Top Bar */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-neutral-50/95 dark:bg-neutral-900/95 backdrop-blur-md z-40 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between px-4">
+      <div className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-white dark:bg-neutral-950 z-40 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between px-4">
         {/* Left: Profile Icon */}
         <Link href={user ? "/profile/me" : "/welcome"} className="shrink-0">
           <UserCircle size={26} className="text-neutral-400 dark:text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-50" weight={pathname === "/profile/me" ? "fill" : "regular"} />
@@ -133,7 +133,7 @@ export function AppNav() {
       </div>
 
       {/* Desktop Sidebar - Presswork Style (Expanding on Hover) */}
-      <aside className="hidden lg:flex lg:flex-col lg:w-20 hover:lg:w-64 lg:fixed lg:top-0 lg:bottom-0 lg:left-0 z-[100] bg-neutral-50 dark:bg-neutral-900 items-start py-8 transition-all duration-300 group/sidebar overflow-hidden">
+      <aside className="hidden lg:flex lg:flex-col lg:w-20 hover:lg:w-64 lg:fixed lg:top-0 lg:bottom-0 lg:left-0 z-[100] bg-white dark:bg-neutral-950 items-start py-8 transition-all duration-300 group/sidebar overflow-hidden border-r border-neutral-200 dark:border-neutral-800">
         {/* Top: Logo Mark (Presswork Signature) */}
         <div className="mb-8 px-4 w-full h-12 flex items-center">
           <Link href="/home" className="relative flex items-center justify-center w-12 h-12 shrink-0">
@@ -236,7 +236,7 @@ export function AppNav() {
 
       {/* Mobile Bottom Bar - Presswork Style */}
       <nav
-        className="lg:hidden fixed bottom-0 left-0 right-0 bg-neutral-50/95 dark:bg-neutral-900/95 backdrop-blur-md z-40 border-t border-neutral-200 dark:border-neutral-800 pb-safe"
+        className="lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-neutral-950 z-40 border-t border-neutral-200 dark:border-neutral-800 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.05)]"
         role="navigation"
         aria-label="Mobile navigation"
       >
