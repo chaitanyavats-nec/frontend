@@ -33,115 +33,128 @@ export function RightSidebar() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-6 py-8 h-fit">
+    <div className="flex flex-col gap-5 py-8 h-fit">
       {/* Search Bar & Theme Toggle */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2.5">
         <div className="relative group flex-1">
           <MagnifyingGlass
             size={18}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-neutral-500 transition-colors group-focus-within:text-cyan-500"
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-neutral-500 transition-colors group-focus-within:text-cyan-500 dark:group-focus-within:text-cyan-400"
           />
           <input
             type="text"
             placeholder="Search Agora..."
-            className="w-full bg-neutral-100 dark:bg-neutral-800/10 hover:bg-neutral-200 dark:hover:bg-neutral-800 focus:bg-neutral-50 dark:focus:bg-neutral-900 border-none rounded-md py-2.5 pl-10 pr-4 text-sm font-sans transition-all focus:ring-2 focus:ring-cyan-500/20 outline-none text-neutral-900 dark:text-neutral-100"
+            className="w-full bg-white dark:bg-[#141312] border border-neutral-200/80 dark:border-white/[0.08] rounded-full py-2.5 pl-11 pr-4 text-sm font-sans transition-all focus:ring-2 focus:ring-[#2ec4bb]/10 focus:border-[#2ec4bb]/50 outline-none text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-500 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] dark:shadow-none"
           />
         </div>
 
         {mounted && (
           <button
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="p-2.5 rounded-md bg-neutral-100 dark:bg-neutral-800/50 text-neutral-500 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-neutral-100 transition-all border border-transparent hover:border-neutral-300 dark:hover:border-neutral-700 shadow-sm"
+            className="p-2.5 rounded-full bg-white dark:bg-[#141312] text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 border border-neutral-200/80 dark:border-white/[0.08] shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] dark:shadow-none transition-all"
             aria-label="Toggle Theme"
           >
-            {theme === "dark" ? <Sun size={20} weight="bold" /> : <Moon size={20} weight="bold" />}
+            {theme === "dark" ? <Sun size={20} weight="regular" /> : <Moon size={20} weight="regular" />}
           </button>
         )}
       </div>
 
-
       {/* Today's News */}
-      <section className="bg-surface/50 rounded-2xl border border-paper-dark/50 overflow-hidden">
-        <div className="px-4 py-3 border-b border-paper-dark/50 flex items-center gap-2">
-          <Newspaper weight="bold" className="text-teal" size={18} />
-          <h2 className="font-editorial text-lg font-bold text-ink">Today&apos;s News</h2>
+      <section className="bg-white dark:bg-[#141312] border border-neutral-200/80 dark:border-white/[0.08] rounded-[14px] shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] dark:shadow-none overflow-hidden">
+        <div className="px-4 py-3.5 border-b border-neutral-100 dark:border-white/[0.05] flex items-center gap-2.5">
+          <Newspaper weight="regular" className="text-cyan-600 dark:text-[#2ec4bb]" size={20} />
+          <h2 className="font-editorial text-[17px] font-bold text-neutral-900 dark:text-[#EAE9E7] tracking-tight">Today&apos;s News</h2>
         </div>
-        <div className="flex flex-col">
+        <div className="flex flex-col gap-4 px-4 pt-4 pb-4">
           {newsItems.map((news, i) => (
             <button
               key={i}
-              className="px-4 py-3 text-left hover:bg-paper-dark/30 transition-colors border-b last:border-0 border-paper-dark/30 group"
+              className="group text-left flex flex-col transition-all"
             >
-              <p className="text-[11px] font-mono uppercase tracking-wider text-slate mb-1">{news.source} • {news.time}</p>
-              <h3 className="text-sm font-bold text-ink leading-tight group-hover:text-teal transition-colors">{news.title}</h3>
+              <div className="text-[10px] font-sans text-neutral-500 dark:text-neutral-500 uppercase tracking-widest mb-1 flex items-center gap-1.5">
+                <span>{news.source.toUpperCase()}</span>
+                <span className="text-[8px] text-neutral-400 dark:text-[#444]">•</span>
+                <span>{news.time.toUpperCase()}</span>
+              </div>
+              <h3 className="text-[13px] leading-snug font-bold text-neutral-900 dark:text-[#EAE9E7] group-hover:text-[#2ec4bb] transition-colors">
+                {news.title}
+              </h3>
             </button>
           ))}
+          <button className="w-full mt-2 py-2.5 text-[12px] font-bold text-cyan-600 dark:text-[#2ec4bb] bg-neutral-50/80 dark:bg-white/[0.05] hover:bg-neutral-100 dark:hover:bg-white/[0.08] rounded-xl transition-colors">
+            Show more
+          </button>
         </div>
-        <button className="w-full py-3 text-xs font-bold text-teal hover:bg-teal/5 transition-colors">
-          Show more
-        </button>
       </section>
 
       {/* Trending */}
-      <section className="bg-surface/50 rounded-2xl border border-paper-dark/50 overflow-hidden">
-        <div className="px-4 py-3 border-b border-paper-dark/50 flex items-center gap-2">
-          <TrendUp weight="bold" className="text-orange" size={18} />
-          <h2 className="font-editorial text-lg font-bold text-ink">Trending</h2>
+      <section className="bg-white dark:bg-[#141312] border border-neutral-200/80 dark:border-white/[0.08] rounded-[14px] shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] dark:shadow-none overflow-hidden">
+        <div className="px-4 py-3.5 border-b border-neutral-100 dark:border-white/[0.05] flex items-center gap-2.5">
+          <TrendUp weight="regular" className="text-cyan-600 dark:text-[#2ec4bb]" size={20} />
+          <h2 className="font-editorial text-[17px] font-bold text-neutral-900 dark:text-[#EAE9E7] tracking-tight">Trending</h2>
         </div>
-        <div className="flex flex-col">
+        <div className="flex flex-col gap-4 px-4 pt-4 pb-4">
           {trendingTopics.map((trend, i) => (
             <button
               key={i}
-              className="px-4 py-3 text-left hover:bg-paper-dark/30 transition-colors border-b last:border-0 border-paper-dark/30"
+              className="group text-left flex flex-col transition-all"
             >
-              <p className="text-[10px] font-bold text-slate/60 uppercase tracking-tighter">{trend.category}</p>
-              <h3 className="text-sm font-bold text-ink mb-0.5">{trend.topic}</h3>
-              <p className="text-[11px] text-slate">{trend.volume}</p>
+              <div className="text-[10px] font-sans text-neutral-500 dark:text-neutral-500 uppercase tracking-widest mb-1">
+                {trend.category.toUpperCase()}
+              </div>
+              <h3 className="text-[13px] leading-snug font-bold text-neutral-900 dark:text-[#EAE9E7] group-hover:text-[#2ec4bb] transition-colors mb-0.5">
+                {trend.topic}
+              </h3>
+              <div className="text-[11px] text-neutral-500 dark:text-[#555] font-medium">
+                {trend.volume}
+              </div>
             </button>
           ))}
+          <button className="w-full mt-2 py-2.5 text-[12px] font-bold text-cyan-600 dark:text-[#2ec4bb] bg-neutral-50/80 dark:bg-white/[0.05] hover:bg-neutral-100 dark:hover:bg-white/[0.08] rounded-xl transition-colors">
+            Show more
+          </button>
         </div>
-        <button className="w-full py-3 text-xs font-bold text-teal hover:bg-teal/5 transition-colors">
-          Show more
-        </button>
       </section>
 
       {/* Who to follow */}
-      <section className="bg-surface/50 rounded-2xl border border-paper-dark/50 overflow-hidden">
-        <div className="px-4 py-3 border-b border-paper-dark/50 flex items-center gap-2">
-          <UserPlus weight="bold" className="text-ink" size={18} />
-          <h2 className="font-editorial text-lg font-bold text-ink">Connect</h2>
+      <section className="bg-white dark:bg-[#141312] border border-neutral-200/80 dark:border-white/[0.08] rounded-[14px] shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] dark:shadow-none overflow-hidden">
+        <div className="px-4 py-3.5 border-b border-neutral-100 dark:border-white/[0.05] flex items-center gap-2.5">
+          <UserPlus weight="regular" className="text-cyan-600 dark:text-[#2ec4bb]" size={20} />
+          <h2 className="font-editorial text-[17px] font-bold text-neutral-900 dark:text-[#EAE9E7] tracking-tight">Connect</h2>
         </div>
-        <div className="flex flex-col">
+        <div className="flex flex-col gap-4 px-4 pt-4 pb-4">
           {recommendFollows.map((user, i) => (
             <div
               key={i}
-              className="px-4 py-3 flex items-start gap-3 hover:bg-paper-dark/30 transition-colors border-b last:border-0 border-paper-dark/30"
+              className="flex items-center gap-3 group"
             >
-              <div className="w-10 h-10 rounded-full bg-paper-dark flex items-center justify-center text-slate font-bold shrink-0 shadow-inner">
+              <div className="w-9 h-9 rounded-full bg-neutral-100 dark:bg-[#1A1918] flex items-center justify-center text-neutral-700 dark:text-[#EAE9E7] text-xs font-bold shrink-0 border border-neutral-200/80 dark:border-white/[0.08]">
                 {user.name.charAt(0)}
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-bold text-ink truncate">{user.name}</h3>
-                <p className="text-xs text-slate truncate">{user.handle}</p>
+                <h3 className="text-[13px] leading-snug font-bold text-neutral-900 dark:text-[#EAE9E7] truncate group-hover:text-[#2ec4bb] transition-colors">
+                  {user.name}
+                </h3>
+                <p className="text-[10px] text-neutral-500 dark:text-[#555] truncate">{user.handle}</p>
               </div>
-              <Button size="sm" variant="outline" className="h-8 rounded-full px-4 text-xs font-bold border-teal text-teal hover:bg-teal/5">
+              <Button size="sm" variant="outline" className="h-[26px] rounded-full px-3 text-[9px] uppercase tracking-widest font-bold border-neutral-200/80 dark:border-white/[0.08] text-cyan-600 dark:text-[#2ec4bb] bg-transparent hover:bg-neutral-50 dark:hover:bg-white/[0.05] transition-colors">
                 Follow
               </Button>
             </div>
           ))}
+          <button className="w-full mt-2 py-2.5 text-[12px] font-bold text-cyan-600 dark:text-[#2ec4bb] bg-neutral-50/80 dark:bg-white/[0.05] hover:bg-neutral-100 dark:hover:bg-white/[0.08] rounded-xl transition-colors">
+            Show more
+          </button>
         </div>
-        <button className="w-full py-3 text-xs font-bold text-teal hover:bg-teal/5 transition-colors">
-          Show more
-        </button>
       </section>
 
       {/* Footer Links */}
       <footer className="px-4 pb-8">
-        <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-slate/60 font-medium">
-          <a href="#" className="hover:underline">Terms of Service</a>
-          <a href="#" className="hover:underline">Privacy Policy</a>
-          <a href="#" className="hover:underline">Cookie Policy</a>
-          <a href="#" className="hover:underline">Transparency</a>
+        <div className="flex flex-wrap gap-x-3 gap-y-1.5 text-[10px] text-neutral-400 dark:text-[#555] font-medium">
+          <a href="#" className="hover:underline hover:text-[#EAE9E7] transition-colors">Terms of Service</a>
+          <a href="#" className="hover:underline hover:text-[#EAE9E7] transition-colors">Privacy Policy</a>
+          <a href="#" className="hover:underline hover:text-[#EAE9E7] transition-colors">Cookie Policy</a>
+          <a href="#" className="hover:underline hover:text-[#EAE9E7] transition-colors">Transparency</a>
           <span>© 2026 AGORA</span>
         </div>
       </footer>
