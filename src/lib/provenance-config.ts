@@ -4,7 +4,7 @@
  * Centralised configuration for the Five Post Types by Information Sourcing.
  */
 
-import { Megaphone, FileText, Bank, HandCoin, ShareNetwork } from "phosphor-react";
+import { Megaphone, FileText, Bank, CurrencyDollar, ShareNetwork } from "phosphor-react";
 
 export const PROVENANCE_TYPES = {
   ORIGINAL: "original",
@@ -59,7 +59,7 @@ export const PROVENANCE_CONFIG: Record<string, ProvenanceConfig> = {
     textColor: "text-[#C53030]", // Terracotta
     bgColor: "bg-[#FFF5F5]",
     borderColor: "border-[#C53030]/20",
-    icon: HandCoin,
+    icon: CurrencyDollar,
     shortDescription: "Produced with financial support.",
     description: "The content was produced with financial support from a named funder — a grant, a commission, a sponsorship, or an employment relationship.",
   },

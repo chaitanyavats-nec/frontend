@@ -17,7 +17,7 @@ import {
   Warning,
   Link as LinkIcon,
   TreeStructure,
-  Certificate
+  CheckCircle
 } from "phosphor-react";
 
 export default function ProvenancePage() {

@@ -6,7 +6,7 @@ import type { PostWithProvenance } from "@/types";
 import { cn } from "@/lib/utils";
 import { 
   FileText, 
-  HandCoin, 
+  CurrencyDollar, 
   Bank, 
   ShareNetwork, 
   Warning, 

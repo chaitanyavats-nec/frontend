@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Warning, Eye, Link as LinkIcon, FileText, Bank, HandCoin, ShareNetwork, Flag } from "phosphor-react";
+import { ArrowRight, Warning, Eye, Link as LinkIcon, FileText, Bank, CurrencyDollar, ShareNetwork, Flag } from "phosphor-react";
 import { ReputationBadge } from "../profile/ReputationBadge";
 import { cn } from "@/lib/utils";
 import { useProvenance } from "@/hooks/useProvenance";
@@ -15,6 +15,14 @@ const updateTypeConfig: Record<string, { label: string; classes: string }> = {
   addition: { label: "Addition", classes: "bg-blue-50 text-blue-600 border-blue-200" },
   dispute: { label: "Dispute", classes: "bg-orange-50 text-orange-600 border-orange-200" },
   verification: { label: "Verified", classes: "bg-teal-50 text-teal-600 border-teal-200" },
+};
+
+const sourceTypeConfig: Record<string, { label: string; pillClasses: string }> = {
+  original: { label: "Original", pillClasses: "bg-[#F0F4F1] text-[#4B634E] border-[#4B634E]/20" },
+  derived: { label: "Derived", pillClasses: "bg-[#EDF2F7] text-[#4A5568] border-[#4A5568]/20" },
+  institutional: { label: "Institutional", pillClasses: "bg-[#FEF9E7] text-[#B7791F] border-[#B7791F]/20" },
+  funded: { label: "Funded", pillClasses: "bg-[#FFF5F5] text-[#C53030] border-[#C53030]/20" },
+  amplified: { label: "Amplified", pillClasses: "bg-[#F7FAFC] text-[#718096] border-[#718096]/20" },
 };
 
 interface ProvenanceTagProps {
