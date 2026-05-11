@@ -160,6 +160,7 @@ export async function getRepliesByPostId(postId: string): Promise<PostWithProven
  * Pure function to derive a ProvenanceSummary from a PostWithProvenance object.
  */
 export function getProvenanceSummary(post: PostWithProvenance): ProvenanceSummary {
+  const isDerivedNoLink = post.source_type === "derived" && !post.origin_url;
   return {
     source_type: post.source_type,
     origin_label: post.origin_label,
@@ -170,6 +171,6 @@ export function getProvenanceSummary(post: PostWithProvenance): ProvenanceSummar
     primary_affiliation: post.author_affiliations?.[0]?.organization_name || null,
     is_on_chain: post.provenance_tx_hash !== null,
     is_ipfs_stored: post.ipfs_cid !== null,
-    health_score: post.trust_score || 0,
+    health_score: isDerivedNoLink ? 0 : (post.trust_score || 0),
   };
 }

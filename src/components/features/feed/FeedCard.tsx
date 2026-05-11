@@ -49,12 +49,95 @@ interface FeedCardProps {
   isReply?: boolean;
 }
 
+function getSemanticMetrics(post: any) {
+  // 1. Source Health (first bar)
+  let sourceScore = 100;
+  const isDerivedNoLink = post.source_type === "derived" && !post.origin_url;
+  if (isDerivedNoLink) {
+    sourceScore = 0; // Derived with no link is critical red!
+  } else {
+    if (post.coordination_flagged) sourceScore -= 40;
+    if (post.funding_type === "commissioned" || post.funding_type === "institutional") sourceScore -= 15;
+    if (post.citations && post.citations.length > 0) sourceScore += 20;
+    if (post.ipfs_cid || post.content_signature) sourceScore += 10;
+    sourceScore = Math.min(100, Math.max(0, sourceScore));
+  }
+
+  let sourceColor = "bg-[#10b981]"; // Green
+  let sourceTooltip = "Verified Source Chain";
+  if (sourceScore < 40) {
+    sourceColor = "bg-[#ef4444]"; // Red
+    sourceTooltip = "Unverified or Missing Source Link";
+  } else if (sourceScore < 75) {
+    sourceColor = "bg-[#f59e0b]"; // Amber
+    sourceTooltip = "Partially Disclosed Source Chain";
+  }
+
+  // 2. Post Faithfulness (second bar)
+  let faithScore = 100;
+  if (post.has_disputed_framing) faithScore -= 50;
+  if (post.coordination_flagged) faithScore -= 40;
+  if (post.context_completeness !== undefined && post.context_completeness !== null) {
+    faithScore = Math.min(faithScore, post.context_completeness * 100);
+  }
+  if (post.provenance_updates && post.provenance_updates.length > 0) {
+    const disputes = post.provenance_updates.filter((u: any) => u.update_type === "misleading_framing" || u.update_type === "incomplete_provenance");
+    faithScore -= disputes.length * 25;
+  }
+  faithScore = Math.min(100, Math.max(0, faithScore));
+
+  let faithColor = "bg-[#10b981]"; // Green
+  let faithTooltip = "High Faithfulness (No disputes)";
+  if (faithScore < 45) {
+    faithColor = "bg-[#ef4444]"; // Red
+    faithTooltip = "Low Faithfulness (Active disputes or framing challenges)";
+  } else if (faithScore < 75) {
+    faithColor = "bg-[#f59e0b]"; // Amber
+    faithTooltip = "Moderate Faithfulness (Coordination warnings)";
+  }
+
+  // 3. Profile History Health (third bar)
+  let profileScore = 70;
+  const level = post.author?.ladder_level || "new";
+  const levels: Record<string, number> = {
+    elder: 95,
+    authority: 90,
+    steward: 90,
+    established: 80,
+    trusted: 75,
+    contributor: 55,
+    new: 30
+  };
+  profileScore = levels[level] || 30;
+
+  if (post.author?.reputation_total > 200) profileScore += 10;
+  if (post.author?.reputation_total < 0) profileScore -= 30;
+  profileScore = Math.min(100, Math.max(0, profileScore));
+
+  let profileColor = "bg-[#10b981]"; // Green
+  let profileTooltip = `Trusted Profile History (${level.toUpperCase()})`;
+  if (profileScore < 40) {
+    profileColor = "bg-[#ef4444]"; // Red
+    profileTooltip = `Unverified Profile History (${level.toUpperCase()})`;
+  } else if (profileScore < 75) {
+    profileColor = "bg-[#f59e0b]"; // Amber
+    profileTooltip = `Contributor Profile History (${level.toUpperCase()})`;
+  }
+
+  return {
+    source: { color: sourceColor, tooltip: sourceTooltip },
+    faith: { color: faithColor, tooltip: faithTooltip },
+    profile: { color: profileColor, tooltip: profileTooltip }
+  };
+}
+
 import { PROVENANCE_CONFIG, getHealthColor } from '@/lib/provenance-config';
 import { useProvenance } from '@/hooks/useProvenance';
 
 export function FeedCard({ post, isReply = false }: FeedCardProps) {
   const [isProvenanceExpanded, setIsProvenanceExpanded] = useState(false);
   const summary = useProvenance(post);
+  const metrics = getSemanticMetrics(post);
   const type = (post.source_type || "original") as string;
   const config = PROVENANCE_CONFIG[type] || PROVENANCE_CONFIG.original;
   const healthColor = getHealthColor(summary.health_score);
@@ -147,13 +230,11 @@ export function FeedCard({ post, isReply = false }: FeedCardProps) {
                   {getRelativeTime(post.created_at)}
                 </time>
               </div>
-              {/* Visual Reputation Squares */}
-              <div className="flex items-center gap-[3px] mt-0.5">
-                <div className="w-2.5 h-2.5 rounded-[2px] bg-danger" />
-                <div className="w-2.5 h-2.5 rounded-[2px] bg-danger" />
-                <div className="w-2.5 h-2.5 rounded-[2px] bg-success" />
-                <div className="w-2.5 h-2.5 rounded-[2px] bg-success" />
-                <div className="w-2.5 h-2.5 rounded-[2px] bg-danger" />
+              {/* Semantic Metric Bars */}
+              <div className="flex items-center gap-[4px] mt-1" onClick={(e) => e.stopPropagation()}>
+                <div className={cn("w-5 h-[3px] rounded-full transition-colors", metrics.source.color)} title={`Source Health: ${metrics.source.tooltip}`} />
+                <div className={cn("w-5 h-[3px] rounded-full transition-colors", metrics.faith.color)} title={`Post Faithfulness: ${metrics.faith.tooltip}`} />
+                <div className={cn("w-5 h-[3px] rounded-full transition-colors", metrics.profile.color)} title={`Profile History: ${metrics.profile.tooltip}`} />
               </div>
             </div>
           </div>

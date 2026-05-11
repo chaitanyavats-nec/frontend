@@ -62,6 +62,12 @@ function CollapsedPill({
   const hasAffiliations = post.author_affiliations?.length > 0;
   const healthColor = getHealthColor(summary.health_score);
 
+  const isDerivedNoLink = type === "derived" && !post.origin_url;
+  const pillBg = isDerivedNoLink ? "bg-[#FFF5F5]" : config.bgColor;
+  const pillText = isDerivedNoLink ? "text-[#C53030]" : config.textColor;
+  const pillBorder = isDerivedNoLink ? "border-[#C53030]/30" : "border-neutral-200 dark:border-neutral-800";
+  const pillLabel = isDerivedNoLink ? "Derived (No Link)" : config.label;
+
   return (
     <div className="flex items-center gap-1.5 flex-wrap">
       <button
@@ -71,14 +77,14 @@ function CollapsedPill({
         }}
         className={cn(
           "inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border font-mono text-[9px] transition-all duration-150 hover:bg-opacity-20 shrink-0",
-          config.bgColor,
-          config.textColor,
-          "border-neutral-200 dark:border-neutral-800"
+          pillBg,
+          pillText,
+          pillBorder
         )}
-        aria-label={`Source: ${config.label}. Click to expand.`}
+        aria-label={`Source: ${pillLabel}. Click to expand.`}
       >
-        <span className="w-1.5 h-1.5 rounded-full bg-current opacity-60" />
-        <span className="font-bold uppercase tracking-widest">{config.label}</span>
+        <span className={cn("w-1.5 h-1.5 rounded-full", isDerivedNoLink ? "bg-[#C53030]" : "bg-current opacity-60")} />
+        <span className="font-bold uppercase tracking-widest">{pillLabel}</span>
       </button>
 
       {showFundedBadge && (

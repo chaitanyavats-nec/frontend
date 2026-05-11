@@ -7,6 +7,8 @@ import { ContributionModal } from "@/components/features/onboarding/Contribution
 import { AuthModal } from "@/components/features/auth/AuthModal";
 import { cn } from "@/lib/utils";
 
+import { SeedUtility } from "@/components/features/admin/SeedUtility";
+
 export default function AppLayout({
   children,
 }: {
@@ -51,6 +53,7 @@ export default function AppLayout({
       </div>
       <ContributionModal />
       <AuthModal />
+      <SeedUtility />
     </div>
   );
 }
