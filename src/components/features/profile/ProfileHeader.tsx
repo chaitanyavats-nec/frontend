@@ -188,25 +188,37 @@ export function ProfileHeader({ profile }: ProfileHeaderProps) {
           </Link>
         </div>
 
-        {/* ── Affiliations (Badges) ── */}
-        {profile.affiliations && profile.affiliations.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-8">
-            {profile.affiliations.map((aff) => (
+        {/* ── Affiliations Section ── */}
+        <div className="space-y-3 mb-8">
+          <h3 className="font-sans text-[10px] font-bold tracking-[0.12em] text-neutral-400 dark:text-neutral-500 uppercase">Affiliations</h3>
+          <div className="flex flex-wrap gap-3 overflow-x-auto pb-1 no-scrollbar">
+            {(profile.affiliations && profile.affiliations.length > 0 ? profile.affiliations : [
+              { id: "mock-1", organization_name: "Vought Intl", role: "Patriot", affiliation_type: "Corporate" },
+              { id: "mock-2", organization_name: "The Seven", role: "Leader", affiliation_type: "Team" },
+              { id: "mock-3", organization_name: "Vought Tower", role: "Resident", affiliation_type: "Institutional" }
+            ]).map((aff) => (
               <div
                 key={aff.id}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-paper-dark/10 hover:bg-paper-dark/20 transition-colors border border-paper-dark/30 rounded-full"
+                className="bg-[#121212] dark:bg-[#121212] border border-[#1e1e1e] rounded-xl px-4 py-3 min-w-[160px] sm:min-w-[180px] flex flex-col justify-between shadow-md"
               >
-                <CheckCircle size={12} className="text-teal shrink-0" weight="fill" />
-                <span className="font-bold text-[10px] text-ink uppercase tracking-widest">
-                  {aff.organization_name}
-                </span>
-                <span className="font-medium text-[8px] text-slate uppercase bg-surface px-1.5 py-0.5 rounded-full border border-paper-dark shadow-sm">
-                  {aff.affiliation_type}
-                </span>
+                <div className="flex items-center justify-between gap-2 border-b border-[#222120] pb-1.5 mb-1.5">
+                  <span className="font-sans font-bold text-neutral-200 text-[11px] uppercase tracking-wider truncate">{aff.organization_name}</span>
+                  <span className="flex h-1.5 w-1.5 rounded-full bg-[#10b981] dark:bg-[#2ec4bb] shrink-0" />
+                </div>
+                <div className="space-y-0.5">
+                  <div className="flex items-center gap-1 text-[9.5px] text-neutral-400 font-sans">
+                    <span className="text-neutral-500 font-bold tracking-wider">ROLE:</span>
+                    <span className="font-medium truncate text-neutral-300">{(aff as any).role || aff.affiliation_type || "Member"}</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-[9.5px] text-neutral-400 font-sans">
+                    <span className="text-neutral-500 font-bold tracking-wider">STATUS:</span>
+                    <span className="font-mono font-bold text-[#10b981] dark:text-[#2ec4bb] text-[9px]">ACTIVE</span>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
-        )}
+        </div>
 
         {/* ── Reputation Meter Integrated ── */}
         <div className="-mx-4 sm:-mx-6 border-t border-paper-dark/30">

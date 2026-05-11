@@ -3,6 +3,26 @@ import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { normalisePost } from "@/lib/normalise";
 
+const POST_ENRICHED_SELECT = `
+  *,
+  author:profiles(
+    *,
+    affiliations(*)
+  ),
+  citations(*),
+  provenance_updates(
+    *,
+    user:profiles(*)
+  ),
+  quoted_post:quoted_post_id(
+    *,
+    author:profiles(
+      *,
+      affiliations(*)
+    )
+  )
+`;
+
 export function usePosts() {
   const supabase = createClient();
   const router = useRouter();
@@ -15,10 +35,7 @@ export function usePosts() {
 
       const { data, error } = await supabase
         .from("posts")
-        .select(`
-          *,
-          author:profiles(*)
-        `)
+        .select(POST_ENRICHED_SELECT)
         .order("created_at", { ascending: false });
       
       if (error) throw error;
@@ -86,11 +103,29 @@ export function usePosts() {
     },
   });
 
+  const deletePostMutation = useMutation({
+    mutationFn: async (postId: string) => {
+      const { error } = await supabase
+        .from("posts")
+        .delete()
+        .eq("id", postId);
+      if (error) throw error;
+      return postId;
+    },
+    onSuccess: (postId) => {
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({ queryKey: ["feed"] });
+      queryClient.invalidateQueries({ queryKey: ["post", postId] });
+    },
+  });
+
   return {
     posts,
     isPostsLoading,
     createPost: createPostMutation.mutateAsync,
     isCreating: createPostMutation.isPending,
     createError: createPostMutation.error,
+    deletePost: deletePostMutation.mutateAsync,
+    isDeleting: deletePostMutation.isPending,
   };
 }

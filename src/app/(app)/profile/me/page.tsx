@@ -9,11 +9,15 @@ import { FeedCard } from "@/components/features/feed/FeedCard";
 import { Users } from "phosphor-react";
 import { createClient } from "@/utils/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { FeedControls, HealthFilter, SortOption } from "@/components/features/feed/FeedControls";
+import { useState } from "react";
 
 export default function MyProfilePage() {
   const { user, isLoading: isAuthLoading } = useAuth();
   const { profile, loading: isProfileLoading, error: profileError } = useProfile(user?.id || "");
   const { posts, loading: isPostsLoading } = useFeed("chronological");
+  const [healthFilter, setHealthFilter] = useState<HealthFilter>("all");
+  const [sortOption, setSortOption] = useState<SortOption>("newest");
 
   if (isAuthLoading || isProfileLoading) {
     return (
@@ -105,7 +109,30 @@ export default function MyProfilePage() {
   }
 
   // Get posts by this user
-  const myPosts = posts?.filter((p) => p.author.did === profile.did) || [];
+  let myPosts = posts?.filter((p) => p.author.did === profile.did) || [];
+
+  // Apply Health Filtering
+  if (healthFilter === "high") {
+    myPosts = myPosts.filter((p) => (p.trust_score ?? 0) >= 80);
+  } else if (healthFilter === "standard") {
+    myPosts = myPosts.filter((p) => (p.trust_score ?? 0) >= 50);
+  } else if (healthFilter === "unverified") {
+    myPosts = myPosts.filter((p) => (p.trust_score ?? 0) < 50);
+  }
+
+  // Apply Sorting
+  myPosts.sort((a, b) => {
+    if (sortOption === "newest") {
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    } else if (sortOption === "oldest") {
+      return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+    } else if (sortOption === "highest-health") {
+      return (b.trust_score ?? 0) - (a.trust_score ?? 0);
+    } else if (sortOption === "lowest-health") {
+      return (a.trust_score ?? 0) - (b.trust_score ?? 0);
+    }
+    return 0;
+  });
 
   // Construct reputation score for sub-component
   const reputationScore = {
@@ -129,6 +156,15 @@ export default function MyProfilePage() {
             <h2 className="font-sans font-semibold text-lg text-ink mb-4 tracking-tight">
               Recent Posts
             </h2>
+
+            <FeedControls
+              healthFilter={healthFilter}
+              setHealthFilter={setHealthFilter}
+              sortOption={sortOption}
+              setSortOption={setSortOption}
+              postCount={myPosts.length}
+            />
+
             {isPostsLoading ? (
               <div className="space-y-4">
                 {[1, 2].map(i => <div key={i} className="h-40 bg-surface rounded-xl animate-pulse border border-paper-dark" />)}

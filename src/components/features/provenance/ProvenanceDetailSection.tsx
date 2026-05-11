@@ -163,12 +163,47 @@ function FundedFields({ post, summary }: { post: PostWithProvenance, summary: an
 }
 
 function AmplifiedFields({ post, summary }: { post: PostWithProvenance, summary: any }) {
+  const getLineageChain = (p: any): any[] => {
+    const chain = [];
+    let current = p.quoted_post;
+    while (current) {
+      chain.push(current);
+      current = current.quoted_post;
+    }
+    return chain;
+  };
+
+  const lineage = getLineageChain(post);
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <Field label="Content Type" value="Amplification of existing content" />
-      <Field label="Original Author" value={post.quoted_post?.author.display_name || "Unknown"} prominent />
       <Field label="Relationship" value="Quote with commentary" />
       <Field label="Network Analysis" value={summary.has_coordination_flag ? "Coordinated pattern detected" : "Organic distribution"} />
+
+      {lineage.length > 0 && (
+        <div className="pt-2">
+          <label className="font-mono text-[9px] uppercase tracking-widest text-slate mb-3 block">Provenance Lineage Chain</label>
+          <div className="relative pl-4 space-y-4 border-l border-neutral-200 dark:border-neutral-800">
+            {lineage.map((item, index) => (
+              <div key={item.id} className="relative group transition-all duration-200">
+                {/* Visual Dot on Timeline */}
+                <div className="absolute left-[-21px] top-1.5 w-2.5 h-2.5 rounded-full bg-cyan-500 border-2 border-white dark:border-black transition-transform group-hover:scale-125 shadow-sm" />
+                
+                <div className="flex flex-col gap-0.5">
+                  <div className="flex items-center gap-1.5 text-xs">
+                    <span className="font-sans font-bold text-neutral-800 dark:text-neutral-200">{item.author?.display_name || "Unknown Author"}</span>
+                    <span className="text-[10px] font-mono text-neutral-400">@{item.author?.display_name.toLowerCase().replace(/ /g, '')}</span>
+                  </div>
+                  <p className="text-xs font-sans text-neutral-500 line-clamp-2 italic leading-relaxed">
+                    "{item.body}"
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

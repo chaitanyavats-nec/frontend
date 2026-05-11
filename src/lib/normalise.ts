@@ -58,6 +58,7 @@ export function normalisePost(raw: RawPostSelect): PostWithProvenance {
 
   return {
     ...raw,
+    source_type: (raw as any).provenance_type || raw.source_type || "original",
     author: author as any,
     topic_tags,
     media_urls,
@@ -70,7 +71,12 @@ export function normalisePost(raw: RawPostSelect): PostWithProvenance {
     _provenance_verified: raw.provenance_tx_hash ? true : ((raw as LegacyPost).provenance ? true : false),
     _content_permanent: raw.ipfs_cid ? true : false,
     _funding_verified: raw.funding_tx_hash ? true : false,
-    quoted_post: raw.quoted_post ? normalisePost(raw.quoted_post as RawPostSelect) : undefined,
+    quoted_post: (() => {
+      if (!raw.quoted_post) return undefined;
+      const qp = Array.isArray(raw.quoted_post) ? raw.quoted_post[0] : raw.quoted_post;
+      if (!qp) return undefined;
+      return normalisePost(qp as RawPostSelect);
+    })(),
   };
 }
 

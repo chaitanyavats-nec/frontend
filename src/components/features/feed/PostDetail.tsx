@@ -18,6 +18,7 @@ import {
   CheckCircle,
   Quotes,
   Heart,
+  Trash,
 } from "phosphor-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -41,7 +42,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { QuotedPost } from "./QuotedPost";
 import { MediaGrid } from "./MediaGrid";
 import type { PostWithProvenance } from "@/types";
@@ -81,12 +82,14 @@ export function PostDetail({ post }: PostDetailProps) {
   const [replyText, setReplyText] = useState("");
   const [showUpdatePanel, setShowUpdatePanel] = useState(false);
   const [isProfileExpanded, setIsProfileExpanded] = useState(false);
-  const { createPost, isCreating, createError } = usePosts();
+  const { createPost, isCreating, createError, deletePost } = usePosts();
   const { user } = useAuth();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const isQuoteMode = searchParams.get("quote") === "true";
   const { likeCount, userHasLiked, toggleLike } = useInteractions(post.id);
   const { open: openAuthModal } = useAuthModalStore();
+  const isAuthor = user?.id === post.author_id;
 
   const withAuth = (action: () => void) => {
     if (!user) {
@@ -222,6 +225,30 @@ export function PostDetail({ post }: PostDetailProps) {
                 <Flag size={15} />
                 <span>Flag post</span>
               </DropdownMenuItem>
+              {isAuthor && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      setTimeout(async () => {
+                        if (confirm("Are you sure you want to delete this post?")) {
+                          try {
+                            await deletePost(post.id);
+                            router.push("/home");
+                          } catch (err) {
+                            console.error("Failed to delete post:", err);
+                          }
+                        }
+                      }, 100);
+                    }} 
+                    className="gap-2.5 cursor-pointer text-red-600 focus:text-red-600 font-semibold"
+                  >
+                    <Trash size={15} />
+                    <span>Delete post</span>
+                  </DropdownMenuItem>
+                </>
+              )}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

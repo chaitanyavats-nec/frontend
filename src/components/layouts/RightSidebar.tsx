@@ -4,6 +4,7 @@ import { MagnifyingGlass, TrendUp, Newspaper, UserPlus, Sun, Moon } from "phosph
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 const trendingTopics = [
   { topic: "Central Banking", volume: "12.4k posts", category: "Governance" },
@@ -13,9 +14,37 @@ const trendingTopics = [
 ];
 
 const newsItems = [
-  { title: "New Governance Proposal: Tiered Voting Weights", time: "2h ago", source: "Agora Gazette" },
-  { title: "Understanding the Lino-Print Aesthetic in Modern Web", time: "5h ago", source: "Design Weekly" },
-  { title: "Civic Engagement reached record highs this quarter", time: "8h ago", source: "Metrics Daily" },
+  {
+    title: "Modi Launches ₹9,400 Crore Projects in Hyderabad, Urges National Austerity",
+    time: "1 day ago",
+    category: "News",
+    postsCount: "193.3K posts",
+    avatars: [
+      "https://images.unsplash.com/photo-1527980965255-d3b416303d12?auto=format&fit=crop&w=40&q=80",
+      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=40&q=80"
+    ]
+  },
+  {
+    title: "Trump Warns Iran After Peace Proposal Rejection",
+    time: "2 days ago",
+    category: "News",
+    postsCount: "184.5K posts",
+    avatars: [
+      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=40&q=80",
+      "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=40&q=80",
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=40&q=80"
+    ]
+  },
+  {
+    title: "Modi Visits Naidu and Kalyan Homes in Hyderabad",
+    time: "16 hours ago",
+    category: "News",
+    postsCount: "104.3K posts",
+    avatars: [
+      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=40&q=80",
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=40&q=80"
+    ]
+  }
 ];
 
 const recommendFollows = [
@@ -69,21 +98,39 @@ export function RightSidebar() {
           {newsItems.map((news, i) => (
             <button
               key={i}
-              className="group text-left flex flex-col transition-all"
+              className="group text-left flex flex-col transition-all gap-1.5"
             >
-              <div className="text-[10px] font-sans text-neutral-500 dark:text-neutral-500 uppercase tracking-widest mb-1 flex items-center gap-1.5">
-                <span>{news.source.toUpperCase()}</span>
-                <span className="text-[8px] text-neutral-400 dark:text-[#444]">•</span>
-                <span>{news.time.toUpperCase()}</span>
-              </div>
-              <h3 className="text-[13px] leading-snug font-bold text-neutral-900 dark:text-[#EAE9E7] group-hover:text-[#2ec4bb] transition-colors">
+              <h3 className="text-[13px] sm:text-[13.5px] leading-snug font-bold text-neutral-900 dark:text-[#EAE9E7] group-hover:text-[#2ec4bb] transition-colors">
                 {news.title}
               </h3>
+              
+              <div className="flex items-center gap-2 mt-0.5">
+                {/* Overlapping Avatars */}
+                <div className="flex -space-x-1.5 overflow-hidden shrink-0">
+                  {news.avatars.map((url, idx) => (
+                    <img
+                      key={idx}
+                      src={url}
+                      alt="avatar"
+                      className="inline-block h-[18px] w-[18px] rounded-full ring-2 ring-white dark:ring-[#141312] object-cover"
+                    />
+                  ))}
+                </div>
+
+                {/* Metadata */}
+                <div className="text-[11px] font-sans text-neutral-500 dark:text-neutral-500 font-medium truncate">
+                  <span>{news.time}</span>
+                  <span className="mx-1 opacity-40">•</span>
+                  <span>{news.category}</span>
+                  <span className="mx-1 opacity-40">•</span>
+                  <span>{news.postsCount}</span>
+                </div>
+              </div>
             </button>
           ))}
-          <button className="w-full mt-2 py-2.5 text-[12px] font-bold text-cyan-600 dark:text-[#2ec4bb] bg-neutral-50/80 dark:bg-white/[0.05] hover:bg-neutral-100 dark:hover:bg-white/[0.08] rounded-xl transition-colors">
+          <Link href="/explore" className="w-full mt-2 py-2.5 text-center block text-[12px] font-bold text-cyan-600 dark:text-[#2ec4bb] bg-neutral-50/80 dark:bg-white/[0.05] hover:bg-neutral-100 dark:hover:bg-white/[0.08] rounded-xl transition-colors">
             Show more
-          </button>
+          </Link>
         </div>
       </section>
 
@@ -110,9 +157,9 @@ export function RightSidebar() {
               </div>
             </button>
           ))}
-          <button className="w-full mt-2 py-2.5 text-[12px] font-bold text-cyan-600 dark:text-[#2ec4bb] bg-neutral-50/80 dark:bg-white/[0.05] hover:bg-neutral-100 dark:hover:bg-white/[0.08] rounded-xl transition-colors">
+          <Link href="/explore" className="w-full mt-2 py-2.5 text-center block text-[12px] font-bold text-cyan-600 dark:text-[#2ec4bb] bg-neutral-50/80 dark:bg-white/[0.05] hover:bg-neutral-100 dark:hover:bg-white/[0.08] rounded-xl transition-colors">
             Show more
-          </button>
+          </Link>
         </div>
       </section>
 
@@ -142,9 +189,9 @@ export function RightSidebar() {
               </Button>
             </div>
           ))}
-          <button className="w-full mt-2 py-2.5 text-[12px] font-bold text-cyan-600 dark:text-[#2ec4bb] bg-neutral-50/80 dark:bg-white/[0.05] hover:bg-neutral-100 dark:hover:bg-white/[0.08] rounded-xl transition-colors">
+          <Link href="/explore" className="w-full mt-2 py-2.5 text-center block text-[12px] font-bold text-cyan-600 dark:text-[#2ec4bb] bg-neutral-50/80 dark:bg-white/[0.05] hover:bg-neutral-100 dark:hover:bg-white/[0.08] rounded-xl transition-colors">
             Show more
-          </button>
+          </Link>
         </div>
       </section>
 

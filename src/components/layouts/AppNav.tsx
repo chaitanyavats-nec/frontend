@@ -10,7 +10,7 @@ import {
   Fingerprint,
   Gear,
   NotePencil,
-  ChartBar,
+  Scales,
   SignIn,
   MagnifyingGlass,
   CaretDown,
@@ -41,7 +41,7 @@ const desktopNavItems: NavItem[] = [
   { label: "Home", href: "/home", icon: House },
   { label: "Explore", href: "/explore", icon: Compass },
   { label: "Compose", href: "/compose", icon: NotePencil },
-  { label: "Governance", href: "/governance", icon: ChartBar, badge: 1 },
+  { label: "Governance", href: "/governance", icon: Scales, badge: 1 },
   { label: "Settings", href: "/settings/account", icon: Gear },
 ];
 
@@ -49,7 +49,7 @@ const mobileNavItems: NavItem[] = [
   { label: "Home", href: "/home", icon: House },
   { label: "Explore", href: "/explore", icon: Compass },
   { label: "Compose", href: "/compose", icon: NotePencil },
-  { label: "Governance", href: "/civics", icon: ChartBar, badge: 1 },
+  { label: "Governance", href: "/civics", icon: Scales, badge: 1 },
   { label: "Settings", href: "/settings/account", icon: Gear },
 ];
 
@@ -170,7 +170,7 @@ export function AppNav() {
                   "flex items-center w-full h-12 rounded-sm transition-all duration-200 relative group px-2",
                   active
                     ? "bg-neutral-200 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-50"
-                    : "text-neutral-400 dark:text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800/50"
+                    : "text-neutral-400 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-50 hover:bg-neutral-100 dark:hover:bg-neutral-800"
                 )}
                 aria-current={active ? "page" : undefined}
               >
@@ -208,7 +208,7 @@ export function AppNav() {
             href={user ? "/profile/me" : "/welcome"}
             className={cn(
               "flex items-center w-full h-12 rounded-sm transition-all group px-2 relative",
-              (user && pathname === "/profile/me") ? "bg-neutral-200 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-50" : "text-neutral-400 dark:text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800/50"
+              (user && pathname === "/profile/me") ? "bg-neutral-200 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-50" : "text-neutral-400 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-50 hover:bg-neutral-100 dark:hover:bg-neutral-800"
             )}
             aria-label={user ? "Profile" : "Sign In"}
           >

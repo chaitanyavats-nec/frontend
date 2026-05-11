@@ -7,6 +7,8 @@ import { useFeed } from "@/hooks/useFeed";
 import { ProfileHeader } from "@/components/features/profile/ProfileHeader";
 import { FeedCard } from "@/components/features/feed/FeedCard";
 import { Button } from "@/components/ui/button";
+import { FeedControls, HealthFilter, SortOption } from "@/components/features/feed/FeedControls";
+import { useState } from "react";
 
 export default function UserProfilePage() {
   const params = useParams();
@@ -15,6 +17,8 @@ export default function UserProfilePage() {
 
   const { profile, loading: isProfileLoading } = useProfile(did);
   const { posts, loading: isPostsLoading } = useFeed("chronological");
+  const [healthFilter, setHealthFilter] = useState<HealthFilter>("all");
+  const [sortOption, setSortOption] = useState<SortOption>("newest");
 
   if (isProfileLoading) {
     return (
@@ -44,7 +48,30 @@ export default function UserProfilePage() {
   }
 
   // Get posts by this user
-  const userPosts = posts?.filter((p) => p.author.did === profile.did) || [];
+  let userPosts = posts?.filter((p) => p.author.did === profile.did) || [];
+
+  // Apply Health Filtering
+  if (healthFilter === "high") {
+    userPosts = userPosts.filter((p) => (p.trust_score ?? 0) >= 80);
+  } else if (healthFilter === "standard") {
+    userPosts = userPosts.filter((p) => (p.trust_score ?? 0) >= 50);
+  } else if (healthFilter === "unverified") {
+    userPosts = userPosts.filter((p) => (p.trust_score ?? 0) < 50);
+  }
+
+  // Apply Sorting
+  userPosts.sort((a, b) => {
+    if (sortOption === "newest") {
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    } else if (sortOption === "oldest") {
+      return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+    } else if (sortOption === "highest-health") {
+      return (b.trust_score ?? 0) - (a.trust_score ?? 0);
+    } else if (sortOption === "lowest-health") {
+      return (a.trust_score ?? 0) - (b.trust_score ?? 0);
+    }
+    return 0;
+  });
 
   return (
     <div className="max-w-[1100px] mx-auto pb-12 px-4 sm:px-6 lg:px-8">
@@ -54,6 +81,14 @@ export default function UserProfilePage() {
           <ProfileHeader profile={profile} />
 
           <div className="space-y-4">
+            <FeedControls
+              healthFilter={healthFilter}
+              setHealthFilter={setHealthFilter}
+              sortOption={sortOption}
+              setSortOption={setSortOption}
+              postCount={userPosts.length}
+            />
+
             {isPostsLoading ? (
               <div className="space-y-4">
                 {[1, 2].map((i) => (

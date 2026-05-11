@@ -1,18 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useTopics } from "@/hooks/useTopics";
 import { usePosts } from "@/hooks/usePosts";
 import { useAuth } from "@/hooks/useAuth";
+import { usePost } from "@/hooks/usePost";
+import { getUserProfile } from "@/lib/queries/users";
 import { Button } from "@/components/ui/button";
 import { ProvenanceTag } from "@/components/features/provenance/ProvenanceTag";
+import { QuotedPost } from "@/components/features/feed/QuotedPost";
 import { ArrowLeft, Link as LinkIcon, Image as ImageIcon, ChartBar, MapPin, Plus, Trash, X } from "phosphor-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import type { PostWithProvenance } from "@/types";
 
-export default function ComposePage() {
+function ComposeForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const quoteId = searchParams.get("quoteId");
+  const { post: quotedPost, loading: isQuoteLoading } = usePost(quoteId || "");
+  
   const { user } = useAuth();
   const { data: topics } = useTopics();
   const { createPost, isCreating, createError } = usePosts();
@@ -27,6 +35,16 @@ export default function ComposePage() {
   const [activeTab, setActiveTab] = useState<"media" | "poll" | "location" | null>(null);
   const [tempMediaUrl, setTempMediaUrl] = useState("");
 
+  // Fetch the currently logged-in user's full profile including verified affiliations
+  const { data: userProfile } = useQuery({
+    queryKey: ["current-user-profile", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      return getUserProfile(user.id);
+    },
+    enabled: !!user?.id,
+  });
+
   // Construct a preview post object for the provenance tag
   const previewPost: PostWithProvenance = {
     id: "preview",
@@ -34,19 +52,19 @@ export default function ComposePage() {
     source_type: provenanceType,
     author: {
       id: user?.id || "preview",
-      display_name: (user as { user_metadata?: { display_name?: string } } | null)?.user_metadata?.display_name || user?.email?.split("@")[0] || "You",
-      did: (user as { user_metadata?: { did?: string } } | null)?.user_metadata?.did || (user?.id ? `did:agora:${user.id}` : "did:agora:preview"),
-      avatar_url: (user as { user_metadata?: { avatar_url?: string } } | null)?.user_metadata?.avatar_url ?? null,
-      ladder_level: "new",
-      reputation_total: 0,
-      reputation_moderation_accuracy: 0,
-      reputation_content_longevity: 0,
-      reputation_dispute_participation: 0,
-      reputation_account_age_weight: 0,
-      affiliations: [],
-      bio: null,
+      display_name: userProfile?.display_name || (user as { user_metadata?: { display_name?: string } } | null)?.user_metadata?.display_name || user?.email?.split("@")[0] || "You",
+      did: userProfile?.did || (user as { user_metadata?: { did?: string } } | null)?.user_metadata?.did || (user?.id ? `did:agora:${user.id}` : "did:agora:preview"),
+      avatar_url: userProfile?.avatar_url || (user as { user_metadata?: { avatar_url?: string } } | null)?.user_metadata?.avatar_url || null,
+      ladder_level: userProfile?.ladder_level || "new",
+      reputation_total: userProfile?.reputation_total || 0,
+      reputation_moderation_accuracy: userProfile?.reputation_moderation_accuracy || 0,
+      reputation_content_longevity: userProfile?.reputation_content_longevity || 0,
+      reputation_dispute_participation: userProfile?.reputation_dispute_participation || 0,
+      reputation_account_age_weight: userProfile?.reputation_account_age_weight || 0,
+      affiliations: userProfile?.affiliations || [],
+      bio: userProfile?.bio || null,
     },
-    author_affiliations: [],
+    author_affiliations: userProfile?.affiliations || [],
     media_urls: mediaUrls,
     topic_tags: topicId ? [topicId] : [],
     created_at: new Date().toISOString(),
@@ -79,7 +97,8 @@ export default function ComposePage() {
     parent_id: null,
     root_id: null,
     type: 'post' as const,
-    quoted_post_id: null,
+    quoted_post_id: quoteId || null,
+    quoted_post: quotedPost || undefined,
   };
 
   const addMediaUrl = () => {
@@ -122,6 +141,7 @@ export default function ComposePage() {
         mediaUrls: mediaUrls.length > 0 ? mediaUrls : null,
         pollData: pollQuestion ? { question: pollQuestion, options: pollOptions.filter(o => o.trim() !== ""), votes: pollOptions.filter(o => o.trim() !== "").map(() => 0) } : null,
         locationData: locationName ? { name: locationName } : null,
+        quotedPostId: quoteId || undefined,
       });
     } catch (err) {
       console.error(err);
@@ -152,8 +172,19 @@ export default function ComposePage() {
             value={body}
             onChange={(e) => setBody(e.target.value)}
             placeholder="What needs witnessing today? Provide context, evidence, and perspective..."
-            className="w-full bg-transparent border-none focus:ring-0 text-lg font-sans leading-relaxed text-neutral-800 dark:text-neutral-200 placeholder:text-neutral-300 dark:placeholder:text-neutral-700 min-h-[250px] resize-none"
+            className="w-full bg-transparent border-none focus:ring-0 text-lg font-sans leading-relaxed text-neutral-800 dark:text-neutral-200 placeholder:text-neutral-300 dark:placeholder:text-neutral-700 min-h-[150px] resize-none"
           />
+
+          {/* Quoted Post Preview */}
+          {quoteId && (
+            <div className="pointer-events-none opacity-80 border-l-2 border-cyan-500/50 pl-4">
+              {isQuoteLoading ? (
+                <div className="animate-pulse h-24 bg-neutral-100 dark:bg-neutral-800/50 rounded-xl" />
+              ) : quotedPost ? (
+                <QuotedPost post={quotedPost} />
+              ) : null}
+            </div>
+          )}
 
           <div className="flex flex-col gap-4 border-y border-[var(--border-subtle)] py-4">
             {/* Rich Media Action Bar */}
@@ -392,6 +423,13 @@ export default function ComposePage() {
         </div>
       </form>
     </div>
+  );
+}
 
+export default function ComposePage() {
+  return (
+    <Suspense fallback={<div className="max-w-2xl mx-auto py-12 px-6 font-sans min-h-screen bg-paper-page"><div className="animate-pulse h-12 bg-neutral-100 dark:bg-neutral-800 rounded" /></div>}>
+      <ComposeForm />
+    </Suspense>
   );
 }

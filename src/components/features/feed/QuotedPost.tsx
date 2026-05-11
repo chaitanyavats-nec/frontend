@@ -2,10 +2,9 @@
 
 import { PostWithAuthor } from "@/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils";
-import Link from "next/link";
+import { DotsThree, MapPin } from "phosphor-react";
 import { MediaGrid } from "./MediaGrid";
-import { MapPin } from "phosphor-react";
+import { cn } from "@/lib/utils";
 
 interface QuotedPostProps {
   post: PostWithAuthor;
@@ -33,52 +32,72 @@ export function QuotedPost({ post }: QuotedPostProps) {
 
   if (!post || !post.id) return null;
 
+  const type = (post.source_type || "original").toUpperCase();
+
   return (
-    <div className="mt-2 mb-1 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-paper-sunken/30 overflow-hidden hover:bg-paper-sunken/50 transition-colors">
-      <div className="p-3">
-        <div className="flex items-center gap-2 mb-1.5">
-          <Avatar className="h-4 w-4 border border-surface shadow-sm">
-            {post.author?.avatar_url && (
-              <AvatarImage src={post.author.avatar_url} alt={post.author.display_name} />
-            )}
-            <AvatarFallback className="text-[8px] font-bold">
-              {getInitials(post.author?.display_name || "??")}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex items-center gap-1.5 min-w-0">
-            <span className="font-sans font-bold text-[12px] text-neutral-900 dark:text-neutral-50 truncate">
-              {post.author?.display_name || "Unknown Author"}
-            </span>
-            <span className="text-neutral-300 dark:text-neutral-700">·</span>
-            <span className="font-mono text-[9px] text-neutral-400 truncate max-w-[80px]">
-              {post.author?.did || 'did:agora:unknown'}
-            </span>
-            <span className="text-neutral-300 dark:text-neutral-700">·</span>
-            <time className="text-[9px] font-mono text-neutral-400">
-              {getRelativeTime(post.created_at)}
-            </time>
+    <div className="mt-3 mb-1 rounded-[14px] border border-neutral-200 dark:border-neutral-600 bg-transparent overflow-hidden hover:bg-neutral-50/50 dark:hover:bg-neutral-900/20 transition-colors cursor-pointer">
+      <div className="p-4 flex flex-col gap-3">
+        {/* Header */}
+        <div className="flex items-start justify-between">
+          <div className="flex items-start gap-3">
+            <Avatar className="h-10 w-10 border border-neutral-100 dark:border-neutral-800 shadow-sm rounded-full overflow-hidden shrink-0">
+              {post.author?.avatar_url && (
+                <AvatarImage src={post.author.avatar_url} alt={post.author.display_name} className="object-cover w-full h-full" />
+              )}
+              <AvatarFallback className="text-[10px] font-bold">
+                {getInitials(post.author?.display_name || "??")}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col">
+              <div className="flex items-center gap-2">
+                <span className="font-sans font-bold text-[15px] text-neutral-900 dark:text-neutral-100">
+                  {post.author?.display_name || "Unknown Author"}
+                </span>
+                <span className="text-[13px] text-neutral-400 dark:text-neutral-500">
+                  {getRelativeTime(post.created_at)}
+                </span>
+              </div>
+              {/* Health Score Indicator Blocks */}
+              <div className="flex items-center gap-[3px] mt-0.5">
+                <div className="w-2.5 h-2.5 rounded-[2px] bg-danger" />
+                <div className="w-2.5 h-2.5 rounded-[2px] bg-danger" />
+                <div className="w-2.5 h-2.5 rounded-[2px] bg-success" />
+                <div className="w-2.5 h-2.5 rounded-[2px] bg-success" />
+                <div className="w-2.5 h-2.5 rounded-[2px] bg-danger" />
+              </div>
+            </div>
           </div>
+          <button className="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300">
+            <DotsThree size={20} weight="bold" />
+          </button>
         </div>
-        <div className="text-[12px] text-neutral-800 dark:text-neutral-200 line-clamp-3 font-sans leading-normal">
+
+        {/* Content */}
+        <div className="text-[15px] text-neutral-800 dark:text-[#EAE9E7] line-clamp-4 font-sans leading-snug break-words">
           {post.body}
         </div>
 
-        {/* ── Location Badge ── */}
-        {post.location_data?.name && (
-          <div className="flex items-center gap-1 mt-1.5">
-            <div className="flex items-center gap-1 px-1 py-0.5 bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-100 dark:border-cyan-800 rounded-sm text-cyan-600 dark:text-cyan-400">
-              <MapPin size={8} weight="fill" />
-              <span className="text-[8px] font-mono font-bold uppercase tracking-wider">{post.location_data.name}</span>
-            </div>
-          </div>
-        )}
-
-        {/* ── Media ── */}
+        {/* Media */}
         {post.media_urls && post.media_urls.length > 0 && (
-          <div className="mt-2">
+          <div className="mt-1">
             <MediaGrid urls={post.media_urls} compact={true} />
           </div>
         )}
+
+        {/* Provenance Tag Capsule */}
+        <div>
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-neutral-900 dark:bg-[#282828] rounded-full text-[10px] font-sans font-bold text-neutral-300 dark:text-[#A8A7A5] uppercase tracking-widest shadow-sm">
+            <div className="w-1.5 h-1.5 rounded-full bg-neutral-500 dark:bg-[#777674]" />
+            {type}
+          </div>
+        </div>
+
+        {/* Stats Footer */}
+        <div className="flex items-center gap-4 text-[11px] font-sans text-neutral-400 dark:text-neutral-500/80 mt-1">
+          <span>{post.reply_count || 10} Likes</span>
+          <span>330 Comments</span>
+          <span>45 references</span>
+        </div>
       </div>
     </div>
   );

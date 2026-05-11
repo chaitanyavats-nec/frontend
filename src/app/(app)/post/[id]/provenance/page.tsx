@@ -17,7 +17,8 @@ import {
   Warning,
   Link as LinkIcon,
   TreeStructure,
-  CheckCircle
+  CheckCircle,
+  ArrowRight
 } from "phosphor-react";
 
 export default function ProvenancePage() {
@@ -187,13 +188,78 @@ function FundedChain({ post }: { post: any }) {
 }
 
 function AmplifiedChain({ post }: { post: any }) {
+  const getFullLineage = (p: any): any[] => {
+    const chain = [];
+    let current = p;
+    while (current) {
+      chain.unshift(current); // unshift to make it chronological (oldest first)
+      current = current.quoted_post;
+    }
+    return chain;
+  };
+
+  const lineage = getFullLineage(post);
+
   return (
-    <div className="space-y-8">
-       <SectionTitle title="Amplification Tree" />
-       <div className="p-12 text-center border-2 border-dashed border-slate-200 rounded-xl">
-          <ShareNetwork size={48} className="mx-auto text-slate-300 mb-4" />
-          <p className="text-slate italic">Visualisation of the amplification network is being generated...</p>
-          <p className="text-[10px] font-mono uppercase text-slate-400 mt-2">Detected 1,202 accounts in coordination window</p>
+    <div className="space-y-6">
+       <SectionTitle title="Amplification & Quote Timeline" />
+       
+       <div className="relative pl-8 border-l-2 border-cyan-500/20 py-2 space-y-10">
+          {lineage.map((item, index) => {
+             const isCurrent = item.id === post.id;
+             const dateStr = new Date(item.created_at).toLocaleDateString("en-GB", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+             });
+
+             return (
+                <div key={item.id} className="relative group transition-all duration-300">
+                   {/* Circle Connector Node */}
+                   <div className={cn(
+                      "absolute left-[-41px] top-4 w-5 h-5 rounded-full border-4 border-white dark:border-black transition-transform duration-300 group-hover:scale-110 shadow-sm flex items-center justify-center",
+                      isCurrent ? "bg-cyan-600" : "bg-neutral-300 dark:bg-neutral-700"
+                   )} />
+
+                   <div className={cn(
+                      "p-5 rounded-lg border shadow-sm transition-all duration-300",
+                      isCurrent 
+                         ? "bg-cyan-50/50 dark:bg-cyan-950/20 border-cyan-200 dark:border-cyan-800 ring-1 ring-cyan-100 dark:ring-cyan-900/30" 
+                         : "bg-paper-raised border-neutral-100 dark:border-neutral-800 hover:border-neutral-200 dark:hover:border-neutral-700"
+                   )}>
+                      <div className="flex flex-wrap justify-between items-center mb-3 gap-2">
+                         <div className="flex items-center gap-2">
+                            <span className="font-sans font-bold text-[15px] text-neutral-800 dark:text-neutral-100">
+                               {item.author?.display_name || "Unknown Author"}
+                            </span>
+                            <span className="text-[10px] font-mono text-neutral-400">
+                               @{item.author?.display_name?.toLowerCase().replace(/ /g, '')}
+                            </span>
+                            {isCurrent && (
+                               <span className="px-1.5 py-0.5 rounded bg-cyan-600 text-white font-mono text-[8px] font-bold uppercase tracking-widest">
+                                  Current
+                               </span>
+                            )}
+                         </div>
+                         <time className="text-[10px] font-mono text-neutral-400">{dateStr}</time>
+                      </div>
+
+                      <p className="text-sm font-sans text-neutral-700 dark:text-neutral-300 leading-relaxed whitespace-pre-wrap">
+                         {item.body}
+                      </p>
+
+                      {index < lineage.length - 1 && (
+                         <div className="mt-3 pt-3 border-t border-neutral-100 dark:border-neutral-800 flex items-center gap-1 text-[10px] font-mono font-bold uppercase tracking-wider text-cyan-600 dark:text-cyan-400">
+                            <span>Quoted by next step</span>
+                            <ArrowRight size={12} weight="bold" />
+                         </div>
+                      )}
+                   </div>
+                </div>
+             );
+          })}
        </div>
     </div>
   );

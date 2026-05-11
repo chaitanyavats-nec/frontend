@@ -24,7 +24,7 @@ const POST_ENRICHED_SELECT = `
     *,
     user:profiles(*)
   ),
-  quoted_post:posts!quoted_post_id(
+  quoted_post:quoted_post_id(
     *,
     author:profiles(
       *,
@@ -68,11 +68,52 @@ export async function getFeedPosts(options: {
   });
 }
 
+const POST_FULL_VIEW_SELECT = `
+  *,
+  author:profiles(
+    *,
+    affiliations(*)
+  ),
+  citations(*),
+  provenance_updates(
+    *,
+    user:profiles(*)
+  ),
+  quoted_post:quoted_post_id(
+    *,
+    author:profiles(
+      *,
+      affiliations(*)
+    ),
+    quoted_post:quoted_post_id(
+      *,
+      author:profiles(
+        *,
+        affiliations(*)
+      ),
+      quoted_post:quoted_post_id(
+        *,
+        author:profiles(
+          *,
+          affiliations(*)
+        ),
+        quoted_post:quoted_post_id(
+          *,
+          author:profiles(
+            *,
+            affiliations(*)
+          )
+        )
+      )
+    )
+  )
+`;
+
 export async function getPostById(id: string): Promise<PostWithProvenance | null> {
   const { data, error } = await supabase
     .from("posts")
     .select(`
-      ${POST_ENRICHED_SELECT},
+      ${POST_FULL_VIEW_SELECT},
       moderation_flags(*)
     `)
     .eq("id", id)
