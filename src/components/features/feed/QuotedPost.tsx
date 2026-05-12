@@ -2,7 +2,7 @@
 
 import { PostWithAuthor } from "@/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { DotsThree, MapPin } from "phosphor-react";
+import { DotsThree, MapPin, ShieldCheck, Warning } from "phosphor-react";
 import { MediaGrid } from "./MediaGrid";
 import { cn } from "@/lib/utils";
 
@@ -35,7 +35,11 @@ export function QuotedPost({ post }: QuotedPostProps) {
   const type = (post.source_type || "original").toUpperCase();
 
   return (
-    <div className="mt-3 mb-1 rounded-[14px] border border-neutral-200 dark:border-neutral-600 bg-transparent overflow-hidden hover:bg-neutral-50/50 dark:hover:bg-neutral-900/20 transition-colors cursor-pointer">
+    <div className={cn(
+      "mt-3 mb-1 rounded-[14px] border border-neutral-200 dark:border-neutral-600 bg-transparent overflow-hidden hover:bg-neutral-50/50 dark:hover:bg-neutral-900/20 transition-colors cursor-pointer",
+      post.coordination_survived && "border-l-4 border-emerald-500/50 bg-emerald-50/[0.005] dark:bg-emerald-950/[0.005]",
+      post.coordination_flagged && "border-l-4 border-red-500/50 bg-red-50/[0.005] dark:bg-red-950/[0.005]"
+    )}>
       <div className="p-4 flex flex-col gap-3">
         {/* Header */}
         <div className="flex items-start justify-between">
@@ -49,13 +53,33 @@ export function QuotedPost({ post }: QuotedPostProps) {
               </AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="font-sans font-bold text-[15px] text-neutral-900 dark:text-neutral-100">
                   {post.author?.display_name || "Unknown Author"}
                 </span>
                 <span className="text-[13px] text-neutral-400 dark:text-neutral-500">
                   {getRelativeTime(post.created_at)}
                 </span>
+
+                {post.coordination_survived && (
+                  <div 
+                    title="Protected from Coordinated Attacks"
+                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[8px] font-bold font-sans uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shrink-0"
+                  >
+                    <ShieldCheck size={10} weight="fill" className="text-emerald-500 shrink-0 animate-pulse" />
+                    <span>Protected</span>
+                  </div>
+                )}
+
+                {post.coordination_flagged && (
+                  <div 
+                    title="Coordinated Disinformation Campaign"
+                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[8px] font-bold font-sans uppercase tracking-wider bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 shrink-0"
+                  >
+                    <Warning size={10} weight="fill" className="text-red-500 shrink-0" />
+                    <span>Disinfo</span>
+                  </div>
+                )}
               </div>
               {/* Health Score Indicator Blocks */}
               <div className="flex items-center gap-[3px] mt-0.5">

@@ -288,6 +288,17 @@ export async function runSeed() {
         media: ["https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&q=80&w=800"],
         body: "Amplifying the decentralized identity protocol specification: A DID still tells everyone you interacted with a system. The privacy guarantee comes from zero-knowledge credentials. Architecture matters more than ownership.",
         hoursAgo: 72
+      },
+      {
+        key: "disinfo_campaign_1",
+        authorName: "homelander",
+        topicSlug: "politics-governance",
+        provenance: "derived",
+        body: "🚨 ALERT: Coordinated leak networks and their radical environmental puppet agencies are falsifying reforestation and land audit telemetry. Our official Vought satellite feed proves forest density is up 12% across Brazil. Do not buy into the fake outrage of unregistered activists trying to destabilize local agriculture! 🇺🇸 #VoughtProtects #AmazonGrowing",
+        coordination_flagged: true,
+        coordination_confidence: 0.96,
+        coordination_survived: false,
+        hoursAgo: 4
       }
     ];
 
@@ -309,7 +320,10 @@ export async function runSeed() {
           media_urls: (p as any).media || null,
           created_at: createdAt,
           type: "post",
-          is_published: true
+          is_published: true,
+          coordination_flagged: (p as any).coordination_flagged || false,
+          coordination_confidence: (p as any).coordination_confidence || null,
+          coordination_survived: (p as any).coordination_survived || false
         }).select("id").single();
 
         if (error) throw error;
@@ -345,6 +359,17 @@ export async function runSeed() {
         body: "Coordination flagged? Safe on-chain? Talk is cheap, mate. Where's the transaction hash of your so-called audit report? Clear the ledger.",
         quotedKey: "homelander_quote",
         hoursAgo: 6
+      },
+      {
+        key: "protected_expose_1",
+        authorName: "Mateus Carvalho",
+        topicSlug: "politics-governance",
+        provenance: "original",
+        body: "This is a textbook coordinated disinformation campaign designed to suppress independent land rights reporting. This post is currently protected under Agora's anti-coordination shield—telemetry and on-chain logs show zero-knowledge signatures from verified, independent satellite networks.",
+        quotedKey: "disinfo_campaign_1",
+        coordination_flagged: false,
+        coordination_survived: true,
+        hoursAgo: 3
       }
     ];
 
@@ -367,7 +392,10 @@ export async function runSeed() {
           created_at: createdAt,
           quoted_post_id: quotedId,
           type: "post",
-          is_published: true
+          is_published: true,
+          coordination_flagged: (p as any).coordination_flagged || false,
+          coordination_confidence: (p as any).coordination_confidence || null,
+          coordination_survived: (p as any).coordination_survived || false
         }).select("id").single();
 
         if (error) throw error;
@@ -526,6 +554,22 @@ export async function runSeed() {
         rootKey: "butcher_quote",
         hoursAgo: 4,
         parentIsPreviousComment: true
+      },
+      // 9. Replies to Disinformation Campaign (disinfo_campaign_1)
+      {
+        authorName: "Billy Butcher",
+        body: "Bloody hell, more Vought propaganda. The satellites don't lie, Homelander, but you certainly do.",
+        parentKey: "disinfo_campaign_1",
+        rootKey: "disinfo_campaign_1",
+        hoursAgo: 3.5
+      },
+      // 10. Replies to Protected Post (protected_expose_1)
+      {
+        authorName: "Kenji Watanabe",
+        body: "We verified the Zero-Knowledge proofs for this satellite feed. The data integrity is 100% solid. Safe from deletion or coordination attacks.",
+        parentKey: "protected_expose_1",
+        rootKey: "protected_expose_1",
+        hoursAgo: 2.5
       }
     ];
 

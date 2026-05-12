@@ -26,6 +26,7 @@ import {
   Fingerprint,
   IdentificationCard,
   Info,
+  Warning,
 } from 'phosphor-react';
 import { QuotedPost } from './QuotedPost';
 import { MediaGrid } from './MediaGrid';
@@ -193,7 +194,9 @@ export function FeedCard({ post, isReply = false }: FeedCardProps) {
         'group transition-colors duration-150 cursor-pointer relative',
         isReply
           ? 'border-l-2 border-cyan-500/20 pl-3 py-3 pr-4 hover:bg-cyan-500/5'
-          : 'border-b border-neutral-100/50 dark:border-white/[0.02] last:border-0 hover:bg-neutral-50/80 dark:hover:bg-white/[0.02]'
+          : 'border-b border-neutral-100/50 dark:border-white/[0.02] last:border-0 hover:bg-neutral-50/80 dark:hover:bg-white/[0.02]',
+        post.coordination_survived && !isReply && 'border-l-4 border-emerald-500/50 pl-2 bg-emerald-50/[0.01] dark:bg-emerald-950/[0.01]',
+        post.coordination_flagged && !isReply && 'border-l-4 border-red-500/50 pl-2 bg-red-50/[0.01] dark:bg-red-950/[0.01]'
       )}
     >
       <div className={cn("flex flex-col", isReply ? "gap-2" : "gap-3 sm:gap-4 pt-3 pb-6 px-3 sm:px-4")}>
@@ -218,7 +221,7 @@ export function FeedCard({ post, isReply = false }: FeedCardProps) {
             </div>
 
             <div className="flex flex-col min-w-0 flex-1 justify-center">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <Link
                   href={`/profile/${post.author.did}`}
                   onClick={e => e.stopPropagation()}
@@ -229,6 +232,28 @@ export function FeedCard({ post, isReply = false }: FeedCardProps) {
                 <time className="text-[12px] font-sans text-neutral-400 dark:text-neutral-500 shrink-0">
                   {getRelativeTime(post.created_at)}
                 </time>
+
+                {post.coordination_survived && (
+                  <div 
+                    title="Protected from Coordinated Attacks: This post has survived systematic reporting or coordinated reputational attack networks."
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold font-sans uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shadow-xs hover:scale-105 transition-all duration-200 shrink-0"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <ShieldCheck size={12} weight="fill" className="text-emerald-500 shrink-0 animate-pulse" />
+                    <span>Protected</span>
+                  </div>
+                )}
+
+                {post.coordination_flagged && (
+                  <div 
+                    title="Coordinated Disinformation Campaign: This content is flagged as a coordinated reputation manipulation and attack campaign."
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold font-sans uppercase tracking-wider bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 shadow-xs hover:scale-105 transition-all duration-200 shrink-0"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Warning size={12} weight="fill" className="text-red-500 shrink-0" />
+                    <span>Disinfo Campaign</span>
+                  </div>
+                )}
               </div>
               {/* Semantic Metric Bars */}
               <div className="flex items-center gap-[4px] mt-1" onClick={(e) => e.stopPropagation()}>
